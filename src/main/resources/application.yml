@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    url: ${CP_OF_ICRITIC_DB_URL:jdbc:postgresql://localhost:5432/copyOfIcritic}
+    username: ${CP_OF_ICRITIC_DB_USERNAME:postgres}
+    password: ${CP_OF_ICRITIC_DB_PASSWORD:postgres}
+  jpa:
+    database: POSTGRESQL
+    show-sql: true
+    properties:
+      javax:
+        persistence:
+          schema-generation:
+            scripts:
+              action: create
+              create-target: 'sql/create.sql'
+              create-source: metadata
+  error:
+    include-stacktrace: never
+server:
+  error:
+    include-stacktrace: never
