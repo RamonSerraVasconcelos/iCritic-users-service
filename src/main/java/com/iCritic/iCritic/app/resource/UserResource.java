@@ -1,10 +1,12 @@
 package com.iCritic.iCritic.app.resource;
 
-import com.iCritic.iCritic.core.user.User;
+import com.iCritic.iCritic.core.enums.BanActionEnum;
+import com.iCritic.iCritic.core.user.dto.UserBanDto;
 import com.iCritic.iCritic.core.user.dto.UserRequestDto;
 import com.iCritic.iCritic.core.user.dto.UserResponseDto;
 import com.iCritic.iCritic.core.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,5 +31,26 @@ public class UserResource {
     @PutMapping("/{id}")
     public UserResponseDto update(@PathVariable Long id, @RequestBody UserRequestDto userRequestDto) {
         return userService.update(id, userRequestDto);
+    }
+
+    @PatchMapping("/{id}/role")
+    public ResponseEntity<Void> changeRole(@PathVariable Long id, @RequestBody UserRequestDto userDto) {
+        userService.changeRole(id, userDto.getRole());
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{id}/ban")
+    public ResponseEntity<Void> ban(@PathVariable Long id, @RequestBody UserBanDto banDto) {
+        userService.changeStatus(id, banDto, BanActionEnum.BAN);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{id}/unban")
+    public ResponseEntity<Void> unban(@PathVariable Long id, @RequestBody UserBanDto banDto) {
+        userService.changeStatus(id, banDto, BanActionEnum.UNBAN);
+
+        return ResponseEntity.ok().build();
     }
 }

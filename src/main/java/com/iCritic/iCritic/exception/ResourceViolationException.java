@@ -17,6 +17,10 @@ public class ResourceViolationException extends RuntimeException {
         super(violation.getMessage());
     }
 
+    public ResourceViolationException(String message) {
+        super(message);
+    }
+
     private static String toString(Set<? extends ConstraintViolation<?>> constraintViolations) {
         return (String)constraintViolations.stream().map((cv) -> {
             return cv == null ? "null" : cv.getPropertyPath() + ": " + cv.getMessage();

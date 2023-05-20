@@ -2,7 +2,10 @@ package com.iCritic.iCritic.core.user.service;
 
 import com.iCritic.iCritic.core.country.Country;
 import com.iCritic.iCritic.core.country.repository.CountryRepository;
+import com.iCritic.iCritic.core.enums.BanActionEnum;
+import com.iCritic.iCritic.core.enums.Role;
 import com.iCritic.iCritic.core.user.User;
+import com.iCritic.iCritic.core.user.dto.UserBanDto;
 import com.iCritic.iCritic.core.user.dto.UserRequestDto;
 import com.iCritic.iCritic.core.user.dto.UserResponseDto;
 import com.iCritic.iCritic.core.user.mapper.UserMapper;
@@ -10,6 +13,7 @@ import com.iCritic.iCritic.core.user.repository.UserRepository;
 import com.iCritic.iCritic.exception.ResourceConflictException;
 import com.iCritic.iCritic.exception.ResourceNotFoundException;
 import com.iCritic.iCritic.exception.ResourceViolationException;
+import com.iCritic.iCritic.infrastructure.database.UpdateUserBanListRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -35,6 +39,9 @@ public class UserService {
 
     @Autowired
     private Validator validator;
+
+    @Autowired
+    private UpdateUserBanListRepository updateUserBanlistRepository;
 
     public UserResponseDto save(@Valid UserRequestDto userRequestDto) {
         Set<ConstraintViolation<UserRequestDto>> violations = validator.validate(userRequestDto);
@@ -82,7 +89,7 @@ public class UserService {
                 .password(user.getPassword())
                 .description(userRequestDto.getDescription())
                 .country(country)
-                .active(user.getActive())
+                .active(user.isActive())
                 .role(user.getRole())
                 .createdAt(user.getCreatedAt())
                 .build();
@@ -100,5 +107,37 @@ public class UserService {
         User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         return UserMapper.INSTANCE.userToUserResponseDto(user);
+    }
+
+    public void changeRole(Long id, String role) {
+        if(id == null) {
+            throw new ResourceViolationException("Invalid id");
+        }
+
+        userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        try {
+            userRepository.updateRole(id, Role.valueOf(role));
+        } catch (IllegalArgumentException ex) {
+            throw new ResourceViolationException("Invalid role");
+        }
+    }
+
+    public void changeStatus(Long id, UserBanDto banDto, BanActionEnum action) {
+        if(id == null) {
+            throw new ResourceViolationException("Invalid id");
+        }
+
+        userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        Set<ConstraintViolation<UserBanDto>> violations = validator.validate(banDto);
+        if (!violations.isEmpty()) {
+            throw new ResourceViolationException(violations);
+        }
+
+        boolean updateAction = action != BanActionEnum.BAN;
+
+        userRepository.updateStatus(id, updateAction);
+        updateUserBanlistRepository.updateBanList(id, banDto.getMotive(), action);
     }
 }

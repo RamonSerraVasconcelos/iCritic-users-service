@@ -38,7 +38,7 @@ public class User {
 
     private String description;
 
-    private Boolean active = true;
+    private boolean active = true;
 
     @Enumerated(EnumType.STRING)
     private Role role = Role.DEFAULT;
