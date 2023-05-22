@@ -6,6 +6,7 @@ import com.iCritic.iCritic.core.enums.BanActionEnum;
 import com.iCritic.iCritic.core.enums.Role;
 import com.iCritic.iCritic.core.user.User;
 import com.iCritic.iCritic.core.user.dto.UserBanDto;
+import com.iCritic.iCritic.core.user.dto.UserLoginDto;
 import com.iCritic.iCritic.core.user.dto.UserRequestDto;
 import com.iCritic.iCritic.core.user.dto.UserResponseDto;
 import com.iCritic.iCritic.core.user.mapper.UserMapper;
@@ -24,6 +25,8 @@ import javax.validation.Validator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static java.util.Objects.nonNull;
 
 @Component
 public class UserService {
@@ -139,5 +142,25 @@ public class UserService {
 
         userRepository.updateStatus(id, updateAction);
         updateUserBanlistRepository.updateBanList(id, banDto.getMotive(), action);
+    }
+
+    public UserLoginDto login(UserRequestDto userRequestDto) {
+        User user = userRepository.findByEmail(userRequestDto.getEmail());
+
+        if(!nonNull(user)) {
+            throw new ResourceNotFoundException("Invalid email or password");
+        }
+
+        boolean isPasswordValid = bcrypt.matches(userRequestDto.getPassword(), user.getPassword());
+
+        if(!isPasswordValid) {
+            throw new ResourceViolationException("Invalid email or password");
+        }
+
+        UserLoginDto userLoginDto = UserLoginDto.builder()
+                .accessToken("")
+                .build();
+
+        return userLoginDto;
     }
 }

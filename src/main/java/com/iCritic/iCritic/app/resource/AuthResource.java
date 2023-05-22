@@ -1,5 +1,6 @@
 package com.iCritic.iCritic.app.resource;
 
+import com.iCritic.iCritic.core.user.dto.UserLoginDto;
 import com.iCritic.iCritic.core.user.dto.UserRequestDto;
 import com.iCritic.iCritic.core.user.dto.UserResponseDto;
 import com.iCritic.iCritic.core.user.service.UserService;
@@ -17,5 +18,11 @@ public class AuthResource {
     @PostMapping(path = "/register")
     public UserResponseDto registerUser(@RequestBody UserRequestDto userRequestDto) {
         return userService.save(userRequestDto);
+    }
+
+    @PostMapping(path = "/login")
+    public UserLoginDto loginUser(@RequestBody UserRequestDto userRequestDto) {
+
+        return userService.login(userRequestDto);
     }
 }

@@ -20,4 +20,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Transactional
     @Query("UPDATE User set active = :active WHERE id = :id")
     void updateStatus(@Param("id") Long id, @Param("active") boolean active);
+
+    User findByEmail(String email);
 }
