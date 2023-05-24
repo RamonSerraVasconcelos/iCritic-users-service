@@ -15,6 +15,7 @@ import com.iCritic.iCritic.exception.ResourceConflictException;
 import com.iCritic.iCritic.exception.ResourceNotFoundException;
 import com.iCritic.iCritic.exception.ResourceViolationException;
 import com.iCritic.iCritic.infrastructure.database.UpdateUserBanListRepository;
+import com.iCritic.iCritic.infrastructure.security.JwtGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -45,6 +46,9 @@ public class UserService {
 
     @Autowired
     private UpdateUserBanListRepository updateUserBanlistRepository;
+
+    @Autowired
+    private JwtGenerator jwtGenerator;
 
     public UserResponseDto save(@Valid UserRequestDto userRequestDto) {
         Set<ConstraintViolation<UserRequestDto>> violations = validator.validate(userRequestDto);
@@ -157,10 +161,10 @@ public class UserService {
             throw new ResourceViolationException("Invalid email or password");
         }
 
-        UserLoginDto userLoginDto = UserLoginDto.builder()
-                .accessToken("")
-                .build();
+        String accessToken = jwtGenerator.generateToken(user);
 
-        return userLoginDto;
+        return UserLoginDto.builder()
+                .accessToken(accessToken)
+                .build();
     }
 }
