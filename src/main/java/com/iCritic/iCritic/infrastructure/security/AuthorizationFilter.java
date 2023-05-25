@@ -15,7 +15,7 @@ import static java.util.Objects.nonNull;
 
 @Component
 @AllArgsConstructor
-public class JwtFilter extends OncePerRequestFilter {
+public class AuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtGenerator jwtGenerator;
 
@@ -37,6 +37,9 @@ public class JwtFilter extends OncePerRequestFilter {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
+
+        request.setAttribute("userId", jwtGenerator.getUserIdFromToken(token));
+        request.setAttribute("role", jwtGenerator.getUserRoleFromToken(token));
 
         filterChain.doFilter(request, response);
     }

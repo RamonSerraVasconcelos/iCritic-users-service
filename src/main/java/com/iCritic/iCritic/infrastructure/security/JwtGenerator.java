@@ -22,7 +22,8 @@ public class JwtGenerator {
 
     public String generateToken(User user) {
         return Jwts.builder()
-                .setSubject(user.getId().toString())
+                .setId(user.getId().toString())
+                .setSubject(user.getRole().toString())
                 .setIssuedAt(new Date())
                 .setExpiration(new java.util.Date(System.currentTimeMillis() + expiration))
                 .signWith(SignatureAlgorithm.HS512, secret)
@@ -47,5 +48,13 @@ public class JwtGenerator {
         }
 
         return false;
+    }
+
+    public String getUserIdFromToken(String token) {
+        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody().getId();
+    }
+
+    public String getUserRoleFromToken(String token) {
+        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody().getSubject();
     }
 }

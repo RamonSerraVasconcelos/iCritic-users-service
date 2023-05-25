@@ -24,6 +24,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
 import javax.validation.Validator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -75,7 +76,11 @@ public class UserService {
         return UserMapper.INSTANCE.userToUserResponseDto(createdUser);
     }
 
-    public UserResponseDto update(Long id, @Valid UserRequestDto userRequestDto) {
+    public UserResponseDto update(String userTokenId, Long id, @Valid UserRequestDto userRequestDto) {
+        if(!Objects.equals(userTokenId, id.toString())) {
+            throw new ResourceConflictException("User id does not match");
+        }
+
         User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         Set<ConstraintViolation<UserRequestDto>> violations = validator.validate(userRequestDto);
