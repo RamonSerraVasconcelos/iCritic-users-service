@@ -19,7 +19,7 @@ public class UserResponseDto {
     private String name;
     private String email;
     private String description;
-    private Boolean active;
+    private boolean active;
     private Role role;
     private CountryResponseDto country;
     private LocalDateTime createdAt;
