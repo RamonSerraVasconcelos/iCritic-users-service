@@ -47,7 +47,7 @@ public class UserResource {
         return UserMapper.INSTANCE.userToUserResponseDto(findUserByIdUseCase.execute(id));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/edit")
     public UserResponseDto update(HttpServletRequest request, @RequestBody UserRequestDto userRequestDto) {
         Set<ConstraintViolation<UserRequestDto>> violations = validator.validate(userRequestDto);
         if (!violations.isEmpty()) {

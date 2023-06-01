@@ -1,5 +1,6 @@
 package com.iCritic.iCritic.core.usecase;
 
+import com.iCritic.iCritic.core.enums.Role;
 import com.iCritic.iCritic.core.model.Country;
 import com.iCritic.iCritic.core.model.User;
 import com.iCritic.iCritic.core.usecase.boundary.CreateUserBoundary;
@@ -42,6 +43,9 @@ public class CreateUserUseCase {
 
         String encodedPassword = bcrypt.encode(user.getPassword());
         user.setPassword(encodedPassword);
+
+        user.setActive(true);
+        user.setRole(Role.DEFAULT);
 
         return createUserBoundary.execute(user);
     }

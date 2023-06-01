@@ -38,6 +38,6 @@ public class UpdateUserUseCase {
                 .createdAt(userToBeUpdated.getCreatedAt())
                 .build();
 
-        return updateUserBoundary.execute(user);
+        return updateUserBoundary.execute(userToUpdate);
     }
 }
