@@ -1,7 +1,7 @@
 package com.iCritic.iCritic.config;
 
-import com.iCritic.iCritic.infrastructure.security.AuthorizationFilter;
-import com.iCritic.iCritic.infrastructure.security.JwtGenerator;
+import com.iCritic.iCritic.entrypoint.validation.AuthorizationFilter;
+import com.iCritic.iCritic.entrypoint.validation.JwtGenerator;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
