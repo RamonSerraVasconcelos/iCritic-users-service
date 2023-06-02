@@ -35,12 +35,11 @@ class CreateUserUseCaseTest {
     @Mock
     private BCryptPasswordEncoder bcrypt;
 
-    private final String encodedPassword = "A1B2C3D4";
-
     @Test
     void givenValidEmailAndPassword_thenCreateAndReturnUser() {
         User user = UserFixture.load();
         String initialPassword = user.getPassword();
+        String encodedPassword = "2d6h2d0shf@837fs92#123";
 
         when(findUserByEmailBoundary.execute(user.getEmail())).thenReturn(null);
         when(findCountryByIdBoundary.execute(user.getCountryId())).thenReturn(user.getCountry());
