@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
     boolean existsByEmail(String email);
 
@@ -22,4 +24,5 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     void updateStatus(@Param("id") Long id, @Param("active") boolean active);
 
     UserEntity findByEmail(String email);
+    List<UserEntity> findAllByOrderByIdAsc();
 }

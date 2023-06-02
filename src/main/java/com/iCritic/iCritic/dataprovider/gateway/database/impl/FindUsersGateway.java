@@ -19,6 +19,6 @@ public class FindUsersGateway implements FindUsersBoundary {
     private final UserRepository userRepository;
 
     public List<User> execute() {
-        return userRepository.findAll().stream().map(UserEntityMapper.INSTANCE::userEntityToUser).collect(Collectors.toList());
+        return userRepository.findAllByOrderByIdAsc().stream().map(UserEntityMapper.INSTANCE::userEntityToUser).collect(Collectors.toList());
     }
 }
