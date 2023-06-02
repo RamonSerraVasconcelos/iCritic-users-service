@@ -24,7 +24,7 @@ class FindUserByIdUseCaseTest {
     private FindUserByIdBoundary findUserByIdBoundary;
 
     @Test
-    void givenValidId_ThenCallGatewayAndReturnUser() {
+    void givenValidId_thenCallGatewayAndReturnUser() {
         User user = UserFixture.load();
 
         when(findUserByIdBoundary.execute(user.getId())).thenReturn(user);

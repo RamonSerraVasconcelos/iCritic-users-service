@@ -26,7 +26,7 @@ class FindUsersUseCaseTest {
     private FindUsersBoundary findUsersBoundary;
 
     @Test
-    void givenCallToUseCase_ThenReturnUsers() {
+    void givenCallToUseCase_thenReturnUsers() {
         List<User> users = List.of(
                 UserFixture.load(),
                 UserFixture.load(),

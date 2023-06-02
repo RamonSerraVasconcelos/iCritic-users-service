@@ -29,7 +29,7 @@ public class SignInUserUseCase {
         User user = findUserByEmailBoundary.execute(userData.getEmail());
 
         if(!nonNull(user)) {
-            throw new ResourceNotFoundException("Invalid email or password");
+            throw new ResourceViolationException("Invalid email or password");
         }
 
         boolean isPasswordValid = bcrypt.matches(userData.getPassword(), user.getPassword());

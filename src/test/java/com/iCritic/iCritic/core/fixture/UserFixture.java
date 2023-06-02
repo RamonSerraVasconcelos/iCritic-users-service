@@ -9,6 +9,7 @@ public class UserFixture {
 
     public static User load() {
         return User.builder()
+                .id(1L)
                 .name("test")
                 .email("test@test.test")
                 .description("test description")
