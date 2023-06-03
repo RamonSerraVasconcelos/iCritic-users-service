@@ -1,6 +1,5 @@
 package com.iCritic.iCritic.core.usecase;
 
-import com.iCritic.iCritic.core.enums.BanActionEnum;
 import com.iCritic.iCritic.core.enums.Role;
 import com.iCritic.iCritic.core.fixture.UserFixture;
 import com.iCritic.iCritic.core.model.User;
@@ -20,7 +19,8 @@ import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UpdateUserUseCaseTest {

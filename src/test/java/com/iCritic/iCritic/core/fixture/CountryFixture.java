@@ -6,7 +6,8 @@ public class CountryFixture {
 
     public static Country load() {
         return Country.builder()
-                .name("test country")
+                .id(1L)
+                .name("test")
                 .build();
     }
 }
