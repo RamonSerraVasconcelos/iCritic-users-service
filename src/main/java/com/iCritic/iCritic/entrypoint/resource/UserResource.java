@@ -1,12 +1,14 @@
 package com.iCritic.iCritic.entrypoint.resource;
 
 import com.iCritic.iCritic.core.enums.BanActionEnum;
+import com.iCritic.iCritic.core.enums.Role;
 import com.iCritic.iCritic.core.model.User;
 import com.iCritic.iCritic.core.usecase.*;
 import com.iCritic.iCritic.entrypoint.mapper.UserMapper;
 import com.iCritic.iCritic.entrypoint.model.UserBanDto;
 import com.iCritic.iCritic.entrypoint.model.UserRequestDto;
 import com.iCritic.iCritic.entrypoint.model.UserResponseDto;
+import com.iCritic.iCritic.entrypoint.validation.RoleValidator;
 import com.iCritic.iCritic.exception.ResourceViolationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -69,14 +71,20 @@ public class UserResource {
     }
 
     @PatchMapping("/{id}/role")
-    public ResponseEntity<Void> changeRole(@PathVariable Long id, @RequestBody UserRequestDto userDto) {
+    public ResponseEntity<Void> changeRole(HttpServletRequest request, @PathVariable Long id, @RequestBody UserRequestDto userDto) {
+        String role = request.getAttribute("role").toString();
+        RoleValidator.validate(List.of(Role.MODERATOR), role);
+
         updateUserRoleUseCase.execute(id, userDto.getRole());
 
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/{id}/ban")
-    public ResponseEntity<Void> ban(@PathVariable Long id, @RequestBody UserBanDto banDto) {
+    public ResponseEntity<Void> ban(HttpServletRequest request, @PathVariable Long id, @RequestBody UserBanDto banDto) {
+        String role = request.getAttribute("role").toString();
+        RoleValidator.validate(List.of(Role.MODERATOR), role);
+
         Set<ConstraintViolation<UserBanDto>> violations = validator.validate(banDto);
         if (!violations.isEmpty()) {
             throw new ResourceViolationException(violations);
@@ -88,7 +96,10 @@ public class UserResource {
     }
 
     @PatchMapping("/{id}/unban")
-    public ResponseEntity<Void> unban(@PathVariable Long id, @RequestBody UserBanDto banDto) {
+    public ResponseEntity<Void> unban(HttpServletRequest request, @PathVariable Long id, @RequestBody UserBanDto banDto) {
+        String role = request.getAttribute("role").toString();
+        RoleValidator.validate(List.of(Role.MODERATOR), role);
+
         Set<ConstraintViolation<UserBanDto>> violations = validator.validate(banDto);
         if (!violations.isEmpty()) {
             throw new ResourceViolationException(violations);
