@@ -1,6 +1,5 @@
 package com.iCritic.iCritic.dataprovider.gateway.database.repository;
 
-import com.iCritic.iCritic.core.enums.BanActionEnum;
 import lombok.AllArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;

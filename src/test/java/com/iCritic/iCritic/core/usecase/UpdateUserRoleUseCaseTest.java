@@ -29,7 +29,7 @@ class UpdateUserRoleUseCaseTest {
     private FindUserByIdBoundary findUserByIdBoundary;
 
     @Test
-    void givenValidIdAndRole_thenUpdateUserRole() {
+    void givenValidIdAndRole_thenCallUpdateUserRoleBoundary() {
         User user = UserFixture.load();
 
         when(findUserByIdBoundary.execute(user.getId())).thenReturn(user);

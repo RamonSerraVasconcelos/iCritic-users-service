@@ -5,7 +5,6 @@ import com.iCritic.iCritic.core.model.User;
 import com.iCritic.iCritic.core.usecase.boundary.FindUserByIdBoundary;
 import com.iCritic.iCritic.core.usecase.boundary.UpdateBanListBoundary;
 import com.iCritic.iCritic.core.usecase.boundary.UpdateUserStatusBoundary;
-import com.iCritic.iCritic.entrypoint.model.UserBanDto;
 import com.iCritic.iCritic.exception.ResourceNotFoundException;
 import com.iCritic.iCritic.exception.ResourceViolationException;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +23,7 @@ public class UpdateUserStatusUseCase {
 
     private final UpdateBanListBoundary updateBanListBoundary;
 
-    public void execute(Long id, UserBanDto userBanDto, BanActionEnum action) {
+    public void execute(Long id, String motive, BanActionEnum action) {
         if (!nonNull(id)) {
             throw new ResourceViolationException("Invalid id");
         }
@@ -38,6 +37,6 @@ public class UpdateUserStatusUseCase {
         boolean active = action != BanActionEnum.BAN;
 
         updateUserStatusBoundary.execute(id, active);
-        updateBanListBoundary.execute(id, userBanDto.getMotive(), action.toString());
+        updateBanListBoundary.execute(id, motive, action.toString());
     }
 }

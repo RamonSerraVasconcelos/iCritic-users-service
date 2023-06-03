@@ -1,6 +1,5 @@
 package com.iCritic.iCritic.dataprovider.gateway.database.impl;
 
-import com.iCritic.iCritic.core.enums.BanActionEnum;
 import com.iCritic.iCritic.core.usecase.boundary.UpdateBanListBoundary;
 import com.iCritic.iCritic.dataprovider.gateway.database.repository.UpdateUserBanListRepository;
 import lombok.RequiredArgsConstructor;

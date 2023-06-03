@@ -82,7 +82,7 @@ public class UserResource {
             throw new ResourceViolationException(violations);
         }
 
-        updateUserStatusUseCase.execute(id, banDto, BanActionEnum.BAN);
+        updateUserStatusUseCase.execute(id, banDto.getMotive(), BanActionEnum.BAN);
 
         return ResponseEntity.ok().build();
     }
@@ -94,7 +94,7 @@ public class UserResource {
             throw new ResourceViolationException(violations);
         }
 
-        updateUserStatusUseCase.execute(id, banDto, BanActionEnum.BAN);
+        updateUserStatusUseCase.execute(id, banDto.getMotive(), BanActionEnum.BAN);
 
         return ResponseEntity.ok().build();
     }
