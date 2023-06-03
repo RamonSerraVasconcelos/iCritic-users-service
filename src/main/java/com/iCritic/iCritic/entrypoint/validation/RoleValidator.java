@@ -11,7 +11,7 @@ public class RoleValidator {
 
     public static void validate(List<Role> allowedRoles, String currentRole) {
         if(!nonNull(currentRole)) {
-            throw new ForbiddenAccessException("insufficient access rights");
+            throw new ForbiddenAccessException();
         }
 
         if(Role.valueOf(currentRole) == Role.ADMIN) {
@@ -19,7 +19,7 @@ public class RoleValidator {
         }
 
         if(!allowedRoles.contains(Role.valueOf(currentRole))) {
-            throw new ForbiddenAccessException("insufficient access rights");
+            throw new ForbiddenAccessException();
         }
     }
 }
