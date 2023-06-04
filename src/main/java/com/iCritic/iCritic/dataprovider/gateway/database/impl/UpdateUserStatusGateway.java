@@ -13,7 +13,7 @@ public class UpdateUserStatusGateway implements UpdateUserStatusBoundary {
 
     private final UserRepository userRepository;
 
-    public void execute(Long id, boolean updateAction) {
-        userRepository.updateStatus(id, updateAction);
+    public void execute(Long id, boolean active) {
+        userRepository.updateStatus(id, active);
     }
 }
