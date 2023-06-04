@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @AllArgsConstructor
-public class UpdateUserBanListRepository {
+public class UserBanListRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
