@@ -27,9 +27,6 @@ class JwtGeneratorTest {
     @Mock
     private ApplicationProperties applicationProperties;
 
-    @Mock
-    private Logger logger;
-
     @Test
     void givenUser_generateAndReturnToken() {
         User user = UserFixture.load();
