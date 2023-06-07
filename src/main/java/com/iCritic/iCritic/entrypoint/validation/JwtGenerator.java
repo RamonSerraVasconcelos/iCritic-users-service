@@ -1,22 +1,22 @@
 package com.iCritic.iCritic.entrypoint.validation;
 
+import com.iCritic.iCritic.config.properties.ApplicationProperties;
 import com.iCritic.iCritic.core.model.User;
 import io.jsonwebtoken.*;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
 @Component
+@RequiredArgsConstructor
 public class JwtGenerator {
 
-    @Value("${spring.app.jwt.secret}")
-    private String secret;
-
-    @Value("${spring.app.jwt.expiration}")
-    private int expiration;
+    @Autowired
+    private ApplicationProperties applicationProperties;
 
     private static final Logger logger = LoggerFactory.getLogger(JwtGenerator.class);
 
@@ -25,14 +25,16 @@ public class JwtGenerator {
                 .setId(user.getId().toString())
                 .setSubject(user.getRole().toString())
                 .setIssuedAt(new Date())
-                .setExpiration(new java.util.Date(System.currentTimeMillis() + expiration))
-                .signWith(SignatureAlgorithm.HS512, secret)
+                .setExpiration(new Date(System.currentTimeMillis() + applicationProperties.getJwtExpiration()))
+                .signWith(SignatureAlgorithm.HS512, applicationProperties.getJwtSecret())
                 .compact();
     }
 
     public boolean validateToken(String token) {
+        JwtParser jwtParser = createJwtParser();
+
         try {
-            Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
+            jwtParser.parseClaimsJws(token);
 
             return true;
         } catch (SignatureException e) {
@@ -51,10 +53,14 @@ public class JwtGenerator {
     }
 
     public String getUserIdFromToken(String token) {
-        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody().getId();
+        return Jwts.parser().setSigningKey(applicationProperties.getJwtSecret()).parseClaimsJws(token).getBody().getId();
     }
 
     public String getUserRoleFromToken(String token) {
-        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody().getSubject();
+        return Jwts.parser().setSigningKey(applicationProperties.getJwtSecret()).parseClaimsJws(token).getBody().getSubject();
+    }
+
+    private JwtParser createJwtParser() {
+        return Jwts.parser().setSigningKey(applicationProperties.getJwtSecret());
     }
 }
