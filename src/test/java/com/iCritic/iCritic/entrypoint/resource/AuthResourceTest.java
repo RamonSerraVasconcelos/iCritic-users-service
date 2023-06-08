@@ -5,17 +5,21 @@ import com.iCritic.iCritic.core.fixture.UserFixture;
 import com.iCritic.iCritic.core.model.User;
 import com.iCritic.iCritic.core.usecase.CreateUserUseCase;
 import com.iCritic.iCritic.core.usecase.SignInUserUseCase;
+import com.iCritic.iCritic.entrypoint.fixture.AuthorizationDataFixture;
 import com.iCritic.iCritic.entrypoint.fixture.UserRequestDtoFixture;
 import com.iCritic.iCritic.entrypoint.fixture.UserResponseDtoFixture;
 import com.iCritic.iCritic.entrypoint.mapper.UserDtoMapper;
+import com.iCritic.iCritic.entrypoint.model.AuthorizationData;
 import com.iCritic.iCritic.entrypoint.model.UserRequestDto;
 import com.iCritic.iCritic.entrypoint.model.UserResponseDto;
 import com.iCritic.iCritic.exception.ResourceViolationException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
@@ -50,7 +54,7 @@ class AuthResourceTest {
     private Validator validator;
 
     @Test
-    void givenValidParameters_callCreateUserUseCase_thenReturnUserResponseDto() {
+    void givenValidParametersOnRegisterUserCall_callCreateUserUseCase_thenReturnUserResponseDto() {
         UserRequestDto userRequestDto = UserRequestDtoFixture.load();
         UserResponseDto userResponseDto = UserResponseDtoFixture.load();
         User user = UserDtoMapper.INSTANCE.userRequestDtoToUser(userRequestDto);
@@ -82,7 +86,7 @@ class AuthResourceTest {
     }
 
     @Test
-    void givenInvalidParameters_validateParemeters_thenThrowResourceViolationException() {
+    void givenInvalidParametersOnRegisterUserCall_validateParemeters_thenThrowResourceViolationException() {
         UserRequestDto userRequestDto = UserRequestDtoFixture.load();
 
         Set<ConstraintViolation<UserRequestDto>> violations = new HashSet<>();
@@ -92,12 +96,55 @@ class AuthResourceTest {
         assertThrows(ResourceViolationException.class, () -> authResource.registerUser(userRequestDto));
     }
 
+    @Test
+    void givenValidParametersOnSignInUserCall_callSignInUserUseCase_thenReturnAuthorizationData() {
+        UserRequestDto userRequestDto = UserRequestDtoFixture.load();
+        UserResponseDto userResponseDto = UserResponseDtoFixture.load();
+        AuthorizationData authorizationData = AuthorizationDataFixture.load();
+
+        when(validator.validate(userRequestDto)).thenReturn(Collections.emptySet());
+        when(signInUserUseCase.execute(any())).thenReturn(authorizationData);
+
+        AuthorizationData returnedAuthData = authResource.loginUser(userRequestDto);
+
+        verify(validator).validate(userRequestDto);
+        verify(signInUserUseCase).execute(any());
+
+        assertNotNull(returnedAuthData);
+        assertEquals(returnedAuthData.getAccessToken(), authorizationData.getAccessToken());
+    }
+
+    @Test
+    void givenInvalidParametersOnSignInUserCall_validateParameters_thenThrowResourceViolationException() {
+        UserRequestDto userRequestDto = UserRequestDtoFixture.load();
+
+        Set<ConstraintViolation<UserRequestDto>> violations = new HashSet<>();
+        violations.add(createMockViolation("email", "Email is required"));
+        when(validator.validate(userRequestDto)).thenReturn(violations);
+
+        assertThrows(ResourceViolationException.class, () -> authResource.loginUser(userRequestDto));
+    }
+
+    @Test
+    void givenInvalidParametersOnSignInUserCall_whenParametersAreNotEmailOrPassword_thenDontThrowException() {
+        UserRequestDto userRequestDto = UserRequestDtoFixture.load();
+        AuthorizationData authorizationData = AuthorizationDataFixture.load();
+
+        Set<ConstraintViolation<UserRequestDto>> violations = new HashSet<>();
+        violations.add(createMockViolation("name", "Name is required"));
+        violations.add(createMockViolation("countryId", "CountryId is required"));
+
+        when(validator.validate(userRequestDto)).thenReturn(violations);
+        when(signInUserUseCase.execute(any())).thenReturn(authorizationData);
+
+        assertDoesNotThrow(() -> authResource.loginUser(userRequestDto));
+    }
+
     private <T> ConstraintViolation<T> createMockViolation(String propertyName, String message) {
         ConstraintViolation<T> violation = Mockito.mock(ConstraintViolation.class);
         Path propertyPath = Mockito.mock(Path.class);
         Mockito.when(propertyPath.toString()).thenReturn(propertyName);
         Mockito.when(violation.getPropertyPath()).thenReturn(propertyPath);
-        Mockito.when(violation.getMessage()).thenReturn(message);
         return violation;
     }
 }
