@@ -48,7 +48,7 @@ class AuthResourceTest {
     private Validator validator;
 
     @Test
-    void givenValidParametersOnRegisterUserCall_callCreateUserUseCase_thenReturnUserResponseDto() {
+    void givenCallToRegisterUserWithValidParameters_callCreateUserUseCase_thenReturnUserResponseDto() {
         UserRequestDto userRequestDto = UserRequestDtoFixture.load();
         UserResponseDto userResponseDto = UserResponseDtoFixture.load();
         User user = UserDtoMapper.INSTANCE.userRequestDtoToUser(userRequestDto);
@@ -80,7 +80,7 @@ class AuthResourceTest {
     }
 
     @Test
-    void givenInvalidParametersOnRegisterUserCall_thenThrowResourceViolationException() {
+    void givenCallToRegisterUserWithInvalidParameters_thenThrowResourceViolationException() {
         UserRequestDto userRequestDto = UserRequestDtoFixture.load();
 
         Set<ConstraintViolation<UserRequestDto>> violations = new HashSet<>();
@@ -91,7 +91,7 @@ class AuthResourceTest {
     }
 
     @Test
-    void givenValidParametersOnSignInUserCall_callSignInUserUseCase_thenReturnAuthorizationData() {
+    void givenCallToSignInUserWithValidParameters_callSignInUserUseCase_thenReturnAuthorizationData() {
         UserRequestDto userRequestDto = UserRequestDtoFixture.load();
         AuthorizationData authorizationData = AuthorizationDataFixture.load();
 
@@ -108,7 +108,7 @@ class AuthResourceTest {
     }
 
     @Test
-    void givenInvalidParametersOnSignInUserCall_thenThrowResourceViolationException() {
+    void givenCallToSignInUserWithInvalidParameters_thenThrowResourceViolationException() {
         UserRequestDto userRequestDto = UserRequestDtoFixture.load();
 
         Set<ConstraintViolation<UserRequestDto>> violations = new HashSet<>();
@@ -119,7 +119,7 @@ class AuthResourceTest {
     }
 
     @Test
-    void givenInvalidParametersOnSignInUserCall_whenParametersAreNotEmailOrPassword_thenDontThrowException() {
+    void givenCallToSignInUserWithInvalidParameters_whenParametersAreNotEmailOrPassword_thenDontThrowException() {
         UserRequestDto userRequestDto = UserRequestDtoFixture.load();
         AuthorizationData authorizationData = AuthorizationDataFixture.load();
 
