@@ -38,6 +38,8 @@ public class UserResource {
 
     private final Validator validator;
 
+    private final RoleValidator roleValidator;
+
     @GetMapping
     public List<UserResponseDto> loadAll() {
         UserDtoMapper mapper = UserDtoMapper.INSTANCE;
@@ -73,7 +75,7 @@ public class UserResource {
     @PatchMapping("/{id}/role")
     public ResponseEntity<Void> changeRole(HttpServletRequest request, @PathVariable Long id, @RequestBody UserRequestDto userDto) {
         String role = request.getAttribute("role").toString();
-        RoleValidator.validate(List.of(Role.MODERATOR), role);
+        roleValidator.validate(List.of(Role.MODERATOR), role);
 
         updateUserRoleUseCase.execute(id, userDto.getRole());
 
@@ -83,7 +85,7 @@ public class UserResource {
     @PatchMapping("/{id}/ban")
     public ResponseEntity<Void> ban(HttpServletRequest request, @PathVariable Long id, @RequestBody UserBanDto banDto) {
         String role = request.getAttribute("role").toString();
-        RoleValidator.validate(List.of(Role.MODERATOR), role);
+        roleValidator.validate(List.of(Role.MODERATOR), role);
 
         Set<ConstraintViolation<UserBanDto>> violations = validator.validate(banDto);
         if (!violations.isEmpty()) {
@@ -98,7 +100,7 @@ public class UserResource {
     @PatchMapping("/{id}/unban")
     public ResponseEntity<Void> unban(HttpServletRequest request, @PathVariable Long id, @RequestBody UserBanDto banDto) {
         String role = request.getAttribute("role").toString();
-        RoleValidator.validate(List.of(Role.MODERATOR), role);
+        roleValidator.validate(List.of(Role.MODERATOR), role);
 
         Set<ConstraintViolation<UserBanDto>> violations = validator.validate(banDto);
         if (!violations.isEmpty()) {
