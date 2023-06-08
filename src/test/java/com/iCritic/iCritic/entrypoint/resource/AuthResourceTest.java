@@ -1,7 +1,6 @@
 package com.iCritic.iCritic.entrypoint.resource;
 
 import com.iCritic.iCritic.core.fixture.CountryFixture;
-import com.iCritic.iCritic.core.fixture.UserFixture;
 import com.iCritic.iCritic.core.model.User;
 import com.iCritic.iCritic.core.usecase.CreateUserUseCase;
 import com.iCritic.iCritic.core.usecase.SignInUserUseCase;
@@ -13,21 +12,16 @@ import com.iCritic.iCritic.entrypoint.model.AuthorizationData;
 import com.iCritic.iCritic.entrypoint.model.UserRequestDto;
 import com.iCritic.iCritic.entrypoint.model.UserResponseDto;
 import com.iCritic.iCritic.exception.ResourceViolationException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.validation.BeanPropertyBindingResult;
-import org.springframework.validation.Errors;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Path;
 import javax.validation.Validator;
-
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashSet;
@@ -86,11 +80,11 @@ class AuthResourceTest {
     }
 
     @Test
-    void givenInvalidParametersOnRegisterUserCall_validateParemeters_thenThrowResourceViolationException() {
+    void givenInvalidParametersOnRegisterUserCall_thenThrowResourceViolationException() {
         UserRequestDto userRequestDto = UserRequestDtoFixture.load();
 
         Set<ConstraintViolation<UserRequestDto>> violations = new HashSet<>();
-        violations.add(createMockViolation("email", "Invalid email format"));
+        violations.add(createMockViolation("email"));
         when(validator.validate(userRequestDto)).thenReturn(violations);
 
         assertThrows(ResourceViolationException.class, () -> authResource.registerUser(userRequestDto));
@@ -99,7 +93,6 @@ class AuthResourceTest {
     @Test
     void givenValidParametersOnSignInUserCall_callSignInUserUseCase_thenReturnAuthorizationData() {
         UserRequestDto userRequestDto = UserRequestDtoFixture.load();
-        UserResponseDto userResponseDto = UserResponseDtoFixture.load();
         AuthorizationData authorizationData = AuthorizationDataFixture.load();
 
         when(validator.validate(userRequestDto)).thenReturn(Collections.emptySet());
@@ -115,11 +108,11 @@ class AuthResourceTest {
     }
 
     @Test
-    void givenInvalidParametersOnSignInUserCall_validateParameters_thenThrowResourceViolationException() {
+    void givenInvalidParametersOnSignInUserCall_thenThrowResourceViolationException() {
         UserRequestDto userRequestDto = UserRequestDtoFixture.load();
 
         Set<ConstraintViolation<UserRequestDto>> violations = new HashSet<>();
-        violations.add(createMockViolation("email", "Email is required"));
+        violations.add(createMockViolation("email"));
         when(validator.validate(userRequestDto)).thenReturn(violations);
 
         assertThrows(ResourceViolationException.class, () -> authResource.loginUser(userRequestDto));
@@ -131,8 +124,8 @@ class AuthResourceTest {
         AuthorizationData authorizationData = AuthorizationDataFixture.load();
 
         Set<ConstraintViolation<UserRequestDto>> violations = new HashSet<>();
-        violations.add(createMockViolation("name", "Name is required"));
-        violations.add(createMockViolation("countryId", "CountryId is required"));
+        violations.add(createMockViolation("name"));
+        violations.add(createMockViolation("countryId"));
 
         when(validator.validate(userRequestDto)).thenReturn(violations);
         when(signInUserUseCase.execute(any())).thenReturn(authorizationData);
@@ -140,7 +133,7 @@ class AuthResourceTest {
         assertDoesNotThrow(() -> authResource.loginUser(userRequestDto));
     }
 
-    private <T> ConstraintViolation<T> createMockViolation(String propertyName, String message) {
+    private <T> ConstraintViolation<T> createMockViolation(String propertyName) {
         ConstraintViolation<T> violation = Mockito.mock(ConstraintViolation.class);
         Path propertyPath = Mockito.mock(Path.class);
         Mockito.when(propertyPath.toString()).thenReturn(propertyName);
