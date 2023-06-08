@@ -107,7 +107,7 @@ public class UserResource {
             throw new ResourceViolationException(violations);
         }
 
-        updateUserStatusUseCase.execute(id, banDto.getMotive(), BanActionEnum.BAN);
+        updateUserStatusUseCase.execute(id, banDto.getMotive(), BanActionEnum.UNBAN);
 
         return ResponseEntity.ok().build();
     }

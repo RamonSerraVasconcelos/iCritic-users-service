@@ -1,6 +1,6 @@
 package com.iCritic.iCritic.entrypoint.resource;
 
-import com.iCritic.iCritic.core.enums.Role;
+import com.iCritic.iCritic.core.enums.BanActionEnum;
 import com.iCritic.iCritic.core.fixture.CountryFixture;
 import com.iCritic.iCritic.core.fixture.UserFixture;
 import com.iCritic.iCritic.core.model.User;
@@ -15,10 +15,10 @@ import com.iCritic.iCritic.entrypoint.validation.RoleValidator;
 import com.iCritic.iCritic.exception.ResourceViolationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 import javax.validation.ConstraintViolation;
@@ -32,7 +32,6 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -65,6 +64,9 @@ class UserResourceTest {
     @Mock
     private RoleValidator roleValidator;
 
+    @Captor
+    private ArgumentCaptor<BanActionEnum> actionCaptor;
+
     @Test
     void givenCallToLoadAllUsers_thenCallFindUsersUseCaseAndReturnUsers() {
         List<User> users = List.of(UserFixture.load(), UserFixture.load(), UserFixture.load());
@@ -85,7 +87,7 @@ class UserResourceTest {
     }
 
     @Test
-    void givenValidParametersOnGetUserCall_thenCallFindUserByIdUseCaseAndReturnUser() {
+    void givenCallToGetUserWithValidParameters_thenCallFindUserByIdUseCaseAndReturnUser() {
         User user = UserFixture.load();
 
         when(findUserByIdUseCase.execute(user.getId())).thenReturn(user);
@@ -105,7 +107,7 @@ class UserResourceTest {
     }
 
     @Test
-    void givenValidParametersOnUpdateUserCall_thenCallUpdateUserUseCaseAndReturnUser() {
+    void givenCallToUpdateUserWithValidParameters_thenCallUpdateUserUseCaseAndReturnUser() {
         UserRequestDto userRequestDto = UserRequestDtoFixture.load();
         User user = UserDtoMapper.INSTANCE.userRequestDtoToUser(userRequestDto);
 
@@ -138,7 +140,7 @@ class UserResourceTest {
     }
 
     @Test
-    void givenInvalidParametersOnUpdateUserCall_thenThrowResourceViolationException() {
+    void givenCallToUpdateUserWithInvalidParameters_thenThrowResourceViolationException() {
         UserRequestDto userRequestDto = UserRequestDtoFixture.load();
 
         Set<ConstraintViolation<UserRequestDto>> violations = new HashSet<>();
@@ -150,7 +152,7 @@ class UserResourceTest {
     }
 
     @Test
-    void givenInvalidParametersUpdateUserCall_whenParametersAreEmailOrPassword_thenDontThrowException() {
+    void givenCallToUpdateUserWithInvalidParameters_whenParametersAreEmailOrPassword_thenDontThrowException() {
         UserRequestDto userRequestDto = UserRequestDtoFixture.load();
         User user = UserDtoMapper.INSTANCE.userRequestDtoToUser(userRequestDto);
         user.setId(1L);
@@ -168,7 +170,7 @@ class UserResourceTest {
     }
 
     @Test
-    void givenValidParametersOnChangeRoleCall_thenCallUpdateUserRoleUseCase() {
+    void givenCallToChangeRoleWithValidParameters_thenCallUpdateUserRoleUseCase() {
         UserRequestDto userRequestDto = UserRequestDtoFixture.load();
 
         request.setAttribute("role", userRequestDto.getRole());
@@ -180,6 +182,68 @@ class UserResourceTest {
 
         verify(roleValidator).validate(any(), any());
         verify(updateUserRoleUseCase).execute(any(), any());
+    }
+
+    @Test
+    void givenCallToBanUserWithValidParameters_thenCallUpdateUserStatusUseCaseWithActionBan_andReturnResponseOk() {
+        Long id = 1L;
+        UserBanDto userBanDto = UserBanDtoFixture.load();
+
+        request.setAttribute("role", "ADMIN");
+
+        when(validator.validate(userBanDto)).thenReturn(Collections.emptySet());
+        doNothing().when(updateUserStatusUseCase).execute(any(), any(), actionCaptor.capture());
+
+        ResponseEntity<Void> response = userResource.ban(request, id, userBanDto);
+
+        assertEquals(actionCaptor.getValue(), BanActionEnum.BAN);
+        assertEquals(response.getStatusCode(), HttpStatus.OK);
+    }
+
+    @Test
+    void givenCallToBanUserWithInvalidParameters_thenThrowResourceViolationException() {
+        Long id = 1L;
+        UserBanDto userBanDto = UserBanDtoFixture.load();
+
+        request.setAttribute("role", "ADMIN");
+
+        Set<ConstraintViolation<UserBanDto>> violations = new HashSet<>();
+        violations.add(createMockViolation("motive"));
+
+        when(validator.validate(userBanDto)).thenReturn(violations);
+
+        assertThrows(ResourceViolationException.class, () -> userResource.ban(request, id, userBanDto));
+    }
+
+    @Test
+    void givenCallToUnbanUserWithValidParameters_thenCallUpdateUserStatusUseCaseWithActionUnban_andReturnResponseOk() {
+        Long id = 1L;
+        UserBanDto userBanDto = UserBanDtoFixture.load();
+
+        request.setAttribute("role", "ADMIN");
+
+        when(validator.validate(userBanDto)).thenReturn(Collections.emptySet());
+        doNothing().when(updateUserStatusUseCase).execute(any(), any(), actionCaptor.capture());
+
+        ResponseEntity<Void> response = userResource.unban(request, id, userBanDto);
+
+        assertEquals(actionCaptor.getValue(), BanActionEnum.UNBAN);
+        assertEquals(response.getStatusCode(), HttpStatus.OK);
+    }
+
+    @Test
+    void givenCallToUnbanUserWithInvalidParameters_thenThrowResourceViolationException() {
+        Long id = 1L;
+        UserBanDto userBanDto = UserBanDtoFixture.load();
+
+        request.setAttribute("role", "ADMIN");
+
+        Set<ConstraintViolation<UserBanDto>> violations = new HashSet<>();
+        violations.add(createMockViolation("motive"));
+
+        when(validator.validate(userBanDto)).thenReturn(violations);
+
+        assertThrows(ResourceViolationException.class, () -> userResource.unban(request, id, userBanDto));
     }
 
     private <T> ConstraintViolation<T> createMockViolation(String propertyName) {
