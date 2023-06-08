@@ -4,7 +4,7 @@ import com.iCritic.iCritic.core.enums.BanActionEnum;
 import com.iCritic.iCritic.core.enums.Role;
 import com.iCritic.iCritic.core.model.User;
 import com.iCritic.iCritic.core.usecase.*;
-import com.iCritic.iCritic.entrypoint.mapper.UserMapper;
+import com.iCritic.iCritic.entrypoint.mapper.UserDtoMapper;
 import com.iCritic.iCritic.entrypoint.model.UserBanDto;
 import com.iCritic.iCritic.entrypoint.model.UserRequestDto;
 import com.iCritic.iCritic.entrypoint.model.UserResponseDto;
@@ -40,13 +40,13 @@ public class UserResource {
 
     @GetMapping
     public List<UserResponseDto> loadAll() {
-        UserMapper mapper = UserMapper.INSTANCE;
+        UserDtoMapper mapper = UserDtoMapper.INSTANCE;
         return findUsersUseCase.execute().stream().map(mapper::userToUserResponseDto).collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
     public UserResponseDto get(@PathVariable Long id) {
-        return UserMapper.INSTANCE.userToUserResponseDto(findUserByIdUseCase.execute(id));
+        return UserDtoMapper.INSTANCE.userToUserResponseDto(findUserByIdUseCase.execute(id));
     }
 
     @PutMapping("/edit")
@@ -62,7 +62,7 @@ public class UserResource {
 
         Long userId = Long.parseLong(request.getAttribute("userId").toString());
 
-        UserMapper mapper = UserMapper.INSTANCE;
+        UserDtoMapper mapper = UserDtoMapper.INSTANCE;
 
         User user = mapper.userRequestDtoToUser(userRequestDto);
 

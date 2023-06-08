@@ -2,10 +2,7 @@ package com.iCritic.iCritic.entrypoint.model;
 
 import com.iCritic.iCritic.entrypoint.model.CountryResponseDto;
 import com.iCritic.iCritic.core.enums.Role;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -13,6 +10,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 public class UserResponseDto {
     private Long id;
     private String name;

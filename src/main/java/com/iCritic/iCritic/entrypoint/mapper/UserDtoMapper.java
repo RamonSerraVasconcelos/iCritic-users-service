@@ -8,8 +8,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 @Mapper
-public abstract class UserMapper {
-    public static final UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
+public abstract class UserDtoMapper {
+    public static final UserDtoMapper INSTANCE = Mappers.getMapper(UserDtoMapper.class);
 
     @Mapping(target = "country", source = "country")
     public abstract UserResponseDto userToUserResponseDto(User user);
