@@ -7,10 +7,10 @@ spring:
     database: POSTGRESQL
   error:
     include-stacktrace: never
-  app:
-    jwt:
-      secret: ${CP_OF_ICRITIC_JWT_SECRET:b7c995a4acd856ea084449fa0000bd086d38888ecddd4d8f4b6b6805f03b028270bfcb5bc7de7c9f24fe7e8a317e633fedb2a3a4441f5af4dc7933e0ff6d7d1b}
-      expiration: ${CP_OF_ICRITIC_JWT_EXPIRATION:9600000}
+  application:
+    properties:
+      jwtSecret: ${CP_OF_ICRITIC_JWT_SECRET:b7c995a4acd856ea084449fa0000bd086d38888ecddd4d8f4b6b6805f03b028270bfcb5bc7de7c9f24fe7e8a317e633fedb2a3a4441f5af4dc7933e0ff6d7d1b}
+      jwtExpiration: ${CP_OF_ICRITIC_JWT_EXPIRATION:9600000}
 server:
   error:
     include-stacktrace: never

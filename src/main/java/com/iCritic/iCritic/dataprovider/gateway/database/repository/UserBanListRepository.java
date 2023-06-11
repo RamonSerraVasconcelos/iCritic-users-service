@@ -1,13 +1,12 @@
 package com.iCritic.iCritic.dataprovider.gateway.database.repository;
 
-import com.iCritic.iCritic.core.enums.BanActionEnum;
 import lombok.AllArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @AllArgsConstructor
-public class UpdateUserBanListRepository {
+public class UserBanListRepository {
 
     private final JdbcTemplate jdbcTemplate;
 

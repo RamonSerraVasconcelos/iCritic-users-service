@@ -29,8 +29,6 @@ public class CreateUserUseCase {
 
     private final BCryptPasswordEncoder bcrypt;
 
-    private final Validator validator;
-
     public User execute(User user) {
         User isUserDuplicated = findUserByEmailBoundary.execute(user.getEmail());
 

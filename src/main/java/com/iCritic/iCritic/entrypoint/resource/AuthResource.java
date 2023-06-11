@@ -3,7 +3,7 @@ package com.iCritic.iCritic.entrypoint.resource;
 import com.iCritic.iCritic.core.model.User;
 import com.iCritic.iCritic.core.usecase.CreateUserUseCase;
 import com.iCritic.iCritic.core.usecase.SignInUserUseCase;
-import com.iCritic.iCritic.entrypoint.mapper.UserMapper;
+import com.iCritic.iCritic.entrypoint.mapper.UserDtoMapper;
 import com.iCritic.iCritic.entrypoint.model.AuthorizationData;
 import com.iCritic.iCritic.entrypoint.model.UserRequestDto;
 import com.iCritic.iCritic.entrypoint.model.UserResponseDto;
@@ -34,11 +34,11 @@ public class AuthResource {
             throw new ResourceViolationException(violations);
         }
 
-        User user = UserMapper.INSTANCE.userRequestDtoToUser(userRequestDto);
+        User user = UserDtoMapper.INSTANCE.userRequestDtoToUser(userRequestDto);
 
         User createdUser = createUserUseCase.execute(user);
 
-        return UserMapper.INSTANCE.userToUserResponseDto(createdUser);
+        return UserDtoMapper.INSTANCE.userToUserResponseDto(createdUser);
     }
 
     @PostMapping(path = "/login")
@@ -53,7 +53,7 @@ public class AuthResource {
             });
         }
 
-        UserMapper mapper = UserMapper.INSTANCE;
+        UserDtoMapper mapper = UserDtoMapper.INSTANCE;
         User user = mapper.userRequestDtoToUser(userRequestDto);
 
         return signInUserUseCase.execute(user);
