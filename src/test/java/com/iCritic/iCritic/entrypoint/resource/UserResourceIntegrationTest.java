@@ -1,7 +1,6 @@
 package com.iCritic.iCritic.entrypoint.resource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.iCritic.iCritic.core.enums.Role;
 import com.iCritic.iCritic.core.fixture.UserFixture;
 import com.iCritic.iCritic.core.model.User;
 import com.iCritic.iCritic.core.usecase.*;
@@ -206,8 +205,6 @@ class UserResourceIntegrationTest {
         ObjectMapper objectMapper = new ObjectMapper();
         String requestBody = objectMapper.writeValueAsString(userBanDto);
 
-        doNothing().when(updateUserStatusUseCase).execute(anyLong(), anyString(), any());
-
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
                 .patch("/users/" + userRequestDto.getId() + "/ban")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -251,8 +248,6 @@ class UserResourceIntegrationTest {
 
         ObjectMapper objectMapper = new ObjectMapper();
         String requestBody = objectMapper.writeValueAsString(userBanDto);
-
-        doNothing().when(updateUserStatusUseCase).execute(anyLong(), anyString(), any());
 
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
                 .patch("/users/" + userRequestDto.getId() + "/unban")
