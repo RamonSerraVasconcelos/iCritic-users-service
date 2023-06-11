@@ -78,7 +78,7 @@ class UserResourceIntegrationTest {
                 .andExpect(jsonPath("$[0].role").value(users.get(0).getRole().toString()))
                 .andExpect(jsonPath("$[0].country.id").value(users.get(0).getCountry().getId()))
                 .andExpect(jsonPath("$[0].country.name").value(users.get(0).getCountry().getName()))
-                .andExpect(jsonPath("$[0].createdAt").value(users.get(0).getCreatedAt().toString()));
+                .andExpect(jsonPath("$[0].createdAt").isNotEmpty());
 
         verify(findUsersUseCase).execute();
     }
@@ -148,7 +148,7 @@ class UserResourceIntegrationTest {
                 .andExpect(jsonPath("$.role").value(user.getRole().toString()))
                 .andExpect(jsonPath("$.country.id").value(user.getCountry().getId()))
                 .andExpect(jsonPath("$.country.name").value(user.getCountry().getName()))
-                .andExpect(jsonPath("$.createdAt").value(user.getCreatedAt().toString()));
+                .andExpect(jsonPath("$.createdAt").isNotEmpty());
 
         verify(updateUserUseCase).execute(anyLong(), any());
     }

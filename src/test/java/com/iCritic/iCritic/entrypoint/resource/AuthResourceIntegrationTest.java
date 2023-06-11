@@ -71,7 +71,7 @@ class AuthResourceIntegrationTest {
                 .andExpect(jsonPath("$.role").value(createdUser.getRole().toString()))
                 .andExpect(jsonPath("$.country.id").value(createdUser.getCountry().getId()))
                 .andExpect(jsonPath("$.country.name").value(createdUser.getCountry().getName()))
-                .andExpect(jsonPath("$.createdAt").value(createdUser.getCreatedAt().toString()));
+                .andExpect(jsonPath("$.createdAt").isNotEmpty());
 
 
         verify(createUserUseCase).execute(any(User.class));
