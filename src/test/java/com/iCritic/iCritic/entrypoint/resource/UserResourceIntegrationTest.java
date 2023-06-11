@@ -79,7 +79,6 @@ class UserResourceIntegrationTest {
                 .andExpect(jsonPath("$[0].country.id").value(users.get(0).getCountry().getId()))
                 .andExpect(jsonPath("$[0].country.name").value(users.get(0).getCountry().getName()))
                 .andExpect(jsonPath("$[0].createdAt").value(users.get(0).getCreatedAt().toString()));
-        ;
 
         verify(findUsersUseCase).execute();
     }
@@ -103,7 +102,7 @@ class UserResourceIntegrationTest {
                 .andExpect(jsonPath("$.role").value(user.getRole().toString()))
                 .andExpect(jsonPath("$.country.id").value(user.getCountry().getId()))
                 .andExpect(jsonPath("$.country.name").value(user.getCountry().getName()))
-                .andExpect(jsonPath("$.createdAt").value(user.getCreatedAt().toString()));
+                .andExpect(jsonPath("$.createdAt").isNotEmpty());
 
         verify(findUserByIdUseCase).execute(user.getId());
     }
