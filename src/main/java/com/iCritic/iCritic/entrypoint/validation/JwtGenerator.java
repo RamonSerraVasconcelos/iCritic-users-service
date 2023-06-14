@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -22,10 +23,21 @@ public class JwtGenerator {
 
     public String generateToken(User user) {
         return Jwts.builder()
-                .setId(user.getId().toString())
-                .setSubject(user.getRole().toString())
+                .setId(UUID.randomUUID().toString())
+                .claim("userId", user.getId().toString())
+                .claim("role", user.getRole().toString())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + applicationProperties.getJwtExpiration()))
+                .signWith(SignatureAlgorithm.HS512, applicationProperties.getJwtSecret())
+                .compact();
+    }
+
+    public String generateRefreshToken(User user) {
+        return Jwts.builder()
+                .setId(UUID.randomUUID().toString())
+                .claim("userId", user.getId().toString())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + applicationProperties.getJwtRefreshExpiration()))
                 .signWith(SignatureAlgorithm.HS512, applicationProperties.getJwtSecret())
                 .compact();
     }

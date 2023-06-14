@@ -10,6 +10,7 @@ import com.iCritic.iCritic.entrypoint.fixture.UserRequestDtoFixture;
 import com.iCritic.iCritic.entrypoint.model.AuthorizationData;
 import com.iCritic.iCritic.entrypoint.model.UserRequestDto;
 import com.iCritic.iCritic.entrypoint.validation.AuthorizationFilter;
+import com.iCritic.iCritic.entrypoint.validation.JwtGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,9 @@ class AuthResourceIntegrationTest {
 
     @MockBean
     private SignInUserUseCase signInUserUseCase;
+
+    @MockBean
+    private JwtGenerator jwtGenerator;
 
     @Test
     void givenRequestToRegisterEndpointWithValidParams_thenRegisterAndReturnUser() throws Exception {
@@ -97,11 +101,14 @@ class AuthResourceIntegrationTest {
     void givenRequestToSignInEndpointWithValidParams_thenSignInAndReturnAccessToken() throws Exception {
         UserRequestDto userRequestDto = UserRequestDto.builder().email("test@test.test").password("password").build();
         AuthorizationData authorizationData = AuthorizationDataFixture.load();
+        boolean isUserAuthorized = true;
 
         ObjectMapper objectMapper = new ObjectMapper();
         String requestBody = objectMapper.writeValueAsString(userRequestDto);
 
-        when(signInUserUseCase.execute(any(User.class))).thenReturn(authorizationData);
+        when(signInUserUseCase.execute(any(User.class))).thenReturn(isUserAuthorized);
+        when(jwtGenerator.generateToken(any())).thenReturn(authorizationData.getAccessToken());
+        when(jwtGenerator.generateRefreshToken(any())).thenReturn(authorizationData.getRefreshToken());
 
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/login")
@@ -110,7 +117,8 @@ class AuthResourceIntegrationTest {
 
         mockMvc.perform(requestBuilder)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.accessToken").value(authorizationData.getAccessToken()));
+                .andExpect(jsonPath("$.accessToken").value(authorizationData.getAccessToken()))
+                .andExpect(jsonPath("$.refreshToken").value(authorizationData.getRefreshToken()));
     }
 
     @Test

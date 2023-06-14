@@ -7,12 +7,15 @@ import com.iCritic.iCritic.entrypoint.mapper.UserDtoMapper;
 import com.iCritic.iCritic.entrypoint.model.AuthorizationData;
 import com.iCritic.iCritic.entrypoint.model.UserRequestDto;
 import com.iCritic.iCritic.entrypoint.model.UserResponseDto;
+import com.iCritic.iCritic.entrypoint.validation.JwtGenerator;
 import com.iCritic.iCritic.exception.ResourceViolationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import java.util.Set;
@@ -26,6 +29,8 @@ public class AuthResource {
     private final SignInUserUseCase signInUserUseCase;
 
     private final Validator validator;
+
+    private final JwtGenerator jwtGenerator;
 
     @PostMapping(path = "/register")
     public UserResponseDto registerUser(@RequestBody UserRequestDto userRequestDto) {
@@ -42,7 +47,7 @@ public class AuthResource {
     }
 
     @PostMapping(path = "/login")
-    public AuthorizationData loginUser(@RequestBody UserRequestDto userRequestDto) {
+    public AuthorizationData loginUser(@RequestBody UserRequestDto userRequestDto, HttpServletResponse response) {
 
         Set<ConstraintViolation<UserRequestDto>> violations = validator.validate(userRequestDto);
         if (!violations.isEmpty()) {
@@ -56,6 +61,20 @@ public class AuthResource {
         UserDtoMapper mapper = UserDtoMapper.INSTANCE;
         User user = mapper.userRequestDtoToUser(userRequestDto);
 
-        return signInUserUseCase.execute(user);
+        if(!signInUserUseCase.execute(user)) {
+            throw new ResourceViolationException("Invalid email or password");
+        }
+
+        AuthorizationData authorizationData = AuthorizationData.builder()
+                .accessToken(jwtGenerator.generateToken(user))
+                .refreshToken(jwtGenerator.generateRefreshToken(user))
+                .build();
+
+        Cookie refreshTokenCookie = new Cookie("refreshToken", authorizationData.getRefreshToken());
+        refreshTokenCookie.setHttpOnly(true);
+
+        response.addCookie(refreshTokenCookie);
+
+        return authorizationData;
     }
 }

@@ -10,4 +10,5 @@ import lombok.*;
 public class AuthorizationData {
 
     private String accessToken;
+    private String refreshToken;
 }

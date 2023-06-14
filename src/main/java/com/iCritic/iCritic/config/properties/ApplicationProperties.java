@@ -12,5 +12,6 @@ import org.springframework.context.annotation.Configuration;
 public class ApplicationProperties {
 
     private int jwtExpiration;
+    private int jwtRefreshExpiration;
     private String jwtSecret;
 }

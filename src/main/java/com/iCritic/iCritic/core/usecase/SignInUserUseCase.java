@@ -23,9 +23,7 @@ public class SignInUserUseCase {
 
     private final BCryptPasswordEncoder bcrypt;
 
-    private final JwtGenerator jwtGenerator;
-
-    public AuthorizationData execute(User userData) {
+    public boolean execute(User userData) {
         User user = findUserByEmailBoundary.execute(userData.getEmail());
 
         if(!nonNull(user)) {
@@ -38,10 +36,6 @@ public class SignInUserUseCase {
             throw new ResourceViolationException("Invalid email or password");
         }
 
-        String accessToken = jwtGenerator.generateToken(user);
-
-        return AuthorizationData.builder()
-                .accessToken(accessToken)
-                .build();
+        return true;
     }
 }

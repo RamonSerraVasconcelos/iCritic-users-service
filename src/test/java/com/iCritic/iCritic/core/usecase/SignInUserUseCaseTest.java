@@ -29,27 +29,20 @@ class SignInUserUseCaseTest {
     @Mock
     private BCryptPasswordEncoder bcrypt;
 
-    @Mock
-    private JwtGenerator jwtGenerator;
-
     @Test
-    void givenValidEmailAndPassword_thenReturnAuthorizationData() {
+    void givenValidEmailAndPassword_thenReturnTrue() {
         User user = UserFixture.load();
         User foundUser = UserFixture.load();
-        String accessToken = "asd28jd982jd9812jd";
 
         when(findUserByEmailBoundary.execute(user.getEmail())).thenReturn(foundUser);
         when(bcrypt.matches(user.getPassword(), foundUser.getPassword())).thenReturn(true);
-        when(jwtGenerator.generateToken(foundUser)).thenReturn(accessToken);
 
-        AuthorizationData authorizationData = signInUserUseCase.execute(user);
+        boolean isUserAuthenticated = signInUserUseCase.execute(user);
 
         verify(findUserByEmailBoundary).execute(user.getEmail());
         verify(bcrypt).matches(user.getPassword(), foundUser.getPassword());
-        verify(jwtGenerator).generateToken(foundUser);
 
-        assertNotNull(authorizationData);
-        assertEquals(authorizationData.getAccessToken(), accessToken);
+        assertTrue(isUserAuthenticated);
     }
 
     @Test
