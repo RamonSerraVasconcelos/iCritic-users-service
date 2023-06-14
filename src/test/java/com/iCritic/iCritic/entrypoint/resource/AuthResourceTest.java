@@ -1,6 +1,7 @@
 package com.iCritic.iCritic.entrypoint.resource;
 
 import com.iCritic.iCritic.core.fixture.CountryFixture;
+import com.iCritic.iCritic.core.fixture.UserFixture;
 import com.iCritic.iCritic.core.model.User;
 import com.iCritic.iCritic.core.usecase.CreateUserUseCase;
 import com.iCritic.iCritic.core.usecase.SignInUserUseCase;
@@ -102,10 +103,10 @@ class AuthResourceTest {
     void givenCallToSignInUserWithValidParameters_callSignInUserUseCase_thenReturnAuthorizationData() {
         UserRequestDto userRequestDto = UserRequestDtoFixture.load();
         AuthorizationData authorizationData = AuthorizationDataFixture.load();
-        boolean isUserAuthorized = true;
+        User user = UserFixture.load();
 
         when(validator.validate(userRequestDto)).thenReturn(Collections.emptySet());
-        when(signInUserUseCase.execute(any())).thenReturn(isUserAuthorized);
+        when(signInUserUseCase.execute(any())).thenReturn(user);
         when(jwtGenerator.generateToken(any())).thenReturn(authorizationData.getAccessToken());
         when(jwtGenerator.generateRefreshToken(any())).thenReturn(authorizationData.getRefreshToken());
 
@@ -132,14 +133,14 @@ class AuthResourceTest {
     @Test
     void givenCallToSignInUserWithInvalidParameters_whenParametersAreNotEmailOrPassword_thenDontThrowException() {
         UserRequestDto userRequestDto = UserRequestDtoFixture.load();
-        boolean isUserAuthorized = true;
+        User user = UserFixture.load();
 
         Set<ConstraintViolation<UserRequestDto>> violations = new HashSet<>();
         violations.add(createMockViolation("name"));
         violations.add(createMockViolation("countryId"));
 
         when(validator.validate(userRequestDto)).thenReturn(violations);
-        when(signInUserUseCase.execute(any())).thenReturn(isUserAuthorized);
+        when(signInUserUseCase.execute(any())).thenReturn(user);
 
         assertDoesNotThrow(() -> authResource.loginUser(userRequestDto, response));
     }

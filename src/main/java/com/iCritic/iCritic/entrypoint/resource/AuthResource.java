@@ -20,6 +20,8 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import java.util.Set;
 
+import static java.util.Objects.nonNull;
+
 @RestController
 @RequiredArgsConstructor
 public class AuthResource {
@@ -61,13 +63,15 @@ public class AuthResource {
         UserDtoMapper mapper = UserDtoMapper.INSTANCE;
         User user = mapper.userRequestDtoToUser(userRequestDto);
 
-        if(!signInUserUseCase.execute(user)) {
+        User loggedUser = signInUserUseCase.execute(user);
+
+        if(!nonNull(loggedUser)) {
             throw new ResourceViolationException("Invalid email or password");
         }
 
         AuthorizationData authorizationData = AuthorizationData.builder()
-                .accessToken(jwtGenerator.generateToken(user))
-                .refreshToken(jwtGenerator.generateRefreshToken(user))
+                .accessToken(jwtGenerator.generateToken(loggedUser))
+                .refreshToken(jwtGenerator.generateRefreshToken(loggedUser))
                 .build();
 
         Cookie refreshTokenCookie = new Cookie("refreshToken", authorizationData.getRefreshToken());

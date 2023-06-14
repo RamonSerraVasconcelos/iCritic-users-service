@@ -101,12 +101,12 @@ class AuthResourceIntegrationTest {
     void givenRequestToSignInEndpointWithValidParams_thenSignInAndReturnAccessToken() throws Exception {
         UserRequestDto userRequestDto = UserRequestDto.builder().email("test@test.test").password("password").build();
         AuthorizationData authorizationData = AuthorizationDataFixture.load();
-        boolean isUserAuthorized = true;
+        User loggedUser = UserFixture.load();
 
         ObjectMapper objectMapper = new ObjectMapper();
         String requestBody = objectMapper.writeValueAsString(userRequestDto);
 
-        when(signInUserUseCase.execute(any(User.class))).thenReturn(isUserAuthorized);
+        when(signInUserUseCase.execute(any(User.class))).thenReturn(loggedUser);
         when(jwtGenerator.generateToken(any())).thenReturn(authorizationData.getAccessToken());
         when(jwtGenerator.generateRefreshToken(any())).thenReturn(authorizationData.getRefreshToken());
 

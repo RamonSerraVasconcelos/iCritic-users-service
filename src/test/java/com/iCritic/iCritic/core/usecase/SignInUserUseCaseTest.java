@@ -37,12 +37,12 @@ class SignInUserUseCaseTest {
         when(findUserByEmailBoundary.execute(user.getEmail())).thenReturn(foundUser);
         when(bcrypt.matches(user.getPassword(), foundUser.getPassword())).thenReturn(true);
 
-        boolean isUserAuthenticated = signInUserUseCase.execute(user);
+        User loggedUser = signInUserUseCase.execute(user);
 
         verify(findUserByEmailBoundary).execute(user.getEmail());
         verify(bcrypt).matches(user.getPassword(), foundUser.getPassword());
 
-        assertTrue(isUserAuthenticated);
+        assertNotNull(loggedUser);
     }
 
     @Test
