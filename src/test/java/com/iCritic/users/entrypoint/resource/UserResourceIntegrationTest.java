@@ -9,7 +9,7 @@ import com.iCritic.users.entrypoint.fixture.UserRequestDtoFixture;
 import com.iCritic.users.entrypoint.model.UserBanDto;
 import com.iCritic.users.entrypoint.model.UserRequestDto;
 import com.iCritic.users.entrypoint.validation.AuthorizationFilter;
-import com.iCritic.users.entrypoint.validation.RoleValidator;
+import com.iCritic.users.core.usecase.ValidateUserRoleUseCase;
 import com.iCritic.users.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -56,7 +56,7 @@ class UserResourceIntegrationTest {
     private UpdateUserStatusUseCase updateUserStatusUseCase;
 
     @MockBean
-    private RoleValidator roleValidator;
+    private ValidateUserRoleUseCase validateUserRoleUseCase;
 
     @Test
     void givenRequestToUsersEndpoint_thenReturnAllUsers() throws Exception {

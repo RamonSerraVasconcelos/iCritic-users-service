@@ -1,6 +1,7 @@
-package com.iCritic.users.entrypoint.validation;
+package com.iCritic.users.core.usecase;
 
 import com.iCritic.users.core.enums.Role;
+import com.iCritic.users.core.usecase.ValidateUserRoleUseCase;
 import com.iCritic.users.exception.ForbiddenAccessException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,10 +14,10 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
-class RoleValidatorTest {
+class ValidateUserRoleUseCaseTest {
 
     @InjectMocks
-    private RoleValidator roleValidator;
+    private ValidateUserRoleUseCase validateUserRoleUseCase;
 
     @Test
     void givenValidParameters_andMatchingRoles_thenAllowed() {
@@ -24,7 +25,7 @@ class RoleValidatorTest {
 
         String currentRole = "MODERATOR";
 
-        assertDoesNotThrow(() -> roleValidator.validate(allowedRoles, currentRole));
+        assertDoesNotThrow(() -> validateUserRoleUseCase.execute(allowedRoles, currentRole));
     }
 
     @Test
@@ -33,14 +34,14 @@ class RoleValidatorTest {
 
         String currentRole = "ADMIN";
 
-        assertDoesNotThrow(() -> roleValidator.validate(allowedRoles, currentRole));
+        assertDoesNotThrow(() -> validateUserRoleUseCase.execute(allowedRoles, currentRole));
     }
 
     @Test
     void givenNullCurrentRole_thenThrowForbiddenAccessException() {
         List<Role> allowedRoles = List.of(Role.MODERATOR);
 
-        assertThrows(ForbiddenAccessException.class, () -> roleValidator.validate(allowedRoles, null));
+        assertThrows(ForbiddenAccessException.class, () -> validateUserRoleUseCase.execute(allowedRoles, null));
     }
 
     @Test
@@ -49,6 +50,6 @@ class RoleValidatorTest {
 
         String currentRole = "DEFAULT";
 
-        assertThrows(ForbiddenAccessException.class, () -> roleValidator.validate(allowedRoles, currentRole));
+        assertThrows(ForbiddenAccessException.class, () -> validateUserRoleUseCase.execute(allowedRoles, currentRole));
     }
 }

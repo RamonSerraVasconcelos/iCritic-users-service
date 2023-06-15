@@ -1,4 +1,4 @@
-package com.iCritic.users.dataprovider.gateway.jwt.impl;
+package com.iCritic.users.dataprovider.gateway.jwt;
 
 import com.iCritic.users.config.properties.ApplicationProperties;
 import com.iCritic.users.core.model.User;

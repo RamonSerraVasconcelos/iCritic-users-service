@@ -8,7 +8,7 @@ import com.iCritic.users.entrypoint.mapper.UserDtoMapper;
 import com.iCritic.users.entrypoint.model.UserBanDto;
 import com.iCritic.users.entrypoint.model.UserRequestDto;
 import com.iCritic.users.entrypoint.model.UserResponseDto;
-import com.iCritic.users.entrypoint.validation.RoleValidator;
+import com.iCritic.users.core.usecase.ValidateUserRoleUseCase;
 import com.iCritic.users.exception.ResourceViolationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +38,7 @@ public class UserResource {
 
     private final Validator validator;
 
-    private final RoleValidator roleValidator;
+    private final ValidateUserRoleUseCase validateUserRoleUseCase;
 
     @GetMapping
     public List<UserResponseDto> loadAll() {
@@ -75,7 +75,7 @@ public class UserResource {
     @PatchMapping("/{id}/role")
     public ResponseEntity<Void> changeRole(HttpServletRequest request, @PathVariable Long id, @RequestBody UserRequestDto userDto) {
         String role = request.getAttribute("role").toString();
-        roleValidator.validate(List.of(Role.MODERATOR), role);
+        validateUserRoleUseCase.execute(List.of(Role.MODERATOR), role);
 
         updateUserRoleUseCase.execute(id, userDto.getRole());
 
@@ -85,7 +85,7 @@ public class UserResource {
     @PatchMapping("/{id}/ban")
     public ResponseEntity<Void> ban(HttpServletRequest request, @PathVariable Long id, @RequestBody UserBanDto banDto) {
         String role = request.getAttribute("role").toString();
-        roleValidator.validate(List.of(Role.MODERATOR), role);
+        validateUserRoleUseCase.execute(List.of(Role.MODERATOR), role);
 
         Set<ConstraintViolation<UserBanDto>> violations = validator.validate(banDto);
         if (!violations.isEmpty()) {
@@ -100,7 +100,7 @@ public class UserResource {
     @PatchMapping("/{id}/unban")
     public ResponseEntity<Void> unban(HttpServletRequest request, @PathVariable Long id, @RequestBody UserBanDto banDto) {
         String role = request.getAttribute("role").toString();
-        roleValidator.validate(List.of(Role.MODERATOR), role);
+        validateUserRoleUseCase.execute(List.of(Role.MODERATOR), role);
 
         Set<ConstraintViolation<UserBanDto>> violations = validator.validate(banDto);
         if (!violations.isEmpty()) {

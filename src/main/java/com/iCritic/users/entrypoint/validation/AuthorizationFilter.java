@@ -1,6 +1,6 @@
 package com.iCritic.users.entrypoint.validation;
 
-import com.iCritic.users.dataprovider.gateway.jwt.impl.JwtProvider;
+import com.iCritic.users.dataprovider.gateway.jwt.JwtProvider;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;

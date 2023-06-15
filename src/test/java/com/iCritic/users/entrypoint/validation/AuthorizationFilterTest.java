@@ -1,6 +1,6 @@
 package com.iCritic.users.entrypoint.validation;
 
-import com.iCritic.users.dataprovider.gateway.jwt.impl.JwtProvider;
+import com.iCritic.users.dataprovider.gateway.jwt.JwtProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

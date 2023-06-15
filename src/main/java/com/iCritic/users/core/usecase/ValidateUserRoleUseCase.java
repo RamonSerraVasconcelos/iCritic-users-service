@@ -1,4 +1,4 @@
-package com.iCritic.users.entrypoint.validation;
+package com.iCritic.users.core.usecase;
 
 import com.iCritic.users.core.enums.Role;
 import com.iCritic.users.exception.ForbiddenAccessException;
@@ -11,9 +11,9 @@ import static java.util.Objects.nonNull;
 
 @Component
 @NoArgsConstructor
-public class RoleValidator {
+public class ValidateUserRoleUseCase {
 
-    public void validate(List<Role> allowedRoles, String currentRole) {
+    public void execute(List<Role> allowedRoles, String currentRole) {
         if(!nonNull(currentRole)) {
             throw new ForbiddenAccessException();
         }

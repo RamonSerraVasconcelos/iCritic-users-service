@@ -11,7 +11,7 @@ import com.iCritic.users.entrypoint.mapper.UserDtoMapper;
 import com.iCritic.users.entrypoint.model.UserBanDto;
 import com.iCritic.users.entrypoint.model.UserRequestDto;
 import com.iCritic.users.entrypoint.model.UserResponseDto;
-import com.iCritic.users.entrypoint.validation.RoleValidator;
+import com.iCritic.users.core.usecase.ValidateUserRoleUseCase;
 import com.iCritic.users.exception.ResourceViolationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -62,7 +62,7 @@ class UserResourceTest {
     private Validator validator;
 
     @Mock
-    private RoleValidator roleValidator;
+    private ValidateUserRoleUseCase validateUserRoleUseCase;
 
     @Captor
     private ArgumentCaptor<BanActionEnum> actionCaptor;
@@ -175,12 +175,12 @@ class UserResourceTest {
 
         request.setAttribute("role", userRequestDto.getRole());
 
-        doNothing().when(roleValidator).validate(any(), any());
+        doNothing().when(validateUserRoleUseCase).execute(any(), any());
         doNothing().when(updateUserRoleUseCase).execute(any(), any());
 
         userResource.changeRole(request, userRequestDto.getId(), userRequestDto);
 
-        verify(roleValidator).validate(any(), any());
+        verify(validateUserRoleUseCase).execute(any(), any());
         verify(updateUserRoleUseCase).execute(any(), any());
     }
 

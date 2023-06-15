@@ -3,7 +3,7 @@ package com.iCritic.users.entrypoint.resource;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.CreateUserUseCase;
 import com.iCritic.users.core.usecase.SignInUserUseCase;
-import com.iCritic.users.dataprovider.gateway.jwt.impl.JwtProvider;
+import com.iCritic.users.dataprovider.gateway.jwt.JwtProvider;
 import com.iCritic.users.entrypoint.mapper.UserDtoMapper;
 import com.iCritic.users.entrypoint.model.AuthorizationData;
 import com.iCritic.users.entrypoint.model.UserRequestDto;
