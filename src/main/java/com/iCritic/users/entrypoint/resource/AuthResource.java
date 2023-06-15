@@ -3,11 +3,11 @@ package com.iCritic.users.entrypoint.resource;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.CreateUserUseCase;
 import com.iCritic.users.core.usecase.SignInUserUseCase;
+import com.iCritic.users.dataprovider.gateway.jwt.impl.JwtProvider;
 import com.iCritic.users.entrypoint.mapper.UserDtoMapper;
 import com.iCritic.users.entrypoint.model.AuthorizationData;
 import com.iCritic.users.entrypoint.model.UserRequestDto;
 import com.iCritic.users.entrypoint.model.UserResponseDto;
-import com.iCritic.users.entrypoint.validation.JwtGenerator;
 import com.iCritic.users.exception.ResourceViolationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,7 +32,7 @@ public class AuthResource {
 
     private final Validator validator;
 
-    private final JwtGenerator jwtGenerator;
+    private final JwtProvider jwtProvider;
 
     @PostMapping(path = "/register")
     public UserResponseDto registerUser(@RequestBody UserRequestDto userRequestDto) {
@@ -65,13 +65,13 @@ public class AuthResource {
 
         User loggedUser = signInUserUseCase.execute(user);
 
-        if(!nonNull(loggedUser)) {
+        if (!nonNull(loggedUser)) {
             throw new ResourceViolationException("Invalid email or password");
         }
 
         AuthorizationData authorizationData = AuthorizationData.builder()
-                .accessToken(jwtGenerator.generateToken(loggedUser))
-                .refreshToken(jwtGenerator.generateRefreshToken(loggedUser))
+                .accessToken(jwtProvider.generateToken(loggedUser))
+                .refreshToken(jwtProvider.generateRefreshToken(loggedUser))
                 .build();
 
         Cookie refreshTokenCookie = new Cookie("refreshToken", authorizationData.getRefreshToken());

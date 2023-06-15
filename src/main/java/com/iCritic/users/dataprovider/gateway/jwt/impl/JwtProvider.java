@@ -1,4 +1,4 @@
-package com.iCritic.users.entrypoint.validation;
+package com.iCritic.users.dataprovider.gateway.jwt.impl;
 
 import com.iCritic.users.config.properties.ApplicationProperties;
 import com.iCritic.users.core.model.User;
@@ -14,12 +14,12 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-public class JwtGenerator {
+public class JwtProvider {
 
     @Autowired
     private ApplicationProperties applicationProperties;
 
-    private static final Logger logger = LoggerFactory.getLogger(JwtGenerator.class);
+    private static final Logger logger = LoggerFactory.getLogger(JwtProvider.class);
 
     public String generateToken(User user) {
         return Jwts.builder()

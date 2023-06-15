@@ -10,7 +10,7 @@ import com.iCritic.users.entrypoint.fixture.UserRequestDtoFixture;
 import com.iCritic.users.entrypoint.model.AuthorizationData;
 import com.iCritic.users.entrypoint.model.UserRequestDto;
 import com.iCritic.users.entrypoint.validation.AuthorizationFilter;
-import com.iCritic.users.entrypoint.validation.JwtGenerator;
+import com.iCritic.users.dataprovider.gateway.jwt.impl.JwtProvider;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +47,7 @@ class AuthResourceIntegrationTest {
     private SignInUserUseCase signInUserUseCase;
 
     @MockBean
-    private JwtGenerator jwtGenerator;
+    private JwtProvider jwtProvider;
 
     @Test
     void givenRequestToRegisterEndpointWithValidParams_thenRegisterAndReturnUser() throws Exception {
@@ -107,8 +107,8 @@ class AuthResourceIntegrationTest {
         String requestBody = objectMapper.writeValueAsString(userRequestDto);
 
         when(signInUserUseCase.execute(any(User.class))).thenReturn(loggedUser);
-        when(jwtGenerator.generateToken(any())).thenReturn(authorizationData.getAccessToken());
-        when(jwtGenerator.generateRefreshToken(any())).thenReturn(authorizationData.getRefreshToken());
+        when(jwtProvider.generateToken(any())).thenReturn(authorizationData.getAccessToken());
+        when(jwtProvider.generateRefreshToken(any())).thenReturn(authorizationData.getRefreshToken());
 
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/login")

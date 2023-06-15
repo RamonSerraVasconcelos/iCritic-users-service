@@ -1,5 +1,6 @@
 package com.iCritic.users.entrypoint.validation;
 
+import com.iCritic.users.dataprovider.gateway.jwt.impl.JwtProvider;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -17,7 +18,7 @@ import static java.util.Objects.nonNull;
 @AllArgsConstructor
 public class AuthorizationFilter extends OncePerRequestFilter {
 
-    private final JwtGenerator jwtGenerator;
+    private final JwtProvider jwtProvider;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -33,13 +34,13 @@ public class AuthorizationFilter extends OncePerRequestFilter {
             return;
         }
 
-        if(!jwtGenerator.validateToken(token)) {
+        if(!jwtProvider.validateToken(token)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
-        request.setAttribute("userId", jwtGenerator.getUserIdFromToken(token));
-        request.setAttribute("role", jwtGenerator.getUserRoleFromToken(token));
+        request.setAttribute("userId", jwtProvider.getUserIdFromToken(token));
+        request.setAttribute("role", jwtProvider.getUserRoleFromToken(token));
 
         filterChain.doFilter(request, response);
     }

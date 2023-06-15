@@ -3,6 +3,7 @@ package com.iCritic.users.entrypoint.validation;
 import com.iCritic.users.config.properties.ApplicationProperties;
 import com.iCritic.users.core.fixture.UserFixture;
 import com.iCritic.users.core.model.User;
+import com.iCritic.users.dataprovider.gateway.jwt.impl.JwtProvider;
 import com.iCritic.users.entrypoint.fixture.JwtTokenFixture;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,10 +16,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class JwtGeneratorTest {
+class JwtProviderTest {
 
     @InjectMocks
-    private JwtGenerator jwtGenerator;
+    private JwtProvider jwtProvider;
 
     @Mock
     private ApplicationProperties applicationProperties;
@@ -30,7 +31,7 @@ class JwtGeneratorTest {
         when(applicationProperties.getJwtExpiration()).thenReturn(JwtTokenFixture.EXPIRATION);
         when(applicationProperties.getJwtSecret()).thenReturn(JwtTokenFixture.SECRET);
 
-        String token = jwtGenerator.generateToken(user);
+        String token = jwtProvider.generateToken(user);
 
         assertNotNull(token);
         assertThat(token).isNotEmpty();
@@ -41,7 +42,7 @@ class JwtGeneratorTest {
         String token = JwtTokenFixture.load();
         when(applicationProperties.getJwtSecret()).thenReturn(JwtTokenFixture.SECRET);
 
-        boolean result = jwtGenerator.validateToken(token);
+        boolean result = jwtProvider.validateToken(token);
 
         assertTrue(result);
     }
@@ -51,7 +52,7 @@ class JwtGeneratorTest {
         String token = "invalid_token";
         when(applicationProperties.getJwtSecret()).thenReturn(JwtTokenFixture.SECRET);
 
-        boolean result = jwtGenerator.validateToken(token);
+        boolean result = jwtProvider.validateToken(token);
 
         assertFalse(result);
     }

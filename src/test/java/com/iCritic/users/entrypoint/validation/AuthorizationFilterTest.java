@@ -1,5 +1,6 @@
 package com.iCritic.users.entrypoint.validation;
 
+import com.iCritic.users.dataprovider.gateway.jwt.impl.JwtProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,7 +27,7 @@ class AuthorizationFilterTest {
     private AuthorizationFilter authorizationFilter;
 
     @Mock
-    private JwtGenerator jwtGenerator;
+    private JwtProvider jwtProvider;
 
     @Mock
     FilterChain filterChain;
@@ -53,9 +54,9 @@ class AuthorizationFilterTest {
         String userId = "1";
         String userRole = "DEFAULT";
 
-        when(jwtGenerator.validateToken(TOKEN)).thenReturn(true);
-        when(jwtGenerator.getUserIdFromToken(TOKEN)).thenReturn(userId);
-        when(jwtGenerator.getUserRoleFromToken(TOKEN)).thenReturn(userRole);
+        when(jwtProvider.validateToken(TOKEN)).thenReturn(true);
+        when(jwtProvider.getUserIdFromToken(TOKEN)).thenReturn(userId);
+        when(jwtProvider.getUserRoleFromToken(TOKEN)).thenReturn(userRole);
 
         request.setRequestURI("/private");
         request.addHeader("Authorization", "Bearer " + TOKEN);
@@ -90,7 +91,7 @@ class AuthorizationFilterTest {
 
     @Test
     void givenInvalidToken_thenReturnUnauthorizedResponse() throws ServletException, IOException {
-        when(jwtGenerator.validateToken(TOKEN)).thenReturn(false);
+        when(jwtProvider.validateToken(TOKEN)).thenReturn(false);
 
         request.setRequestURI("/private");
         request.addHeader("Authorization", "Bearer " + TOKEN);

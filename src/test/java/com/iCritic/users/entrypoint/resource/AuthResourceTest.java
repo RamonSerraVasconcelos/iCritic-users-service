@@ -12,7 +12,7 @@ import com.iCritic.users.entrypoint.mapper.UserDtoMapper;
 import com.iCritic.users.entrypoint.model.AuthorizationData;
 import com.iCritic.users.entrypoint.model.UserRequestDto;
 import com.iCritic.users.entrypoint.model.UserResponseDto;
-import com.iCritic.users.entrypoint.validation.JwtGenerator;
+import com.iCritic.users.dataprovider.gateway.jwt.impl.JwtProvider;
 import com.iCritic.users.exception.ResourceViolationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,7 +51,7 @@ class AuthResourceTest {
     private Validator validator;
 
     @Mock
-    private JwtGenerator jwtGenerator;
+    private JwtProvider jwtProvider;
 
     @Mock
     HttpServletResponse response;
@@ -107,8 +107,8 @@ class AuthResourceTest {
 
         when(validator.validate(userRequestDto)).thenReturn(Collections.emptySet());
         when(signInUserUseCase.execute(any())).thenReturn(user);
-        when(jwtGenerator.generateToken(any())).thenReturn(authorizationData.getAccessToken());
-        when(jwtGenerator.generateRefreshToken(any())).thenReturn(authorizationData.getRefreshToken());
+        when(jwtProvider.generateToken(any())).thenReturn(authorizationData.getAccessToken());
+        when(jwtProvider.generateRefreshToken(any())).thenReturn(authorizationData.getRefreshToken());
 
         AuthorizationData returnedAuthData = authResource.loginUser(userRequestDto, response);
 
