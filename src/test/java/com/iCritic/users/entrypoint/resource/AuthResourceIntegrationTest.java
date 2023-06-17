@@ -10,7 +10,7 @@ import com.iCritic.users.entrypoint.fixture.UserRequestDtoFixture;
 import com.iCritic.users.entrypoint.model.AuthorizationData;
 import com.iCritic.users.entrypoint.model.UserRequestDto;
 import com.iCritic.users.entrypoint.validation.AuthorizationFilter;
-import com.iCritic.users.dataprovider.gateway.jwt.JwtProvider;
+import com.iCritic.users.dataprovider.jwt.JwtProvider;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

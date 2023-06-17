@@ -2,24 +2,28 @@ package com.iCritic.users.entrypoint.resource;
 
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.CreateUserUseCase;
+import com.iCritic.users.core.usecase.FindUserByIdUseCase;
 import com.iCritic.users.core.usecase.SignInUserUseCase;
-import com.iCritic.users.dataprovider.gateway.jwt.JwtProvider;
+import com.iCritic.users.dataprovider.jwt.JwtProvider;
 import com.iCritic.users.entrypoint.mapper.UserDtoMapper;
 import com.iCritic.users.entrypoint.model.AuthorizationData;
 import com.iCritic.users.entrypoint.model.UserRequestDto;
 import com.iCritic.users.entrypoint.model.UserResponseDto;
 import com.iCritic.users.exception.ResourceViolationException;
+import com.iCritic.users.exception.UnauthorizedAccessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import java.util.Set;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @RestController
@@ -29,6 +33,8 @@ public class AuthResource {
     private final CreateUserUseCase createUserUseCase;
 
     private final SignInUserUseCase signInUserUseCase;
+
+    private final FindUserByIdUseCase findUserByIdUseCase;
 
     private final Validator validator;
 
@@ -80,5 +86,52 @@ public class AuthResource {
         response.addCookie(refreshTokenCookie);
 
         return authorizationData;
+    }
+
+    @PostMapping(path = "/refresh")
+    public AuthorizationData refreshToken(@RequestBody AuthorizationData authorizationDataRequest, HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = extractRefreshTokenFromRequest(request, authorizationDataRequest);
+
+        if(isNull(refreshToken)) {
+            throw new UnauthorizedAccessException("Invalid refresh token");
+        }
+
+        if(!jwtProvider.validateRefreshToken(refreshToken)) {
+            throw new UnauthorizedAccessException("Invalid refresh token");
+        }
+
+        User user = findUserByIdUseCase.execute(Long.parseLong(jwtProvider.getUserIdFromToken(refreshToken)));
+
+        AuthorizationData authorizationData = AuthorizationData.builder()
+                .accessToken(jwtProvider.generateToken(user))
+                .refreshToken(jwtProvider.generateRefreshToken(user))
+                .build();
+
+        Cookie refreshTokenCookie = new Cookie("refreshToken", authorizationData.getRefreshToken());
+        refreshTokenCookie.setHttpOnly(true);
+
+        response.addCookie(refreshTokenCookie);
+
+        return authorizationData;
+    }
+
+    private String extractRefreshTokenFromRequest(HttpServletRequest request, AuthorizationData authorizationDataRequest) {
+        String refreshToken = null;
+
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("refreshToken")) {
+                    refreshToken = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        if(isNull(refreshToken)) {
+            refreshToken = authorizationDataRequest.getRefreshToken();
+        }
+
+        return refreshToken;
     }
 }

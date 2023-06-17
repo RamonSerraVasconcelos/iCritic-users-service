@@ -29,14 +29,26 @@ CREATE TABLE banlist (
     action VARCHAR(5),
     motive VARCHAR(1000),
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (id)
 );
 
-ALTER TABLE if EXISTS users ADD CONSTRAINT UK_6dotkott2kjsp8vw4d0m25fb7 UNIQUE (email);
+CREATE TABLE refresh_tokens(
+    id VARCHAR(36) NOT NULL,
+    user_id INT8,
+    issued_at TIMESTAMP,
+    expires_at TIMESTAMP,
+    active BOOLEAN,
+    PRIMARY KEY (id)
+);
 
-ALTER TABLE if EXISTS users ADD CONSTRAINT FKjlpks00ofkq3sqd9hqiavv5lg FOREIGN KEY (country_id) REFERENCES countries;
+ALTER TABLE if EXISTS users ADD CONSTRAINT users_unique_email UNIQUE (email);
 
-ALTER TABLE if EXISTS banlist ADD CONSTRAINT IwYXrFBQidVFBqhz9ufP7MYmYjc FOREIGN KEY (user_id) REFERENCES users;
+ALTER TABLE if EXISTS users ADD CONSTRAINT fk_users_countries_id FOREIGN KEY (country_id) REFERENCES countries;
+
+ALTER TABLE if EXISTS banlist ADD CONSTRAINT fk_banlist_users_id FOREIGN KEY (user_id) REFERENCES users;
+
+ALTER TABLE if EXISTS refresh_tokens ADD CONSTRAINT fk_refresh_tokens_users_id FOREIGN KEY (user_id) REFERENCES users;
 
 -- FUNCTION TO CREATE AND UPDATE DATES
 CREATE OR REPLACE FUNCTION trigger_set_timestamp()

@@ -1,9 +1,6 @@
 package com.iCritic.users.exception.handler;
 
-import com.iCritic.users.exception.ResourceConflictException;
-import com.iCritic.users.exception.ResourceNotFoundException;
-import com.iCritic.users.exception.ResourceViolationException;
-import com.iCritic.users.exception.ForbiddenAccessException;
+import com.iCritic.users.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -34,6 +31,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceViolationException.class)
     public ResponseEntity<ErrorDetails> resourceViolationExceptionHandler(ResourceViolationException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(buildResponseError(ex.getMessage()));
+    }
+
+    @ExceptionHandler(UnauthorizedAccessException.class)
+    public ResponseEntity<ErrorDetails> unauthorizedAccessExceptionHandler(UnauthorizedAccessException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(buildResponseError(ex.getMessage()));
     }
 
     @ExceptionHandler(ForbiddenAccessException.class)

@@ -3,7 +3,6 @@ package com.iCritic.users.dataprovider.jwt;
 import com.iCritic.users.config.properties.ApplicationProperties;
 import com.iCritic.users.core.fixture.UserFixture;
 import com.iCritic.users.core.model.User;
-import com.iCritic.users.dataprovider.gateway.jwt.JwtProvider;
 import com.iCritic.users.entrypoint.fixture.JwtTokenFixture;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
