@@ -10,6 +10,7 @@ spring:
   application:
     properties:
       jwtSecret: ${CP_OF_ICRITIC_JWT_SECRET:b7c995a4acd856ea084449fa0000bd086d38888ecddd4d8f4b6b6805f03b028270bfcb5bc7de7c9f24fe7e8a317e633fedb2a3a4441f5af4dc7933e0ff6d7d1b}
+      jwtRefreshSecret: ${CP_OF_ICRITIC_JWT_REFRESH_SECRET:659402b168ac90cba8ea6f5954d268879415d099a0848912d023f5afc038c82cbaae463a23d69958c922eebed281a69d83231262f926f9442e8306fd4e6b7e3f'}
       jwtExpiration: ${CP_OF_ICRITIC_JWT_EXPIRATION:600000}
       jwtRefreshExpiration: ${CP_OF_ICRITIC_JWT_REFRESH_EXPIRATION:604800000}
 server:

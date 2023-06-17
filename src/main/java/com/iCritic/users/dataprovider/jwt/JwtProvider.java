@@ -4,7 +4,6 @@ import com.iCritic.users.config.properties.ApplicationProperties;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.dataprovider.gateway.database.entity.UserEntity;
 import com.iCritic.users.dataprovider.gateway.database.mapper.UserEntityMapper;
-import com.iCritic.users.exception.UnauthorizedAccessException;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -25,7 +24,8 @@ public class JwtProvider {
     @Autowired
     private ApplicationProperties applicationProperties;
 
-    private final JwtManager jwtManager;
+    @Autowired
+    private JwtManager jwtManager;
 
     private static final Logger logger = LoggerFactory.getLogger(JwtProvider.class);
 
@@ -61,12 +61,12 @@ public class JwtProvider {
                 .claim("userId", user.getId().toString())
                 .setIssuedAt(issuedAt)
                 .setExpiration(expiresAt)
-                .signWith(SignatureAlgorithm.HS512, applicationProperties.getJwtSecret())
+                .signWith(SignatureAlgorithm.HS512, applicationProperties.getJwtRefreshSecret())
                 .compact();
     }
 
     public boolean validateToken(String token) {
-        JwtParser jwtParser = createJwtParser();
+        JwtParser jwtParser = createTokenParser();
 
         try {
             jwtParser.parseClaimsJws(token);
@@ -88,18 +88,30 @@ public class JwtProvider {
     }
 
     public boolean validateRefreshToken(String token) {
-        boolean istokenValid = validateToken(token);
+        JwtParser jwtParser = createRefreshTokenParser();
 
-        if(!istokenValid) {
-            return false;
+        try {
+            jwtParser.parseClaimsJws(token);
+
+            if(!jwtManager.isTokenActive(getRefreshTokenId(token))) {
+                jwtManager.revokeUserTokens(Long.parseLong(getUserIdFromRefreshToken(token)));
+                return false;
+            }
+
+            return true;
+        } catch (SignatureException e) {
+            logger.error("Invalid JWT signature: {}", e.getMessage());
+        } catch (MalformedJwtException e) {
+            logger.error("Invalid JWT token: {}", e.getMessage());
+        } catch (ExpiredJwtException e) {
+            logger.error("JWT token is expired: {}", e.getMessage());
+        } catch (UnsupportedJwtException e) {
+            logger.error("JWT token is unsupported: {}", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            logger.error("JWT claims string is empty: {}", e.getMessage());
         }
 
-        if(!jwtManager.isTokenActive(getTokenId(token))) {
-            jwtManager.revokeUserTokens(Long.parseLong(getUserIdFromToken(token)));
-            return false;
-        }
-
-        return true;
+        return false;
     }
 
     public String getTokenId(String token) {
@@ -114,7 +126,19 @@ public class JwtProvider {
         return Jwts.parser().setSigningKey(applicationProperties.getJwtSecret()).parseClaimsJws(token).getBody().get("role").toString();
     }
 
-    private JwtParser createJwtParser() {
+    private JwtParser createTokenParser() {
         return Jwts.parser().setSigningKey(applicationProperties.getJwtSecret());
+    }
+
+    public String getRefreshTokenId(String token) {
+        return Jwts.parser().setSigningKey(applicationProperties.getJwtRefreshSecret()).parseClaimsJws(token).getBody().getId();
+    }
+
+    public String getUserIdFromRefreshToken(String token) {
+        return Jwts.parser().setSigningKey(applicationProperties.getJwtRefreshSecret()).parseClaimsJws(token).getBody().get("userId").toString();
+    }
+
+    private JwtParser createRefreshTokenParser() {
+        return Jwts.parser().setSigningKey(applicationProperties.getJwtRefreshSecret());
     }
 }

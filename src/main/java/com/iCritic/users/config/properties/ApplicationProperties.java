@@ -14,4 +14,5 @@ public class ApplicationProperties {
     private int jwtExpiration;
     private int jwtRefreshExpiration;
     private String jwtSecret;
+    private String jwtRefreshSecret;
 }
