@@ -100,7 +100,7 @@ public class AuthResource {
             throw new UnauthorizedAccessException("Invalid refresh token");
         }
 
-        User user = findUserByIdUseCase.execute(Long.parseLong(jwtProvider.getUserIdFromToken(refreshToken)));
+        User user = findUserByIdUseCase.execute(Long.parseLong(jwtProvider.getUserIdFromRefreshToken(refreshToken)));
 
         AuthorizationData authorizationData = AuthorizationData.builder()
                 .accessToken(jwtProvider.generateToken(user))
