@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iCritic.users.core.fixture.UserFixture;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.CreateUserUseCase;
+import com.iCritic.users.core.usecase.FindUserByIdUseCase;
 import com.iCritic.users.core.usecase.SignInUserUseCase;
 import com.iCritic.users.entrypoint.fixture.AuthorizationDataFixture;
 import com.iCritic.users.entrypoint.fixture.UserRequestDtoFixture;
@@ -45,6 +46,9 @@ class AuthResourceIntegrationTest {
 
     @MockBean
     private SignInUserUseCase signInUserUseCase;
+
+    @MockBean
+    private FindUserByIdUseCase findUserByIdUseCase;
 
     @MockBean
     private JwtProvider jwtProvider;
