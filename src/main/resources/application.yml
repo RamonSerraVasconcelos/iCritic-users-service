@@ -14,5 +14,6 @@ spring:
       jwtExpiration: ${CP_OF_ICRITIC_JWT_EXPIRATION:600000}
       jwtRefreshExpiration: ${CP_OF_ICRITIC_JWT_REFRESH_EXPIRATION:604800000}
 server:
+  port: 8081
   error:
     include-stacktrace: never

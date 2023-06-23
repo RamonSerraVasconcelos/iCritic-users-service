@@ -1,9 +1,12 @@
 package com.iCritic.users.entrypoint.validation;
 
 import com.iCritic.users.dataprovider.jwt.JwtProvider;
+import com.iCritic.users.exception.UnauthorizedAccessException;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -12,10 +15,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static java.util.Objects.nonNull;
+import static java.util.Objects.isNull;
 
 @Component
 @AllArgsConstructor
+@Slf4j
 public class AuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
@@ -27,32 +31,23 @@ public class AuthorizationFilter extends OncePerRequestFilter {
             return;
         }
 
-        String token = extractToken(request);
+        String token = request.getHeader("Authorization");
 
-        if(!nonNull(token)) {
+        if(isNull(token)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
-        if(!jwtProvider.validateToken(token)) {
+        try {
+            log.info("Retrieving information from access token id: [{}]", jwtProvider.getTokenId(token));
+            request.setAttribute("userId", jwtProvider.getUserIdFromToken(token));
+            request.setAttribute("role", jwtProvider.getUserRoleFromToken(token));
+        } catch(Exception e) {
+            log.error("Error retrieving claims from access token: [{}]", e.getMessage());
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
         }
-
-        request.setAttribute("userId", jwtProvider.getUserIdFromToken(token));
-        request.setAttribute("role", jwtProvider.getUserRoleFromToken(token));
 
         filterChain.doFilter(request, response);
-    }
-
-    private String extractToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
-
-        return null;
     }
 
     private boolean isEndpointOpen(HttpServletRequest request) {

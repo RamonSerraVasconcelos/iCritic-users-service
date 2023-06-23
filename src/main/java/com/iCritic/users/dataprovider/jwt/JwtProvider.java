@@ -65,28 +65,6 @@ public class JwtProvider {
                 .compact();
     }
 
-    public boolean validateToken(String token) {
-        JwtParser jwtParser = createTokenParser();
-
-        try {
-            jwtParser.parseClaimsJws(token);
-
-            return true;
-        } catch (SignatureException e) {
-            logger.error("Invalid JWT signature: {}", e.getMessage());
-        } catch (MalformedJwtException e) {
-            logger.error("Invalid JWT token: {}", e.getMessage());
-        } catch (ExpiredJwtException e) {
-            logger.error("JWT token is expired: {}", e.getMessage());
-        } catch (UnsupportedJwtException e) {
-            logger.error("JWT token is unsupported: {}", e.getMessage());
-        } catch (IllegalArgumentException e) {
-            logger.error("JWT claims string is empty: {}", e.getMessage());
-        }
-
-        return false;
-    }
-
     public boolean validateRefreshToken(String token) {
         JwtParser jwtParser = createRefreshTokenParser();
 
@@ -114,20 +92,27 @@ public class JwtProvider {
         return false;
     }
 
+    public Claims getTokenClaims(String token) {
+        return Jwts.parser().parseClaimsJwt(token).getBody();
+    }
+
     public String getTokenId(String token) {
-        return Jwts.parser().setSigningKey(applicationProperties.getJwtSecret()).parseClaimsJws(token).getBody().getId();
+        Claims claims = getTokenClaims(token);
+        return claims.getId();
     }
 
     public String getUserIdFromToken(String token) {
-        return Jwts.parser().setSigningKey(applicationProperties.getJwtSecret()).parseClaimsJws(token).getBody().get("userId").toString();
+        Claims claims = getTokenClaims(token);
+        return claims.get("userId").toString();
     }
 
     public String getUserRoleFromToken(String token) {
-        return Jwts.parser().setSigningKey(applicationProperties.getJwtSecret()).parseClaimsJws(token).getBody().get("role").toString();
+        Claims claims = getTokenClaims(token);
+        return claims.get("role").toString();
     }
 
-    private JwtParser createTokenParser() {
-        return Jwts.parser().setSigningKey(applicationProperties.getJwtSecret());
+    private JwtParser createRefreshTokenParser() {
+        return Jwts.parser().setSigningKey(applicationProperties.getJwtRefreshSecret());
     }
 
     public String getRefreshTokenId(String token) {
@@ -136,9 +121,5 @@ public class JwtProvider {
 
     public String getUserIdFromRefreshToken(String token) {
         return Jwts.parser().setSigningKey(applicationProperties.getJwtRefreshSecret()).parseClaimsJws(token).getBody().get("userId").toString();
-    }
-
-    private JwtParser createRefreshTokenParser() {
-        return Jwts.parser().setSigningKey(applicationProperties.getJwtRefreshSecret());
     }
 }
