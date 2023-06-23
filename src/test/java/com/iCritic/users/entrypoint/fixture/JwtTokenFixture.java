@@ -29,4 +29,12 @@ public class JwtTokenFixture {
                 .signWith(SignatureAlgorithm.HS512, REFRESH_SECRET)
                 .compact();
     }
+
+    public static String loadUnsignedToken() {
+        return Jwts.builder()
+                .setId(UUID.randomUUID().toString())
+                .claim("userId", 1L)
+                .claim("role", "DEFAULT")
+                .compact();
+    }
 }

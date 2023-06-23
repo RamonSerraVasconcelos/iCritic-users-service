@@ -60,23 +60,24 @@ class JwtProviderTest {
     }
 
     @Test
-    void givenValidToken_whenValidating_thenReturnTrue() {
-        String token = JwtTokenFixture.load();
-        when(applicationProperties.getJwtSecret()).thenReturn(JwtTokenFixture.SECRET);
+    void givenValidToken_whenRetrievingClaims_thenExecuteSuccessfully() {
+        String token = JwtTokenFixture.loadUnsignedToken();
 
-        boolean result = jwtProvider.validateToken(token);
+        String userId = jwtProvider.getUserIdFromToken(token);
+        String role = jwtProvider.getUserRoleFromToken(token);
 
-        assertTrue(result);
+        assertNotNull(userId);
+        assertNotNull(role);
+        assertThat(userId).isNotEmpty();
+        assertThat(role).isNotEmpty();
     }
 
     @Test
-    void givenInvalidToken_whenValidating_thenReturnFalse() {
+    void givenInvalidToken_whenRetrievingClaims_thenThrowException() {
         String token = "invalid_token";
-        when(applicationProperties.getJwtSecret()).thenReturn(JwtTokenFixture.SECRET);
 
-        boolean result = jwtProvider.validateToken(token);
-
-        assertFalse(result);
+        assertThrows(Exception.class, () -> jwtProvider.getUserIdFromToken(token));
+        assertThrows(Exception.class, () -> jwtProvider.getUserRoleFromToken(token));
     }
 
     @Test
@@ -95,9 +96,9 @@ class JwtProviderTest {
     @Test
     void givenInvalidRefreshToken_whenValidating_thenReturnFalse() {
         String token = "invalid_token";
-        when(applicationProperties.getJwtSecret()).thenReturn(JwtTokenFixture.REFRESH_SECRET);
+        when(applicationProperties.getJwtRefreshSecret()).thenReturn(JwtTokenFixture.REFRESH_SECRET);
 
-        boolean result = jwtProvider.validateToken(token);
+        boolean result = jwtProvider.validateRefreshToken(token);
 
         assertFalse(result);
     }

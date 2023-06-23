@@ -45,6 +45,7 @@ public class AuthorizationFilter extends OncePerRequestFilter {
         } catch(Exception e) {
             log.error("Error retrieving claims from access token: [{}]", e.getMessage());
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
         }
 
         filterChain.doFilter(request, response);

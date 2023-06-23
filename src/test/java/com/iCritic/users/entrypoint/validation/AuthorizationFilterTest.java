@@ -1,6 +1,7 @@
 package com.iCritic.users.entrypoint.validation;
 
 import com.iCritic.users.dataprovider.jwt.JwtProvider;
+import io.jsonwebtoken.MalformedJwtException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,12 +55,11 @@ class AuthorizationFilterTest {
         String userId = "1";
         String userRole = "DEFAULT";
 
-        when(jwtProvider.validateToken(TOKEN)).thenReturn(true);
         when(jwtProvider.getUserIdFromToken(TOKEN)).thenReturn(userId);
         when(jwtProvider.getUserRoleFromToken(TOKEN)).thenReturn(userRole);
 
         request.setRequestURI("/private");
-        request.addHeader("Authorization", "Bearer " + TOKEN);
+        request.addHeader("Authorization", TOKEN);
 
         authorizationFilter.doFilterInternal(request, response, filterChain);
 
@@ -91,10 +91,11 @@ class AuthorizationFilterTest {
 
     @Test
     void givenInvalidToken_thenReturnUnauthorizedResponse() throws ServletException, IOException {
-        when(jwtProvider.validateToken(TOKEN)).thenReturn(false);
-
+        String invalidToken = "invalid_token";
         request.setRequestURI("/private");
-        request.addHeader("Authorization", "Bearer " + TOKEN);
+        request.addHeader("Authorization", invalidToken);
+
+        doThrow(MalformedJwtException.class).when(jwtProvider).getUserIdFromToken(invalidToken);
 
         authorizationFilter.doFilterInternal(request, response, filterChain);
 
