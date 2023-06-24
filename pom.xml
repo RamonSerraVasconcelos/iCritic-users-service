@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.iCritic</groupId>
-	<artifactId>iCritic</artifactId>
+	<artifactId>icritic-users-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>iCritic</name>
-	<description>Project for rating movies</description>
+	<name>icritic-users-service</name>
+	<description>iCritic application service responsible for handling user data</description>
 	<properties>
 		<java.version>11</java.version>
 		<org.mapstruct.version>1.5.3.Final</org.mapstruct.version>
