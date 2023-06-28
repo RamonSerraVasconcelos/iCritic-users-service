@@ -58,6 +58,9 @@ class UserResourceIntegrationTest {
     @MockBean
     private ValidateUserRoleUseCase validateUserRoleUseCase;
 
+    @MockBean
+    private UpdateUserPictureUseCase updateUserPictureUseCase;
+
     @Test
     void givenRequestToUsersEndpoint_thenReturnAllUsers() throws Exception {
         List<User> users = List.of(UserFixture.load(), UserFixture.load(), UserFixture.load());
