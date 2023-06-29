@@ -71,11 +71,9 @@
             <scope>test</scope>
         </dependency>
 		<dependency>
-			<groupId>com.azure.spring</groupId>
-			<artifactId>spring-cloud-azure-dependencies</artifactId>
-			<version>4.8.0</version>
-			<type>pom</type>
-			<scope>import</scope>
+			<groupId>com.azure</groupId>
+			<artifactId>azure-storage-blob</artifactId>
+			<version>12.10.0</version>
 		</dependency>
     </dependencies>
 
