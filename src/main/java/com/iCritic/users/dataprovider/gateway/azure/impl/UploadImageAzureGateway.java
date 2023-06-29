@@ -2,7 +2,6 @@ package com.iCritic.users.dataprovider.gateway.azure.impl;
 
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
-import com.azure.storage.blob.BlobServiceClient;
 import com.iCritic.users.config.AzureStorageConfig;
 import com.iCritic.users.config.properties.AzureStorageProperties;
 import com.iCritic.users.core.model.Image;
@@ -26,13 +25,12 @@ public class UploadImageAzureGateway implements UploadImageBoundary {
 
     public void execute(Image image) {
         try {
-            byte[] content = FileCopyUtils.copyToByteArray(image.getFile());
-            BlobServiceClient blobServiceClient = azureStorageConfig.getBlobServiceClient();
-
-            BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(azureStorageProperties.getContainerName());
+            BlobContainerClient containerClient = azureStorageConfig.getPicturesBlobContainerClient();
             BlobClient blobClient = containerClient.getBlobClient(image.getName());
 
+            byte[] content = FileCopyUtils.copyToByteArray(image.getFile());
             ByteArrayInputStream inputStream = new ByteArrayInputStream(content);
+
             blobClient.upload(inputStream, content.length);
         } catch (Exception e) {
             log.error("Error while uploading image:", e);
