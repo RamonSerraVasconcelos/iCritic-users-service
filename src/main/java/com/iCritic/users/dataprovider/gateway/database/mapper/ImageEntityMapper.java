@@ -3,7 +3,6 @@ package com.iCritic.users.dataprovider.gateway.database.mapper;
 import com.iCritic.users.core.model.Image;
 import com.iCritic.users.dataprovider.gateway.database.entity.ImageEntity;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 @Mapper

@@ -1,21 +1,21 @@
 package com.iCritic.users.entrypoint.validation;
 
-import com.iCritic.users.dataprovider.jwt.JwtProvider;
-import com.iCritic.users.exception.UnauthorizedAccessException;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
+import static java.util.Objects.isNull;
+
+import java.io.IOException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
-import static java.util.Objects.isNull;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import com.iCritic.users.dataprovider.jwt.JwtProvider;
+
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @AllArgsConstructor
@@ -25,15 +25,16 @@ public class AuthorizationFilter extends OncePerRequestFilter {
     private final JwtProvider jwtProvider;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if(isEndpointOpen(request)) {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+        if (isEndpointOpen(request)) {
             filterChain.doFilter(request, response);
             return;
         }
 
         String token = request.getHeader("Authorization");
 
-        if(isNull(token)) {
+        if (isNull(token)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
@@ -42,7 +43,7 @@ public class AuthorizationFilter extends OncePerRequestFilter {
             log.info("Retrieving information from access token id: [{}]", jwtProvider.getTokenId(token));
             request.setAttribute("userId", jwtProvider.getUserIdFromToken(token));
             request.setAttribute("role", jwtProvider.getUserRoleFromToken(token));
-        } catch(Exception e) {
+        } catch (Exception e) {
             log.error("Error retrieving claims from access token: [{}]", e.getMessage());
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;

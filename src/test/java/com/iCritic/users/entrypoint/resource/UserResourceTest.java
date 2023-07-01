@@ -4,22 +4,32 @@ import com.iCritic.users.core.enums.BanActionEnum;
 import com.iCritic.users.core.fixture.CountryFixture;
 import com.iCritic.users.core.fixture.UserFixture;
 import com.iCritic.users.core.model.User;
-import com.iCritic.users.core.usecase.*;
+import com.iCritic.users.core.usecase.FindUserByIdUseCase;
+import com.iCritic.users.core.usecase.FindUsersUseCase;
+import com.iCritic.users.core.usecase.UpdateUserPictureUseCase;
+import com.iCritic.users.core.usecase.UpdateUserRoleUseCase;
+import com.iCritic.users.core.usecase.UpdateUserStatusUseCase;
+import com.iCritic.users.core.usecase.UpdateUserUseCase;
+import com.iCritic.users.core.usecase.ValidateUserRoleUseCase;
 import com.iCritic.users.entrypoint.fixture.UserBanDtoFixture;
 import com.iCritic.users.entrypoint.fixture.UserRequestDtoFixture;
 import com.iCritic.users.entrypoint.mapper.UserDtoMapper;
 import com.iCritic.users.entrypoint.model.UserBanDto;
 import com.iCritic.users.entrypoint.model.UserRequestDto;
 import com.iCritic.users.entrypoint.model.UserResponseDto;
-import com.iCritic.users.core.usecase.ValidateUserRoleUseCase;
 import com.iCritic.users.exception.ResourceViolationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockMultipartFile;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Path;
@@ -30,9 +40,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserResourceTest {
@@ -63,6 +79,9 @@ class UserResourceTest {
 
     @Mock
     private ValidateUserRoleUseCase validateUserRoleUseCase;
+
+    @Mock
+    private UpdateUserPictureUseCase updateUserPictureUseCase;
 
     @Captor
     private ArgumentCaptor<BanActionEnum> actionCaptor;
@@ -167,6 +186,20 @@ class UserResourceTest {
         when(updateUserUseCase.execute(any(), any())).thenReturn(user);
 
         assertDoesNotThrow(() -> userResource.update(request, userRequestDto));
+    }
+
+    @Test
+    void givenCallToChangeProfilePictureWithValidParameters_thenCallupdateUserPictureUseCaseAndReturnOk() {
+        MockMultipartFile file = new MockMultipartFile("file", "test.png", "image/png", "test.png".getBytes());
+
+        request.setAttribute("userId", 1L);
+        doNothing().when(updateUserPictureUseCase).execute(any(), any(), any());
+
+        ResponseEntity<Void> response = userResource.changeProfilePicture(request, file);
+
+        verify(updateUserPictureUseCase).execute(any(), any(), any());
+        assertNotNull(response);
+        assertEquals(response.getStatusCode(), HttpStatus.OK);
     }
 
     @Test

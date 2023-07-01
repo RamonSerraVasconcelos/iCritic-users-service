@@ -1,10 +1,9 @@
 package com.iCritic.users.entrypoint.fixture;
 
+import java.util.UUID;
+
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 public class JwtTokenFixture {
 
