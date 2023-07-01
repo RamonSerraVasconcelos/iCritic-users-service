@@ -18,6 +18,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -174,6 +175,21 @@ class UserResourceIntegrationTest {
 
         mockMvc.perform(requestBuilder)
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void givenRequestToChangeProfilePictureWithValidParameters_thenReturnResponseOk() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("file", "test.png", "image/png", "test".getBytes());
+
+        doNothing().when(updateUserPictureUseCase).execute(any(), any(), any());
+
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
+                .multipart("/users/profile-picture")
+                .file(file)
+                .requestAttr("userId", 1L);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isOk());
     }
 
     @Test
