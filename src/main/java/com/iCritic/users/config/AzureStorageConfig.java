@@ -1,5 +1,6 @@
 package com.iCritic.users.config;
 
+import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
@@ -17,9 +18,10 @@ public class AzureStorageConfig {
         return new BlobServiceClientBuilder().connectionString(azureStorageProperties.getConnectionString()).buildClient();
     }
 
-    public BlobContainerClient getPicturesBlobContainerClient() {
+    public BlobClient getBlobClient(String imageName) {
         BlobServiceClient blobServiceClient = getBlobServiceClient();
 
-        return blobServiceClient.getBlobContainerClient(azureStorageProperties.getContainerName());
+        BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(azureStorageProperties.getContainerName());
+        return containerClient.getBlobClient(imageName);
     }
 }
