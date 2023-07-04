@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.multipart.MultipartException;
 
 import java.net.ConnectException;
 
@@ -57,5 +58,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(FileSizeLimitExceededException.class)
     public ResponseEntity<ErrorDetails> fileSizeLimitExceededExceptionHandler(FileSizeLimitExceededException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(buildResponseError("File size limit exceeded"));
+    }
+
+    @ExceptionHandler(MultipartException.class)
+    public ResponseEntity<ErrorDetails> multipartExceptionHandler(MultipartException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(buildResponseError(ex.getMessage()));
     }
 }
