@@ -1,22 +1,22 @@
 package com.iCritic.users.dataprovider.gateway.database.impl;
 
-import com.iCritic.users.core.fixture.UserFixture;
-import com.iCritic.users.core.model.User;
-import com.iCritic.users.dataprovider.gateway.database.entity.UserEntity;
-import com.iCritic.users.dataprovider.gateway.database.fixture.UserEntityFixture;
-import com.iCritic.users.dataprovider.gateway.database.repository.UserRepository;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import com.iCritic.users.core.fixture.UserFixture;
+import com.iCritic.users.core.model.User;
+import com.iCritic.users.dataprovider.gateway.database.entity.UserEntity;
+import com.iCritic.users.dataprovider.gateway.database.fixture.UserEntityFixture;
+import com.iCritic.users.dataprovider.gateway.database.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
 class FindUserByEmailGatewayTest {

@@ -1,4 +1,7 @@
 spring:
+  servlet:
+    multipart:
+      max-file-size: 5MB
   datasource:
     url: ${CP_OF_ICRITIC_DB_URL:jdbc:postgresql://localhost:5432/copyOfIcritic}
     username: ${CP_OF_ICRITIC_DB_USERNAME:postgres}
@@ -13,6 +16,9 @@ spring:
       jwtRefreshSecret: ${CP_OF_ICRITIC_JWT_REFRESH_SECRET:659402b168ac90cba8ea6f5954d268879415d099a0848912d023f5afc038c82cbaae463a23d69958c922eebed281a69d83231262f926f9442e8306fd4e6b7e3f'}
       jwtExpiration: ${CP_OF_ICRITIC_JWT_EXPIRATION:600000}
       jwtRefreshExpiration: ${CP_OF_ICRITIC_JWT_REFRESH_EXPIRATION:604800000}
+      azure:
+        connectionString: ${CP_OF_ICRITIC_AZURE_CONNECTION_STRING}
+        containerName: ${CP_OF_ICRITIC_AZURE_CONTAINER_NAME}
 server:
   port: 8081
   error:

@@ -3,20 +3,35 @@ package com.iCritic.users.entrypoint.resource;
 import com.iCritic.users.core.enums.BanActionEnum;
 import com.iCritic.users.core.enums.Role;
 import com.iCritic.users.core.model.User;
-import com.iCritic.users.core.usecase.*;
+import com.iCritic.users.core.usecase.FindUserByIdUseCase;
+import com.iCritic.users.core.usecase.FindUsersUseCase;
+import com.iCritic.users.core.usecase.UpdateUserPictureUseCase;
+import com.iCritic.users.core.usecase.UpdateUserRoleUseCase;
+import com.iCritic.users.core.usecase.UpdateUserStatusUseCase;
+import com.iCritic.users.core.usecase.UpdateUserUseCase;
+import com.iCritic.users.core.usecase.ValidateUserRoleUseCase;
 import com.iCritic.users.entrypoint.mapper.UserDtoMapper;
 import com.iCritic.users.entrypoint.model.UserBanDto;
 import com.iCritic.users.entrypoint.model.UserRequestDto;
 import com.iCritic.users.entrypoint.model.UserResponseDto;
-import com.iCritic.users.core.usecase.ValidateUserRoleUseCase;
 import com.iCritic.users.exception.ResourceViolationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -39,6 +54,8 @@ public class UserResource {
     private final Validator validator;
 
     private final ValidateUserRoleUseCase validateUserRoleUseCase;
+
+    private final UpdateUserPictureUseCase updateUserPictureUseCase;
 
     @GetMapping
     public List<UserResponseDto> loadAll() {
@@ -70,6 +87,16 @@ public class UserResource {
 
         User updatedUser = updateUserUseCase.execute(userId, user);
         return mapper.userToUserResponseDto(updatedUser);
+    }
+
+    @PostMapping("/profile-picture")
+    public ResponseEntity<Void> changeProfilePicture(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
+        try {
+            updateUserPictureUseCase.execute(Long.parseLong(request.getAttribute("userId").toString()), file.getOriginalFilename(), file.getInputStream());
+            return ResponseEntity.ok().build();
+        } catch (IOException e) {
+            throw new ResourceViolationException("Invalid file");
+        }
     }
 
     @PatchMapping("/{id}/role")

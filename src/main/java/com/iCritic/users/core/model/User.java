@@ -22,6 +22,7 @@ public class User {
     private boolean active = true;
     private Role role = Role.DEFAULT;
     private Country country;
+    private Image profilePicture;
     private transient Long countryId;
     private String passwordResetHash;
     private Date passwordResetDate;

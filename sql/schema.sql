@@ -11,6 +11,7 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL, 
     description VARCHAR(255), 
     country_id INT8,
+    profile_picture_id INT8,
     role VARCHAR(255),
     active BOOLEAN, 
     email_reset_date TIMESTAMP, 
@@ -42,13 +43,23 @@ CREATE TABLE refresh_tokens(
     PRIMARY KEY (id)
 );
 
-ALTER TABLE if EXISTS users ADD CONSTRAINT users_unique_email UNIQUE (email);
+CREATE TABLE images(
+    id BIGSERIAL NOT NULL,
+    name VARCHAR(29),
+    original_name VARCHAR(75),
+    extension VARCHAR(4),
+    PRIMARY KEY (id)
+);
 
-ALTER TABLE if EXISTS users ADD CONSTRAINT fk_users_countries_id FOREIGN KEY (country_id) REFERENCES countries;
+ALTER TABLE IF EXISTS users ADD CONSTRAINT users_unique_email UNIQUE (email);
 
-ALTER TABLE if EXISTS banlist ADD CONSTRAINT fk_banlist_users_id FOREIGN KEY (user_id) REFERENCES users;
+ALTER TABLE IF EXISTS users ADD CONSTRAINT fk_users_countries_id FOREIGN KEY (country_id) REFERENCES countries;
 
-ALTER TABLE if EXISTS refresh_tokens ADD CONSTRAINT fk_refresh_tokens_users_id FOREIGN KEY (user_id) REFERENCES users;
+ALTER TABLE IF EXISTS users ADD CONSTRAINT fk_users_images_id FOREIGN KEY (profile_picture_id) REFERENCES images;
+
+ALTER TABLE IF EXISTS banlist ADD CONSTRAINT fk_banlist_users_id FOREIGN KEY (user_id) REFERENCES users;
+
+ALTER TABLE IF EXISTS refresh_tokens ADD CONSTRAINT fk_refresh_tokens_users_id FOREIGN KEY (user_id) REFERENCES users;
 
 -- FUNCTION TO CREATE AND UPDATE DATES
 CREATE OR REPLACE FUNCTION trigger_set_timestamp()

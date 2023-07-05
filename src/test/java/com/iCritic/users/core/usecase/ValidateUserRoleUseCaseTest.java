@@ -1,17 +1,17 @@
 package com.iCritic.users.core.usecase;
 
-import com.iCritic.users.core.enums.Role;
-import com.iCritic.users.core.usecase.ValidateUserRoleUseCase;
-import com.iCritic.users.exception.ForbiddenAccessException;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import com.iCritic.users.core.enums.Role;
+import com.iCritic.users.exception.ForbiddenAccessException;
 
 @ExtendWith(MockitoExtension.class)
 class ValidateUserRoleUseCaseTest {
