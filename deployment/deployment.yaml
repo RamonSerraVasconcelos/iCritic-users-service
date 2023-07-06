@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: icritic-users-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: icritic-users-service
+  template:
+    metadata:
+      labels:
+        app: icritic-users-service
+    spec:
+      containers:
+        - name: icritic-users-service
+          image: ramonsvasconcelos/icritic-users-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8081
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: icritic-users-service-loadbalancer
+spec:
+  type: LoadBalancer
+  selector:
+    app: icritic-users-service
+  ports:
+    - port: 80
+      targetPort: 8081
