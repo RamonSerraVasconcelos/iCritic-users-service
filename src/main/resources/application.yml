@@ -3,22 +3,22 @@ spring:
     multipart:
       max-file-size: 5MB
   datasource:
-    url: ${ICRITIC-DB-URL:jdbc:postgresql://localhost:5432/copyOfIcritic}
-    username: ${ICRITIC-DB-USERNAME:postgres}
-    password: ${ICRITIC-DB-PASSWORD:postgres}
+    url: ${ICRITIC_DB_URL:jdbc:postgresql://localhost:5432/copyOfIcritic}
+    username: ${ICRITIC_DB_USERNAME:postgres}
+    password: ${ICRITIC_DB_PASSWORD:postgres}
   jpa:
     database: POSTGRESQL
   error:
     include-stacktrace: never
   application:
     properties:
-      jwtSecret: ${ICRITIC-JWT-SECRET:b7c995a4acd856ea084449fa0000bd086d38888ecddd4d8f4b6b6805f03b028270bfcb5bc7de7c9f24fe7e8a317e633fedb2a3a4441f5af4dc7933e0ff6d7d1b}
-      jwtRefreshSecret: ${ICRITIC-JWT-REFRESH-SECRET:659402b168ac90cba8ea6f5954d268879415d099a0848912d023f5afc038c82cbaae463a23d69958c922eebed281a69d83231262f926f9442e8306fd4e6b7e3f'}
-      jwtExpiration: ${ICRITIC-JWT-EXPIRATION:600000}
-      jwtRefreshExpiration: ${ICRITIC-JWT-REFRESH-EXPIRATION:604800000}
+      jwtSecret: ${ICRITIC_JWT_SECRET:b7c995a4acd856ea084449fa0000bd086d38888ecddd4d8f4b6b6805f03b028270bfcb5bc7de7c9f24fe7e8a317e633fedb2a3a4441f5af4dc7933e0ff6d7d1b}
+      jwtRefreshSecret: ${ICRITIC_JWT_REFRESH_SECRET:659402b168ac90cba8ea6f5954d268879415d099a0848912d023f5afc038c82cbaae463a23d69958c922eebed281a69d83231262f926f9442e8306fd4e6b7e3f'}
+      jwtExpiration: ${ICRITIC_JWT_EXPIRATION:600000}
+      jwtRefreshExpiration: ${ICRITIC_JWT_REFRESH_EXPIRATION:604800000}
       azure:
-        connectionString: ${ICRITIC-AZURE-CONNECTION-STRING}
-        containerName: ${ICRITIC-AZURE-CONTAINER-NAME}
+        connectionString: ${ICRITIC_AZURE_CONNECTION_STRING}
+        containerName: ${ICRITIC_AZURE_CONTAINER_NAME}
 server:
   port: 8081
   error:
