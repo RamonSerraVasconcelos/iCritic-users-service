@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: icritic-users-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: icritic-users-service
+  template:
+    metadata:
+      labels:
+        app: icritic-users-service
+    spec:
+      containers:
+        - name: icritic-users-service
+          image: ramonsvasconcelos/icritic-users-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8081
+          envFrom:
+          - configMapRef:
+              name: icritic-users-configmap
+          - secretRef:
+              name: icritic-users-secrets
+          volumeMounts:
+            - name: secrets-store01-inline
+              mountPath: "/mnt/secrets-store"
+              readOnly: true
+      volumes:
+        - name: secrets-store01-inline
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: "icritic-stage-users-keyvault-provider"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: icritic-users-service-loadbalancer
+spec:
+  type: ClusterIP
+  selector:
+    app: icritic-users-service
+  ports:
+    - protocol: TCP
+      port: 8081
+      targetPort: 8081

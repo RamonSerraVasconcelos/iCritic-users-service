@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.iCritic</groupId>
 	<artifactId>icritic-users-service</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<name>icritic-users-service</name>
 	<description>iCritic application service responsible for handling user data</description>
 	<properties>
@@ -76,9 +76,12 @@
 			<version>12.10.0</version>
 		</dependency>
     </dependencies>
-
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -110,5 +113,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>
