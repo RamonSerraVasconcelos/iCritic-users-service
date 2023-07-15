@@ -40,9 +40,10 @@ kind: Service
 metadata:
   name: icritic-users-service-loadbalancer
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: icritic-users-service
   ports:
-    - port: 80
+    - protocol: TCP
+      port: 8081
       targetPort: 8081
