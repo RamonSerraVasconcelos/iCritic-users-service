@@ -19,10 +19,10 @@ spec:
           ports:
             - containerPort: 8081
           envFrom:
-            - configMapRef:
-                name: icritic-users-configmap
-            - secretRef:
-                name: icritic-users-secrets
+          - configMapRef:
+              name: icritic-users-configmap
+          - secretRef:
+              name: icritic-users-secrets
           volumeMounts:
             - name: secrets-store01-inline
               mountPath: "/mnt/secrets-store"
@@ -33,7 +33,7 @@ spec:
             driver: secrets-store.csi.k8s.io
             readOnly: true
             volumeAttributes:
-              secretProviderClass: "icritic-stage-keyvault-provider"
+              secretProviderClass: "icritic-stage-users-keyvault-provider"
 ---
 apiVersion: v1
 kind: Service
