@@ -18,5 +18,6 @@ public class UserResponseDto {
     private boolean active;
     private Role role;
     private CountryResponseDto country;
+    private String profilePictureUrl;
     private LocalDateTime createdAt;
 }

@@ -19,6 +19,7 @@ spring:
       azure:
         connectionString: ${ICRITIC_AZURE_CONNECTION_STRING}
         containerName: ${ICRITIC_AZURE_CONTAINER_NAME}
+        containerHostUrl: ${ICRITIC_AZURE_CONTAINER_URL:https://icriticstagestorage.blob.core.windows.net/icritic-pictures}
 server:
   port: 8081
   error:
