@@ -17,6 +17,7 @@ public class UserFixture {
                 .active(true)
                 .role(Role.DEFAULT)
                 .countryId(1L)
+                .profilePicture(ImageFixture.load())
                 .country(CountryFixture.load())
                 .createdAt(LocalDateTime.now())
                 .build();

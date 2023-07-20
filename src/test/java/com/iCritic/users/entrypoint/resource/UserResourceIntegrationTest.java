@@ -1,13 +1,17 @@
 package com.iCritic.users.entrypoint.resource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iCritic.users.config.properties.AzureStorageProperties;
 import com.iCritic.users.core.fixture.UserFixture;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.*;
 import com.iCritic.users.entrypoint.fixture.UserBanDtoFixture;
 import com.iCritic.users.entrypoint.fixture.UserRequestDtoFixture;
+import com.iCritic.users.entrypoint.fixture.UserResponseDtoFixture;
+import com.iCritic.users.entrypoint.mapper.UserDtoMapper;
 import com.iCritic.users.entrypoint.model.UserBanDto;
 import com.iCritic.users.entrypoint.model.UserRequestDto;
+import com.iCritic.users.entrypoint.model.UserResponseDto;
 import com.iCritic.users.entrypoint.validation.AuthorizationFilter;
 import com.iCritic.users.core.usecase.ValidateUserRoleUseCase;
 import com.iCritic.users.exception.ResourceNotFoundException;
@@ -62,11 +66,16 @@ class UserResourceIntegrationTest {
     @MockBean
     private UpdateUserPictureUseCase updateUserPictureUseCase;
 
+    @MockBean
+    private UserDtoMapper userDtoMapper;
+
     @Test
     void givenRequestToUsersEndpoint_thenReturnAllUsers() throws Exception {
         List<User> users = List.of(UserFixture.load(), UserFixture.load(), UserFixture.load());
+        UserResponseDto userResponseDto = UserResponseDtoFixture.load();
 
         when(findUsersUseCase.execute()).thenReturn(users);
+        when(userDtoMapper.userToUserResponseDto(any())).thenReturn(userResponseDto);
 
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
                 .get("/users")
@@ -90,8 +99,10 @@ class UserResourceIntegrationTest {
     @Test
     void givenRequestToGetUserEndpoint_thenReturnUser() throws Exception {
         User user = UserFixture.load();
+        UserResponseDto userResponseDto = UserResponseDtoFixture.load();
 
         when(findUserByIdUseCase.execute(user.getId())).thenReturn(user);
+        when(userDtoMapper.userToUserResponseDto(any())).thenReturn(userResponseDto);
 
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
                 .get("/users/" + user.getId())
@@ -130,12 +141,15 @@ class UserResourceIntegrationTest {
     @Test
     void givenRequestToUpdateUserEndpointWithValidParameters_thenReturnUpdatedUser() throws Exception {
         UserRequestDto userRequestDto = UserRequestDtoFixture.load();
+        UserResponseDto userResponseDto = UserResponseDtoFixture.load();
         User user = UserFixture.load();
 
         ObjectMapper objectMapper = new ObjectMapper();
         String requestBody = objectMapper.writeValueAsString(userRequestDto);
 
         when(updateUserUseCase.execute(anyLong(), any())).thenReturn(user);
+        when(userDtoMapper.userRequestDtoToUser(userRequestDto)).thenReturn(user);
+        when(userDtoMapper.userToUserResponseDto(user)).thenReturn(userResponseDto);
 
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
                 .put("/users/edit")

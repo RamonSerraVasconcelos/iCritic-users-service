@@ -14,4 +14,5 @@ public class AzureStorageProperties {
 
     private String connectionString;
     private String containerName;
+    private String containerHostUrl;
 }

@@ -40,6 +40,8 @@ public class AuthResource {
 
     private final JwtProvider jwtProvider;
 
+    private final UserDtoMapper userDtoMapper;
+
     @PostMapping(path = "/register")
     public UserResponseDto registerUser(@RequestBody UserRequestDto userRequestDto) {
         Set<ConstraintViolation<UserRequestDto>> violations = validator.validate(userRequestDto);
@@ -47,11 +49,11 @@ public class AuthResource {
             throw new ResourceViolationException(violations);
         }
 
-        User user = UserDtoMapper.INSTANCE.userRequestDtoToUser(userRequestDto);
+        User user = userDtoMapper.userRequestDtoToUser(userRequestDto);
 
         User createdUser = createUserUseCase.execute(user);
 
-        return UserDtoMapper.INSTANCE.userToUserResponseDto(createdUser);
+        return userDtoMapper.userToUserResponseDto(createdUser);
     }
 
     @PostMapping(path = "/login")
@@ -66,8 +68,7 @@ public class AuthResource {
             });
         }
 
-        UserDtoMapper mapper = UserDtoMapper.INSTANCE;
-        User user = mapper.userRequestDtoToUser(userRequestDto);
+        User user = userDtoMapper.userRequestDtoToUser(userRequestDto);
 
         User loggedUser = signInUserUseCase.execute(user);
 

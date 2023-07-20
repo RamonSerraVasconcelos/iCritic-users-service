@@ -10,9 +10,9 @@ public class UserResponseDtoFixture {
     public static UserResponseDto load() {
         return UserResponseDto.builder()
                 .id(1L)
-                .name("name")
-                .email("email")
-                .description("description")
+                .name("test")
+                .email("test@test.test")
+                .description("test description")
                 .active(true)
                 .role(Role.DEFAULT)
                 .country(CountryResponseDtoFixture.load())

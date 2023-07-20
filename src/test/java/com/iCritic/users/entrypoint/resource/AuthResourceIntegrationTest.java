@@ -8,8 +8,11 @@ import com.iCritic.users.core.usecase.FindUserByIdUseCase;
 import com.iCritic.users.core.usecase.SignInUserUseCase;
 import com.iCritic.users.entrypoint.fixture.AuthorizationDataFixture;
 import com.iCritic.users.entrypoint.fixture.UserRequestDtoFixture;
+import com.iCritic.users.entrypoint.fixture.UserResponseDtoFixture;
+import com.iCritic.users.entrypoint.mapper.UserDtoMapper;
 import com.iCritic.users.entrypoint.model.AuthorizationData;
 import com.iCritic.users.entrypoint.model.UserRequestDto;
+import com.iCritic.users.entrypoint.model.UserResponseDto;
 import com.iCritic.users.entrypoint.validation.AuthorizationFilter;
 import com.iCritic.users.dataprovider.jwt.JwtProvider;
 import org.junit.jupiter.api.Test;
@@ -53,16 +56,22 @@ class AuthResourceIntegrationTest {
     @MockBean
     private JwtProvider jwtProvider;
 
+    @MockBean
+    private UserDtoMapper userDtoMapper;
+
     @Test
     void givenRequestToRegisterEndpointWithValidParams_thenRegisterAndReturnUser() throws Exception {
         UserRequestDto userRequestDto = UserRequestDtoFixture.load();
+        UserResponseDto userResponseDto = UserResponseDtoFixture.load();
+        User user = UserFixture.load();
         userRequestDto.setPassword("password");
-        User createdUser = UserFixture.load();
 
         ObjectMapper objectMapper = new ObjectMapper();
         String requestBody = objectMapper.writeValueAsString(userRequestDto);
 
-        when(createUserUseCase.execute(any(User.class))).thenReturn(createdUser);
+        when(createUserUseCase.execute(any(User.class))).thenReturn(user);
+        when(userDtoMapper.userRequestDtoToUser(any())).thenReturn(user);
+        when(userDtoMapper.userToUserResponseDto(any())).thenReturn(userResponseDto);
 
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/register")
@@ -71,14 +80,14 @@ class AuthResourceIntegrationTest {
 
         mockMvc.perform(requestBuilder)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(createdUser.getId()))
-                .andExpect(jsonPath("$.name").value(createdUser.getName()))
-                .andExpect(jsonPath("$.email").value(createdUser.getEmail()))
-                .andExpect(jsonPath("$.description").value(createdUser.getDescription()))
-                .andExpect(jsonPath("$.active").value(createdUser.isActive()))
-                .andExpect(jsonPath("$.role").value(createdUser.getRole().toString()))
-                .andExpect(jsonPath("$.country.id").value(createdUser.getCountry().getId()))
-                .andExpect(jsonPath("$.country.name").value(createdUser.getCountry().getName()))
+                .andExpect(jsonPath("$.id").value(user.getId()))
+                .andExpect(jsonPath("$.name").value(user.getName()))
+                .andExpect(jsonPath("$.email").value(user.getEmail()))
+                .andExpect(jsonPath("$.description").value(user.getDescription()))
+                .andExpect(jsonPath("$.active").value(user.isActive()))
+                .andExpect(jsonPath("$.role").value(user.getRole().toString()))
+                .andExpect(jsonPath("$.country.id").value(user.getCountry().getId()))
+                .andExpect(jsonPath("$.country.name").value(user.getCountry().getName()))
                 .andExpect(jsonPath("$.createdAt").isNotEmpty());
 
 
@@ -105,12 +114,13 @@ class AuthResourceIntegrationTest {
     void givenRequestToSignInEndpointWithValidParams_thenSignInAndReturnAccessToken() throws Exception {
         UserRequestDto userRequestDto = UserRequestDto.builder().email("test@test.test").password("password").build();
         AuthorizationData authorizationData = AuthorizationDataFixture.load();
-        User loggedUser = UserFixture.load();
+        User user = UserFixture.load();
 
         ObjectMapper objectMapper = new ObjectMapper();
         String requestBody = objectMapper.writeValueAsString(userRequestDto);
 
-        when(signInUserUseCase.execute(any(User.class))).thenReturn(loggedUser);
+        when(userDtoMapper.userRequestDtoToUser(any())).thenReturn(user);
+        when(signInUserUseCase.execute(any(User.class))).thenReturn(user);
         when(jwtProvider.generateToken(any())).thenReturn(authorizationData.getAccessToken());
         when(jwtProvider.generateRefreshToken(any())).thenReturn(authorizationData.getRefreshToken());
 

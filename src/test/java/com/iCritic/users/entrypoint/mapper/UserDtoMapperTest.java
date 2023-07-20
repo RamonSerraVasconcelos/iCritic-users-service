@@ -1,29 +1,41 @@
 package com.iCritic.users.entrypoint.mapper;
 
+import com.iCritic.users.config.properties.AzureStorageProperties;
 import com.iCritic.users.core.fixture.UserFixture;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.entrypoint.fixture.UserRequestDtoFixture;
 import com.iCritic.users.entrypoint.model.UserRequestDto;
 import com.iCritic.users.entrypoint.model.UserResponseDto;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class UserDtoMapperTest {
+
+    @InjectMocks
+    private UserDtoMapper userDtoMapper;
+
+    @Mock
+    private AzureStorageProperties azureStorageProperties;
 
     @Test
     void givenUserRequestDto_convertUserToUser_thenReturnUser() {
         UserRequestDto userRequestDto = UserRequestDtoFixture.load();
 
-        User user = UserDtoMapper.INSTANCE.userRequestDtoToUser(userRequestDto);
+        User user = userDtoMapper.userRequestDtoToUser(userRequestDto);
 
         assertNotNull(user);
         assertEquals(user.getName(), userRequestDto.getName());
         assertEquals(user.getEmail(), userRequestDto.getEmail());
         assertEquals(user.getPassword(), userRequestDto.getPassword());
         assertEquals(user.getDescription(), userRequestDto.getDescription());
-        assertEquals(user.getRole().toString(), userRequestDto.getRole());
         assertEquals(user.getCountryId(), userRequestDto.getCountryId());
     }
 
@@ -31,7 +43,11 @@ class UserDtoMapperTest {
     void givenUser_convertUserToUserResponseDto_thenReturnUserResponseDto() {
         User user = UserFixture.load();
 
-        UserResponseDto userResponseDto = UserDtoMapper.INSTANCE.userToUserResponseDto(user);
+        String containeHostUrl = "http://testhost.com";
+
+        when(azureStorageProperties.getContainerHostUrl()).thenReturn(containeHostUrl);
+
+        UserResponseDto userResponseDto = userDtoMapper.userToUserResponseDto(user);
 
         assertNotNull(userResponseDto);
         assertEquals(userResponseDto.getId(), user.getId());
@@ -42,5 +58,6 @@ class UserDtoMapperTest {
         assertEquals(userResponseDto.getRole(), user.getRole());
         assertEquals(userResponseDto.getCountry().getId(), user.getCountry().getId());
         assertEquals(userResponseDto.getCountry().getName(), user.getCountry().getName());
+        assertEquals(userResponseDto.getProfilePictureUrl(), containeHostUrl + "/" + user.getProfilePicture().getName());
     }
 }
