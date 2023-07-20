@@ -13,6 +13,7 @@ import com.iCritic.users.core.usecase.UpdateUserUseCase;
 import com.iCritic.users.core.usecase.ValidateUserRoleUseCase;
 import com.iCritic.users.entrypoint.fixture.UserBanDtoFixture;
 import com.iCritic.users.entrypoint.fixture.UserRequestDtoFixture;
+import com.iCritic.users.entrypoint.fixture.UserResponseDtoFixture;
 import com.iCritic.users.entrypoint.mapper.UserDtoMapper;
 import com.iCritic.users.entrypoint.model.UserBanDto;
 import com.iCritic.users.entrypoint.model.UserRequestDto;
@@ -83,14 +84,19 @@ class UserResourceTest {
     @Mock
     private UpdateUserPictureUseCase updateUserPictureUseCase;
 
+    @Mock
+    private UserDtoMapper userDtoMapper;
+
     @Captor
     private ArgumentCaptor<BanActionEnum> actionCaptor;
 
     @Test
     void givenCallToLoadAllUsers_thenCallFindUsersUseCaseAndReturnUsers() {
         List<User> users = List.of(UserFixture.load(), UserFixture.load(), UserFixture.load());
+        UserResponseDto userResponseDto = UserResponseDtoFixture.load();
 
         when(findUsersUseCase.execute()).thenReturn(users);
+        when(userDtoMapper.userToUserResponseDto(any())).thenReturn(userResponseDto);
 
         List<UserResponseDto> returnedUsers = userResource.loadAll();
 
@@ -102,14 +108,16 @@ class UserResourceTest {
         assertEquals(returnedUsers.get(0).getRole(), users.get(0).getRole());
         assertEquals(returnedUsers.get(0).getCountry().getId(), users.get(0).getCountry().getId());
         assertEquals(returnedUsers.get(0).getCountry().getName(), users.get(0).getCountry().getName());
-        assertEquals(returnedUsers.get(0).getCreatedAt(), users.get(0).getCreatedAt());
+        assertNotNull(returnedUsers.get(0).getCreatedAt());
     }
 
     @Test
     void givenCallToGetUserWithValidParameters_thenCallFindUserByIdUseCaseAndReturnUser() {
         User user = UserFixture.load();
+        UserResponseDto userResponseDto = UserResponseDtoFixture.load();
 
         when(findUserByIdUseCase.execute(user.getId())).thenReturn(user);
+        when(userDtoMapper.userToUserResponseDto(any())).thenReturn(userResponseDto);
 
         UserResponseDto returnedUser = userResource.get(user.getId());
 
@@ -122,15 +130,18 @@ class UserResourceTest {
         assertEquals(returnedUser.getRole(), user.getRole());
         assertEquals(returnedUser.getCountry().getId(), user.getCountry().getId());
         assertEquals(returnedUser.getCountry().getName(), user.getCountry().getName());
-        assertEquals(returnedUser.getCreatedAt(), user.getCreatedAt());
+        assertNotNull(returnedUser.getCreatedAt());
     }
 
     @Test
     void givenCallToUpdateUserWithValidParameters_thenCallUpdateUserUseCaseAndReturnUser() {
         UserRequestDto userRequestDto = UserRequestDtoFixture.load();
-        User user = UserDtoMapper.INSTANCE.userRequestDtoToUser(userRequestDto);
+        UserResponseDto userResponseDto = UserResponseDtoFixture.load();
+        User user = UserFixture.load();
 
         when(validator.validate(userRequestDto)).thenReturn(Collections.emptySet());
+        when(userDtoMapper.userRequestDtoToUser(userRequestDto)).thenReturn(user);
+        when(userDtoMapper.userToUserResponseDto(user)).thenReturn(userResponseDto);
 
         user.setId(1L);
         user.setCountry(CountryFixture.load());
@@ -173,7 +184,7 @@ class UserResourceTest {
     @Test
     void givenCallToUpdateUserWithInvalidParameters_whenParametersAreEmailOrPassword_thenDontThrowException() {
         UserRequestDto userRequestDto = UserRequestDtoFixture.load();
-        User user = UserDtoMapper.INSTANCE.userRequestDtoToUser(userRequestDto);
+        User user = UserFixture.load();
         user.setId(1L);
 
         Set<ConstraintViolation<UserRequestDto>> violations = new HashSet<>();

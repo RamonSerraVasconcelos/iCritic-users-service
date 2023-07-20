@@ -54,13 +54,16 @@ class AuthResourceTest {
     private JwtProvider jwtProvider;
 
     @Mock
+    private UserDtoMapper userDtoMapper;
+
+    @Mock
     HttpServletResponse response;
 
     @Test
     void givenCallToRegisterUserWithValidParameters_callCreateUserUseCase_thenReturnUserResponseDto() {
         UserRequestDto userRequestDto = UserRequestDtoFixture.load();
         UserResponseDto userResponseDto = UserResponseDtoFixture.load();
-        User user = UserDtoMapper.INSTANCE.userRequestDtoToUser(userRequestDto);
+        User user = UserFixture.load();
 
         when(validator.validate(userRequestDto)).thenReturn(Collections.emptySet());
 
@@ -70,6 +73,8 @@ class AuthResourceTest {
         user.setActive(true);
 
         when(createUserUseCase.execute(any())).thenReturn(user);
+        when(userDtoMapper.userRequestDtoToUser(userRequestDto)).thenReturn(user);
+        when(userDtoMapper.userToUserResponseDto(user)).thenReturn(userResponseDto);
 
         UserResponseDto createdUser = authResource.registerUser(userRequestDto);
 

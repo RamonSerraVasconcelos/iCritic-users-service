@@ -57,15 +57,16 @@ public class UserResource {
 
     private final UpdateUserPictureUseCase updateUserPictureUseCase;
 
+    private final UserDtoMapper userDtoMapper;
+
     @GetMapping
     public List<UserResponseDto> loadAll() {
-        UserDtoMapper mapper = UserDtoMapper.INSTANCE;
-        return findUsersUseCase.execute().stream().map(mapper::userToUserResponseDto).collect(Collectors.toList());
+        return findUsersUseCase.execute().stream().map(userDtoMapper::userToUserResponseDto).collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
     public UserResponseDto get(@PathVariable Long id) {
-        return UserDtoMapper.INSTANCE.userToUserResponseDto(findUserByIdUseCase.execute(id));
+        return userDtoMapper.userToUserResponseDto(findUserByIdUseCase.execute(id));
     }
 
     @PutMapping("/edit")
@@ -81,12 +82,10 @@ public class UserResource {
 
         Long userId = Long.parseLong(request.getAttribute("userId").toString());
 
-        UserDtoMapper mapper = UserDtoMapper.INSTANCE;
-
-        User user = mapper.userRequestDtoToUser(userRequestDto);
+        User user = userDtoMapper.userRequestDtoToUser(userRequestDto);
 
         User updatedUser = updateUserUseCase.execute(userId, user);
-        return mapper.userToUserResponseDto(updatedUser);
+        return userDtoMapper.userToUserResponseDto(updatedUser);
     }
 
     @PostMapping("/profile-picture")
