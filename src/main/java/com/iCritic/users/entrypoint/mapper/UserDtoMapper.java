@@ -34,7 +34,7 @@ public class UserDtoMapper {
                 .description(user.getDescription())
                 .active(user.isActive())
                 .role(user.getRole())
-                .country(CountryResponseDto.builder().id(user.getCountryId()).name(user.getCountry().getName()).build())
+                .country(CountryResponseDto.builder().id(user.getCountry().getId()).name(user.getCountry().getName()).build())
                 .profilePictureUrl(nonNull(user.getProfilePicture()) ? buildImageUrl(user.getProfilePicture().getName()) : null)
                 .createdAt(user.getCreatedAt())
                 .build();
