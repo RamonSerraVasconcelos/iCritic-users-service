@@ -11,7 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class RequestPasswordResetMessage {
+public class PasswordResetRequest {
 
     private String email;
     private String passwordResetHash;

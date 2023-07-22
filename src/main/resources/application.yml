@@ -8,6 +8,9 @@ spring:
     password: ${ICRITIC_DB_PASSWORD:postgres}
   jpa:
     database: POSTGRESQL
+  kafka:
+    bootstrap-servers: ${ICRITIC_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    password-reset-request-topic: ${ICRITIC_KAFKA_PASSWORD_RESET_REQUEST_TOPIC:password-reset-request}
   error:
     include-stacktrace: never
   application:
