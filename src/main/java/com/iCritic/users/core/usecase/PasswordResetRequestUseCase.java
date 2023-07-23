@@ -33,7 +33,7 @@ public class PasswordResetRequestUseCase {
         try {
             User user = findUserByEmailBoundary.execute(email);
 
-            if(isNull(user)) {
+            if (isNull(user)) {
                 throw new ResourceNotFoundException("User not found");
             }
 
@@ -51,8 +51,8 @@ public class PasswordResetRequestUseCase {
                     .build();
 
             postPasswordResetRequestMessageBoundary.execute(passwordResetRequest);
-        } catch(ResourceNotFoundException e) {
+        } catch (ResourceNotFoundException e) {
             log.error("User not found with email: {}", email);
-    }
+        }
     }
 }

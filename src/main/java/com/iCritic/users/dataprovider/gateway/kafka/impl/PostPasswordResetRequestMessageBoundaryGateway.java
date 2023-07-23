@@ -1,28 +1,36 @@
 package com.iCritic.users.dataprovider.gateway.kafka.impl;
 
+import com.iCritic.users.config.properties.KafkaProperties;
 import com.iCritic.users.core.model.PasswordResetRequest;
 import com.iCritic.users.core.usecase.boundary.PostPasswordResetRequestMessageBoundary;
 import com.iCritic.users.dataprovider.gateway.kafka.entity.PasswordResetRequestMessage;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class PostPasswordResetRequestMessageBoundaryGateway implements PostPasswordResetRequestMessageBoundary {
 
     @Autowired
     private KafkaTemplate<String, PasswordResetRequestMessage> kafkaTemplate;
 
-    @Value("${spring.kafka.password-reset-request-topic}")
-    private String topic;
+    @Autowired
+    private KafkaProperties kafkaProperties;
 
     public void execute(PasswordResetRequest passwordResetRequest) {
-        PasswordResetRequestMessage passwordResetRequestMessage = PasswordResetRequestMessage.builder()
-                .email(passwordResetRequest.getEmail())
-                .passwordResetHash(passwordResetRequest.getPasswordResetHash())
-                .build();
+        try {
+            log.info("Sending message to topic: [{}] with email: [{}]", kafkaProperties.getPasswordResetRequestTopic(), passwordResetRequest.getEmail());
 
-        kafkaTemplate.send(topic, passwordResetRequestMessage);
+            PasswordResetRequestMessage passwordResetRequestMessage = PasswordResetRequestMessage.builder()
+                    .email(passwordResetRequest.getEmail())
+                    .passwordResetHash(passwordResetRequest.getPasswordResetHash())
+                    .build();
+
+            kafkaTemplate.send(kafkaProperties.getPasswordResetRequestTopic(), passwordResetRequestMessage);
+        } catch (Exception e) {
+            log.error("Error when sending message to topic: [{}]. Error: [{}]", kafkaProperties.getPasswordResetRequestTopic(), e.getMessage());
+        }
     }
 }
