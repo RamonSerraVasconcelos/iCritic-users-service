@@ -47,7 +47,7 @@ public class PasswordResetRequestUseCase {
 
             PasswordResetRequest passwordResetRequest = PasswordResetRequest.builder()
                     .email(user.getEmail())
-                    .passwordResetHash(encryptedHash)
+                    .passwordResetHash(passwordResetHash)
                     .build();
 
             postPasswordResetRequestMessageBoundary.execute(passwordResetRequest);

@@ -22,6 +22,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -45,7 +46,7 @@ public class PostPasswordResetRequestMessageBoundaryGatewayTest {
 
         passwordResetRequestGateway.execute(passwordResetRequest);
 
-        verify(kafkaProperties).getPasswordResetRequestTopic();
+        verify(kafkaProperties, times(2)).getPasswordResetRequestTopic();
         verify(kafkaTemplate).send(any(), any(PasswordResetRequestMessage.class));
     }
 
@@ -67,7 +68,7 @@ public class PostPasswordResetRequestMessageBoundaryGatewayTest {
         passwordResetRequestGateway.execute(passwordResetRequest);
 
         List<ILoggingEvent> loggingEvents = listAppender.list;
-        String loggedError = loggingEvents.toArray()[0].toString();
+        String loggedError = loggingEvents.toArray()[1].toString();
         assertEquals(logError, loggedError);
     }
 }
