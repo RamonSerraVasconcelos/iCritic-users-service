@@ -24,6 +24,7 @@ public class PostPasswordResetRequestMessageBoundaryGateway implements PostPassw
             log.info("Sending message to topic: [{}] with email: [{}]", kafkaProperties.getPasswordResetRequestTopic(), passwordResetRequest.getEmail());
 
             PasswordResetRequestMessage passwordResetRequestMessage = PasswordResetRequestMessage.builder()
+                    .userId(passwordResetRequest.getUserId())
                     .email(passwordResetRequest.getEmail())
                     .passwordResetHash(passwordResetRequest.getPasswordResetHash())
                     .build();

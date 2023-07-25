@@ -8,6 +8,7 @@ public class PasswordResetRequestFixture {
 
     public static PasswordResetRequest load() {
         return PasswordResetRequest.builder()
+                .userId(1L)
                 .email("test@test.test")
                 .passwordResetHash(UUID.randomUUID().toString())
                 .build();

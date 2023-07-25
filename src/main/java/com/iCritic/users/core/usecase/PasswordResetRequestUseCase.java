@@ -46,6 +46,7 @@ public class PasswordResetRequestUseCase {
             updateUserGateway.execute(user);
 
             PasswordResetRequest passwordResetRequest = PasswordResetRequest.builder()
+                    .userId(user.getId())
                     .email(user.getEmail())
                     .passwordResetHash(passwordResetHash)
                     .build();

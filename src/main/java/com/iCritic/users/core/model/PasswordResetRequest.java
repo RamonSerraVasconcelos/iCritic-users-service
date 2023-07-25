@@ -13,6 +13,7 @@ import lombok.Setter;
 @Builder
 public class PasswordResetRequest {
 
+    private Long userId;
     private String email;
     private String passwordResetHash;
 }
