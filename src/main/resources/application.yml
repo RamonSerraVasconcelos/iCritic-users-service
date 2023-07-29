@@ -4,8 +4,8 @@ spring:
       max-file-size: 5MB
   datasource:
     url: ${ICRITIC_DB_URL:jdbc:postgresql://localhost:5432/copyOfIcritic}
-    username: ${ICRITIC_DB_USERNAME:postgres}
-    password: ${ICRITIC_DB_PASSWORD:postgres}
+    username: ${ICRITIC_DB_USERNAME:root}
+    password: ${ICRITIC_DB_PASSWORD:root}
   jpa:
     database: POSTGRESQL
   kafka:
