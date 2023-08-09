@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
@@ -41,7 +41,7 @@ public class PasswordResetRequestUseCase {
             String encryptedHash = bcrypt.encode(passwordResetHash);
 
             user.setPasswordResetHash(encryptedHash);
-            user.setPasswordResetDate(new Date());
+            user.setPasswordResetDate(LocalDateTime.now());
 
             updateUserGateway.execute(user);
 

@@ -1,10 +1,14 @@
 package com.iCritic.users.core.model;
 
 import com.iCritic.users.core.enums.Role;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Getter
 @Setter
@@ -25,9 +29,9 @@ public class User {
     private Image profilePicture;
     private transient Long countryId;
     private String passwordResetHash;
-    private Date passwordResetDate;
+    private LocalDateTime passwordResetDate;
     private String emailResetHash;
-    private Date emailResetDate;
+    private LocalDateTime emailResetDate;
     private String newEmailReset;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
