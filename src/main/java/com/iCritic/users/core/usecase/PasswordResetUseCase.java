@@ -63,7 +63,7 @@ public class PasswordResetUseCase {
             postPasswordResetMessageBoundary.execute(user.getId(), user.getEmail());
             jwtManager.revokeUserTokens(user.getId());
         } catch (ResourceViolationException e) {
-            log.error("Failed to reset user password with email: [{}]", email);
+            log.error("Failed to reset user password with email: [{}]", email, e);
             throw e;
         }
     }
