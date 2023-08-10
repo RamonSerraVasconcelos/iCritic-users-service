@@ -4,10 +4,12 @@ import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.CreateUserUseCase;
 import com.iCritic.users.core.usecase.FindUserByIdUseCase;
 import com.iCritic.users.core.usecase.PasswordResetRequestUseCase;
+import com.iCritic.users.core.usecase.PasswordResetUseCase;
 import com.iCritic.users.core.usecase.SignInUserUseCase;
 import com.iCritic.users.dataprovider.jwt.JwtProvider;
 import com.iCritic.users.entrypoint.mapper.UserDtoMapper;
 import com.iCritic.users.entrypoint.model.AuthorizationData;
+import com.iCritic.users.entrypoint.model.PasswordResetData;
 import com.iCritic.users.entrypoint.model.UserRequestDto;
 import com.iCritic.users.entrypoint.model.UserResponseDto;
 import com.iCritic.users.exception.ResourceViolationException;
@@ -39,6 +41,8 @@ public class AuthResource {
     private final FindUserByIdUseCase findUserByIdUseCase;
 
     private final PasswordResetRequestUseCase passwordResetRequestUseCase;
+
+    private final PasswordResetUseCase passwordResetUseCase;
 
     private final Validator validator;
 
@@ -127,6 +131,18 @@ public class AuthResource {
         }
 
         passwordResetRequestUseCase.execute(userRequestDto.getEmail());
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping(path = "/reset-password")
+    public ResponseEntity<Void> passwordReset(@RequestBody PasswordResetData passwordResetData) {
+        Set<ConstraintViolation<PasswordResetData>> violations = validator.validate(passwordResetData);
+        if (!violations.isEmpty()) {
+            throw new ResourceViolationException(violations);
+        }
+
+        passwordResetUseCase.execute(passwordResetData.getEmail(), passwordResetData.getPasswordResetHash(), passwordResetData.getPassword());
 
         return ResponseEntity.ok().build();
     }

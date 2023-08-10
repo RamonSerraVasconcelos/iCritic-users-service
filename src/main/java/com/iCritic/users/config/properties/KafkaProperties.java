@@ -13,4 +13,5 @@ public class KafkaProperties {
 
     private String bootstrapServers;
     private String passwordResetRequestTopic;
+    private String passwordResetTopic;
 }

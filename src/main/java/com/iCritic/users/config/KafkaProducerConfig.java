@@ -1,6 +1,7 @@
 package com.iCritic.users.config;
 
 import com.iCritic.users.config.properties.KafkaProperties;
+import com.iCritic.users.dataprovider.gateway.kafka.entity.PasswordResetMessage;
 import com.iCritic.users.dataprovider.gateway.kafka.entity.PasswordResetRequestMessage;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -33,5 +34,19 @@ public class KafkaProducerConfig {
     @Bean
     public KafkaTemplate<String, PasswordResetRequestMessage> kafkaTemplate() {
         return new KafkaTemplate<String, PasswordResetRequestMessage>(requestPasswordResetProducerFactory());
+    }
+
+    @Bean
+    public ProducerFactory<String, PasswordResetMessage> passwordResetProducerFactory() {
+        Map<String, Object> config = new HashMap<>();
+        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers());
+        config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        return new DefaultKafkaProducerFactory<>(config);
+    }
+
+    @Bean
+    public KafkaTemplate<String, PasswordResetMessage> passwordResetMessageKafkaTemplate() {
+        return new KafkaTemplate<String, PasswordResetMessage>(passwordResetProducerFactory());
     }
 }

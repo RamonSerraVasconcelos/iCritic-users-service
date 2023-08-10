@@ -41,7 +41,7 @@ public class PasswordResetRequestUseCase {
             String encryptedHash = bcrypt.encode(passwordResetHash);
 
             user.setPasswordResetHash(encryptedHash);
-            user.setPasswordResetDate(LocalDateTime.now());
+            user.setPasswordResetDate(LocalDateTime.now().plusMinutes(5));
 
             updateUserGateway.execute(user);
 
