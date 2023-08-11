@@ -48,7 +48,7 @@ public class PasswordResetUseCase {
                 throw new ResourceViolationException("Invalid email or password hash");
             }
 
-            boolean isPasswordDuplicated = bcrypt.matches(user.getPassword(), newPassword);
+            boolean isPasswordDuplicated = bcrypt.matches(newPassword, user.getPassword());
 
             if (isPasswordDuplicated) {
                 throw new ResourceViolationException("The new password cannot be equal to the old one");
