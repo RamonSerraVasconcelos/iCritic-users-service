@@ -3,15 +3,19 @@ package com.iCritic.users.entrypoint.resource;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.CreateUserUseCase;
 import com.iCritic.users.core.usecase.FindUserByIdUseCase;
+import com.iCritic.users.core.usecase.PasswordResetRequestUseCase;
+import com.iCritic.users.core.usecase.PasswordResetUseCase;
 import com.iCritic.users.core.usecase.SignInUserUseCase;
 import com.iCritic.users.dataprovider.jwt.JwtProvider;
 import com.iCritic.users.entrypoint.mapper.UserDtoMapper;
 import com.iCritic.users.entrypoint.model.AuthorizationData;
+import com.iCritic.users.entrypoint.model.PasswordResetData;
 import com.iCritic.users.entrypoint.model.UserRequestDto;
 import com.iCritic.users.entrypoint.model.UserResponseDto;
 import com.iCritic.users.exception.ResourceViolationException;
 import com.iCritic.users.exception.UnauthorizedAccessException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,6 +39,10 @@ public class AuthResource {
     private final SignInUserUseCase signInUserUseCase;
 
     private final FindUserByIdUseCase findUserByIdUseCase;
+
+    private final PasswordResetRequestUseCase passwordResetRequestUseCase;
+
+    private final PasswordResetUseCase passwordResetUseCase;
 
     private final Validator validator;
 
@@ -114,6 +122,29 @@ public class AuthResource {
         response.addCookie(refreshTokenCookie);
 
         return authorizationData;
+    }
+
+    @PostMapping(path = "/forgot-password")
+    public ResponseEntity<Void> passwordResetRequest(@RequestBody UserRequestDto userRequestDto) {
+        if(isNull(userRequestDto.getEmail())) {
+            throw new ResourceViolationException("Email is required");
+        }
+
+        passwordResetRequestUseCase.execute(userRequestDto.getEmail());
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping(path = "/reset-password")
+    public ResponseEntity<Void> passwordReset(@RequestBody PasswordResetData passwordResetData) {
+        Set<ConstraintViolation<PasswordResetData>> violations = validator.validate(passwordResetData);
+        if (!violations.isEmpty()) {
+            throw new ResourceViolationException(violations);
+        }
+
+        passwordResetUseCase.execute(passwordResetData.getEmail(), passwordResetData.getPasswordResetHash(), passwordResetData.getPassword());
+
+        return ResponseEntity.ok().build();
     }
 
     private String extractRefreshTokenFromRequest(HttpServletRequest request, AuthorizationData authorizationDataRequest) {

@@ -5,12 +5,16 @@ import com.iCritic.users.core.fixture.UserFixture;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.CreateUserUseCase;
 import com.iCritic.users.core.usecase.FindUserByIdUseCase;
+import com.iCritic.users.core.usecase.PasswordResetRequestUseCase;
+import com.iCritic.users.core.usecase.PasswordResetUseCase;
 import com.iCritic.users.core.usecase.SignInUserUseCase;
 import com.iCritic.users.entrypoint.fixture.AuthorizationDataFixture;
+import com.iCritic.users.entrypoint.fixture.PasswordResetDataFixture;
 import com.iCritic.users.entrypoint.fixture.UserRequestDtoFixture;
 import com.iCritic.users.entrypoint.fixture.UserResponseDtoFixture;
 import com.iCritic.users.entrypoint.mapper.UserDtoMapper;
 import com.iCritic.users.entrypoint.model.AuthorizationData;
+import com.iCritic.users.entrypoint.model.PasswordResetData;
 import com.iCritic.users.entrypoint.model.UserRequestDto;
 import com.iCritic.users.entrypoint.model.UserResponseDto;
 import com.iCritic.users.entrypoint.validation.AuthorizationFilter;
@@ -58,6 +62,12 @@ class AuthResourceIntegrationTest {
 
     @MockBean
     private UserDtoMapper userDtoMapper;
+
+    @MockBean
+    private PasswordResetRequestUseCase passwordResetRequestUseCase;
+
+    @MockBean
+    private PasswordResetUseCase passwordResetUseCase;
 
     @Test
     void givenRequestToRegisterEndpointWithValidParams_thenRegisterAndReturnUser() throws Exception {
@@ -144,6 +154,74 @@ class AuthResourceIntegrationTest {
 
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isBadRequest());
+    }
+
+    //Necessary to create tests for refresh token flow
+
+    @Test
+    void givenRequestToResetPasswordRequestWithValidParameters_thenReturnResponseOk() throws Exception {
+        UserRequestDto userRequestDto = UserRequestDtoFixture.load();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String requestBody = objectMapper.writeValueAsString(userRequestDto);
+
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post("/forgot-password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void givenRequestToResetPasswordRequestWithInvalidParameters_thenReturnResponseBadRequest() throws Exception {
+        UserRequestDto userRequestDto = UserRequestDtoFixture.load();
+        userRequestDto.setEmail(null);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String requestBody = objectMapper.writeValueAsString(userRequestDto);
+
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post("/forgot-password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void givenRequestToResetPasswordWithValidParameters_thenReturnResponseOk() throws Exception {
+        PasswordResetData passwordResetData = PasswordResetDataFixture.load();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String requestBody = objectMapper.writeValueAsString(passwordResetData);
+
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post("/reset-password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void givenRequestToResetPasswordWithInvalidParameters_thenReturnResponseBadRequest() throws Exception {
+        PasswordResetData passwordResetData = PasswordResetDataFixture.load();
+        passwordResetData.setPasswordResetHash(null);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String requestBody = objectMapper.writeValueAsString(passwordResetData);
+
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post("/reset-password")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody);
 

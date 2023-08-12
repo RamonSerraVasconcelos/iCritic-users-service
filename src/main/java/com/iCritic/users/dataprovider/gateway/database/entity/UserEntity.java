@@ -22,7 +22,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Table(name = "users")
@@ -68,11 +67,11 @@ public class UserEntity {
 
     private String passwordResetHash;
 
-    private Date passwordResetDate;
+    private LocalDateTime passwordResetDate;
 
     private String emailResetHash;
 
-    private Date emailResetDate;
+    private LocalDateTime emailResetDate;
 
     private String newEmailReset;
 

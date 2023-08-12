@@ -4,12 +4,16 @@ import com.iCritic.users.core.fixture.CountryFixture;
 import com.iCritic.users.core.fixture.UserFixture;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.CreateUserUseCase;
+import com.iCritic.users.core.usecase.PasswordResetRequestUseCase;
+import com.iCritic.users.core.usecase.PasswordResetUseCase;
 import com.iCritic.users.core.usecase.SignInUserUseCase;
 import com.iCritic.users.entrypoint.fixture.AuthorizationDataFixture;
+import com.iCritic.users.entrypoint.fixture.PasswordResetDataFixture;
 import com.iCritic.users.entrypoint.fixture.UserRequestDtoFixture;
 import com.iCritic.users.entrypoint.fixture.UserResponseDtoFixture;
 import com.iCritic.users.entrypoint.mapper.UserDtoMapper;
 import com.iCritic.users.entrypoint.model.AuthorizationData;
+import com.iCritic.users.entrypoint.model.PasswordResetData;
 import com.iCritic.users.entrypoint.model.UserRequestDto;
 import com.iCritic.users.entrypoint.model.UserResponseDto;
 import com.iCritic.users.dataprovider.jwt.JwtProvider;
@@ -20,6 +24,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
@@ -33,6 +38,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,6 +52,12 @@ class AuthResourceTest {
 
     @Mock
     private SignInUserUseCase signInUserUseCase;
+
+    @Mock
+    private PasswordResetRequestUseCase passwordResetRequestUseCase;
+
+    @Mock
+    private PasswordResetUseCase passwordResetUseCase;
 
     @Mock
     private Validator validator;
@@ -148,6 +160,53 @@ class AuthResourceTest {
         when(signInUserUseCase.execute(any())).thenReturn(user);
 
         assertDoesNotThrow(() -> authResource.loginUser(userRequestDto, response));
+    }
+
+    //Necessary to create tests for refresh token flow
+
+    @Test
+    void givenCallToPasswordResetRequestWithValidParameters_thenReturnStatusOk() {
+        UserRequestDto userRequestDto = UserRequestDtoFixture.load();
+
+        ResponseEntity<Void> response = authResource.passwordResetRequest(userRequestDto);
+
+        verify(passwordResetRequestUseCase).execute(userRequestDto.getEmail());
+        assertEquals(response.getStatusCode().value(), HttpServletResponse.SC_OK);
+    }
+
+    @Test
+    void givenCallToPasswordResetRequestWithInvalidParameters_thenThrowResourceViolationException() {
+        UserRequestDto userRequestDto = UserRequestDtoFixture.load();
+        userRequestDto.setEmail(null);
+
+        assertThrows(ResourceViolationException.class, () -> authResource.passwordResetRequest(userRequestDto));
+
+        verifyNoInteractions(passwordResetRequestUseCase);
+    }
+
+    @Test
+    void givenCallToPasswordResetWithValidParameters_thenReturnStatusOk() {
+        PasswordResetData passwordResetData = PasswordResetDataFixture.load();
+
+        when(validator.validate(passwordResetData)).thenReturn(Collections.emptySet());
+
+        ResponseEntity<Void> response = authResource.passwordReset(passwordResetData);
+
+        verify(passwordResetUseCase).execute(passwordResetData.getEmail(), passwordResetData.getPasswordResetHash(), passwordResetData.getPassword());
+        assertEquals(response.getStatusCode().value(), HttpServletResponse.SC_OK);
+    }
+
+    @Test
+    void givenCallToPasswordResetWithInvalidParameters_thenThrowResourceViolationException() {
+        PasswordResetData passwordResetData = PasswordResetDataFixture.load();
+
+        Set<ConstraintViolation<PasswordResetData>> violations = new HashSet<>();
+        violations.add(createMockViolation("name"));
+
+        when(validator.validate(passwordResetData)).thenReturn(violations);
+
+        assertThrows(ResourceViolationException.class, () -> authResource.passwordReset(passwordResetData));
+        verifyNoInteractions(passwordResetUseCase);
     }
 
     private <T> ConstraintViolation<T> createMockViolation(String propertyName) {

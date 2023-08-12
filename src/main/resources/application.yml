@@ -4,10 +4,14 @@ spring:
       max-file-size: 5MB
   datasource:
     url: ${ICRITIC_DB_URL:jdbc:postgresql://localhost:5432/copyOfIcritic}
-    username: ${ICRITIC_DB_USERNAME:postgres}
-    password: ${ICRITIC_DB_PASSWORD:postgres}
+    username: ${ICRITIC_DB_USERNAME:root}
+    password: ${ICRITIC_DB_PASSWORD:root}
   jpa:
     database: POSTGRESQL
+  kafka:
+    bootstrap-servers: ${ICRITIC_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    password-reset-request-topic: ${ICRITIC_KAFKA_PASSWORD_RESET_REQUEST_TOPIC:password-reset-request}
+    password-reset-topic: ${ICRITIC_KAFKA_PASSWORD_RESET_TOPIC:password-reset}
   error:
     include-stacktrace: never
   application:
