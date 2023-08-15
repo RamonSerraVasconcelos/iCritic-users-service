@@ -1,6 +1,7 @@
 package com.iCritic.users.core.usecase;
 
 import com.iCritic.users.core.model.User;
+import com.iCritic.users.core.usecase.boundary.DeleteUserRefreshTokensBoundary;
 import com.iCritic.users.core.usecase.boundary.FindUserByEmailBoundary;
 import com.iCritic.users.core.usecase.boundary.PostPasswordResetMessageBoundary;
 import com.iCritic.users.core.usecase.boundary.UpdateUserBoundary;
@@ -25,6 +26,8 @@ public class PasswordResetUseCase {
     private final UpdateUserBoundary updateUserBoundary;
 
     private final PostPasswordResetMessageBoundary postPasswordResetMessageBoundary;
+
+    private final DeleteUserRefreshTokensBoundary deleteUserRefreshTokensBoundary;
 
     private final BCryptPasswordEncoder bcrypt;
 
@@ -61,7 +64,7 @@ public class PasswordResetUseCase {
 
             updateUserBoundary.execute(user);
             postPasswordResetMessageBoundary.execute(user.getId(), user.getEmail());
-            jwtManager.revokeUserTokens(user.getId());
+            deleteUserRefreshTokensBoundary.execute(user.getId());
         } catch (ResourceViolationException e) {
             log.error("Failed to reset user password with email: [{}]", email, e);
             throw e;
