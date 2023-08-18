@@ -1,5 +1,6 @@
 package com.iCritic.users.core.model;
 
+import io.jsonwebtoken.Claims;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,13 +15,11 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-public class RefreshToken {
+public class AccessToken {
 
     private String encodedToken;
     private String id;
-    private User user;
     private List<Claim> claims;
     private LocalDateTime issuedAt;
     private LocalDateTime expiresAt;
-    private boolean active;
 }

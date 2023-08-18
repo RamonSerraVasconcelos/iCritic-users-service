@@ -1,7 +1,7 @@
 package com.iCritic.users.config;
 
+import com.iCritic.users.core.usecase.boundary.ValidateAccessTokenBoundary;
 import com.iCritic.users.entrypoint.validation.AuthorizationFilter;
-import com.iCritic.users.dataprovider.jwt.JwtProvider;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -11,14 +11,14 @@ import org.springframework.context.annotation.Configuration;
 @AllArgsConstructor
 public class FilterConfig {
 
-    private final JwtProvider jwtProvider;
+    private final ValidateAccessTokenBoundary validateAccessTokenBoundary;
 
     @Bean
     public FilterRegistrationBean<AuthorizationFilter> authenticationFilter() {
 
         FilterRegistrationBean<AuthorizationFilter> registrationBean = new FilterRegistrationBean<>();
 
-        registrationBean.setFilter(new AuthorizationFilter(jwtProvider));
+        registrationBean.setFilter(new AuthorizationFilter(validateAccessTokenBoundary));
         registrationBean.addUrlPatterns("*");
         registrationBean.addInitParameter("excludeUrls", "/register,/login,/refresh,/logout,/forgot-password,/reset-password");
 

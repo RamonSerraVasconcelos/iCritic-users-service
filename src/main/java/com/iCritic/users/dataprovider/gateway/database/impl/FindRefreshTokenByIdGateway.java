@@ -16,7 +16,7 @@ public class FindRefreshTokenByIdGateway implements FindRefreshTokenByIdBoundary
 
     private final RefreshTokenRepository refreshTokenRepository;
 
-    public Optional<RefreshToken>  execute(String id) {
+    public Optional<RefreshToken> execute(String id) {
         Optional<RefreshTokenEntity> refreshTokenEntity = refreshTokenRepository.findById(id);
 
         RefreshTokenEntityMapper refreshTokenEntityMapper = RefreshTokenEntityMapper.INSTANCE;

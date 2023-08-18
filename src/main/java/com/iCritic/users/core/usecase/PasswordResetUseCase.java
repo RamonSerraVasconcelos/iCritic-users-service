@@ -5,7 +5,6 @@ import com.iCritic.users.core.usecase.boundary.DeleteUserRefreshTokensBoundary;
 import com.iCritic.users.core.usecase.boundary.FindUserByEmailBoundary;
 import com.iCritic.users.core.usecase.boundary.PostPasswordResetMessageBoundary;
 import com.iCritic.users.core.usecase.boundary.UpdateUserBoundary;
-import com.iCritic.users.dataprovider.jwt.JwtManager;
 import com.iCritic.users.exception.ResourceViolationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,8 +29,6 @@ public class PasswordResetUseCase {
     private final DeleteUserRefreshTokensBoundary deleteUserRefreshTokensBoundary;
 
     private final BCryptPasswordEncoder bcrypt;
-
-    private final JwtManager jwtManager;
 
     public void execute(String email, String passwordResetHash, String newPassword) {
         try {

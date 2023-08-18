@@ -1,14 +1,14 @@
 package com.iCritic.users.entrypoint.resource;
 
+import com.iCritic.users.core.model.AuthorizationData;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.CreateUserUseCase;
 import com.iCritic.users.core.usecase.FindUserByIdUseCase;
 import com.iCritic.users.core.usecase.PasswordResetRequestUseCase;
 import com.iCritic.users.core.usecase.PasswordResetUseCase;
+import com.iCritic.users.core.usecase.RefreshUserTokenUseCase;
 import com.iCritic.users.core.usecase.SignInUserUseCase;
-import com.iCritic.users.dataprovider.jwt.JwtProvider;
 import com.iCritic.users.entrypoint.mapper.UserDtoMapper;
-import com.iCritic.users.entrypoint.model.AuthorizationData;
 import com.iCritic.users.entrypoint.model.PasswordResetData;
 import com.iCritic.users.entrypoint.model.UserRequestDto;
 import com.iCritic.users.entrypoint.model.UserResponseDto;
@@ -28,7 +28,6 @@ import javax.validation.Validator;
 import java.util.Set;
 
 import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 
 @RestController
 @RequiredArgsConstructor
@@ -44,9 +43,9 @@ public class AuthResource {
 
     private final PasswordResetUseCase passwordResetUseCase;
 
-    private final Validator validator;
+    private final RefreshUserTokenUseCase refreshUserTokenUseCase;
 
-    private final JwtProvider jwtProvider;
+    private final Validator validator;
 
     private final UserDtoMapper userDtoMapper;
 
@@ -78,16 +77,7 @@ public class AuthResource {
 
         User user = userDtoMapper.userRequestDtoToUser(userRequestDto);
 
-        User loggedUser = signInUserUseCase.execute(user);
-
-        if (!nonNull(loggedUser)) {
-            throw new ResourceViolationException("Invalid email or password");
-        }
-
-        AuthorizationData authorizationData = AuthorizationData.builder()
-                .accessToken(jwtProvider.generateToken(loggedUser))
-                .refreshToken(jwtProvider.generateRefreshToken(loggedUser))
-                .build();
+        AuthorizationData authorizationData = signInUserUseCase.execute(user);
 
         Cookie refreshTokenCookie = new Cookie("refreshToken", authorizationData.getRefreshToken());
         refreshTokenCookie.setHttpOnly(true);
@@ -101,20 +91,11 @@ public class AuthResource {
     public AuthorizationData refreshToken(@RequestBody AuthorizationData authorizationDataRequest, HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = extractRefreshTokenFromRequest(request, authorizationDataRequest);
 
-        if(isNull(refreshToken)) {
+        if (isNull(refreshToken)) {
             throw new UnauthorizedAccessException("Invalid refresh token");
         }
 
-        if(!jwtProvider.validateRefreshToken(refreshToken)) {
-            throw new UnauthorizedAccessException("Invalid refresh token");
-        }
-
-        User user = findUserByIdUseCase.execute(Long.parseLong(jwtProvider.getUserIdFromRefreshToken(refreshToken)));
-
-        AuthorizationData authorizationData = AuthorizationData.builder()
-                .accessToken(jwtProvider.generateToken(user))
-                .refreshToken(jwtProvider.generateRefreshToken(user))
-                .build();
+        AuthorizationData authorizationData = refreshUserTokenUseCase.execute(refreshToken);
 
         Cookie refreshTokenCookie = new Cookie("refreshToken", authorizationData.getRefreshToken());
         refreshTokenCookie.setHttpOnly(true);
@@ -126,7 +107,7 @@ public class AuthResource {
 
     @PostMapping(path = "/forgot-password")
     public ResponseEntity<Void> passwordResetRequest(@RequestBody UserRequestDto userRequestDto) {
-        if(isNull(userRequestDto.getEmail())) {
+        if (isNull(userRequestDto.getEmail())) {
             throw new ResourceViolationException("Email is required");
         }
 
@@ -160,7 +141,7 @@ public class AuthResource {
             }
         }
 
-        if(isNull(refreshToken)) {
+        if (isNull(refreshToken)) {
             refreshToken = authorizationDataRequest.getRefreshToken();
         }
 
