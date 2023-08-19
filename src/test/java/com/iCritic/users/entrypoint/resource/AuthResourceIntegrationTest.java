@@ -2,23 +2,23 @@ package com.iCritic.users.entrypoint.resource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iCritic.users.core.fixture.UserFixture;
+import com.iCritic.users.core.model.AuthorizationData;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.CreateUserUseCase;
 import com.iCritic.users.core.usecase.FindUserByIdUseCase;
 import com.iCritic.users.core.usecase.PasswordResetRequestUseCase;
 import com.iCritic.users.core.usecase.PasswordResetUseCase;
+import com.iCritic.users.core.usecase.RefreshUserTokenUseCase;
 import com.iCritic.users.core.usecase.SignInUserUseCase;
 import com.iCritic.users.entrypoint.fixture.AuthorizationDataFixture;
 import com.iCritic.users.entrypoint.fixture.PasswordResetDataFixture;
 import com.iCritic.users.entrypoint.fixture.UserRequestDtoFixture;
 import com.iCritic.users.entrypoint.fixture.UserResponseDtoFixture;
 import com.iCritic.users.entrypoint.mapper.UserDtoMapper;
-import com.iCritic.users.entrypoint.model.AuthorizationData;
 import com.iCritic.users.entrypoint.model.PasswordResetData;
 import com.iCritic.users.entrypoint.model.UserRequestDto;
 import com.iCritic.users.entrypoint.model.UserResponseDto;
 import com.iCritic.users.entrypoint.validation.AuthorizationFilter;
-import com.iCritic.users.dataprovider.jwt.JwtProvider;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,10 +55,10 @@ class AuthResourceIntegrationTest {
     private SignInUserUseCase signInUserUseCase;
 
     @MockBean
-    private FindUserByIdUseCase findUserByIdUseCase;
+    private RefreshUserTokenUseCase refreshUserTokenUseCase;
 
     @MockBean
-    private JwtProvider jwtProvider;
+    private FindUserByIdUseCase findUserByIdUseCase;
 
     @MockBean
     private UserDtoMapper userDtoMapper;
@@ -130,9 +130,7 @@ class AuthResourceIntegrationTest {
         String requestBody = objectMapper.writeValueAsString(userRequestDto);
 
         when(userDtoMapper.userRequestDtoToUser(any())).thenReturn(user);
-        when(signInUserUseCase.execute(any(User.class))).thenReturn(user);
-        when(jwtProvider.generateToken(any())).thenReturn(authorizationData.getAccessToken());
-        when(jwtProvider.generateRefreshToken(any())).thenReturn(authorizationData.getRefreshToken());
+        when(signInUserUseCase.execute(any(User.class))).thenReturn(authorizationData);
 
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/login")
@@ -161,7 +159,44 @@ class AuthResourceIntegrationTest {
                 .andExpect(status().isBadRequest());
     }
 
-    //Necessary to create tests for refresh token flow
+    @Test
+    void givenRequestToRefreshTokenEndpointWithValidParams_thenRefreshAndReturnAuthorizationData() throws Exception {
+        AuthorizationData authorizationData = AuthorizationDataFixture.load();
+
+        when(refreshUserTokenUseCase.execute(authorizationData.getRefreshToken())).thenReturn(authorizationData);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String requestBody = objectMapper.writeValueAsString(authorizationData);
+
+        when(refreshUserTokenUseCase.execute(authorizationData.getRefreshToken())).thenReturn(authorizationData);
+
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post("/refresh")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").value(authorizationData.getAccessToken()))
+                .andExpect(jsonPath("$.refreshToken").value(authorizationData.getRefreshToken()));
+    }
+
+    @Test
+    void givenRequestToRefreshTokenEndpointWithInvalidParams_thenReturnBadRequest() throws Exception {
+        AuthorizationData authorizationData = AuthorizationDataFixture.load();
+        authorizationData.setRefreshToken(null);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String requestBody = objectMapper.writeValueAsString(authorizationData);
+
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post("/refresh")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isUnauthorized());
+    }
 
     @Test
     void givenRequestToResetPasswordRequestWithValidParameters_thenReturnResponseOk() throws Exception {
