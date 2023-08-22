@@ -24,8 +24,7 @@ public class GenerateRefreshTokenUseCase {
 
     private final SaveRefreshTokenBoundary saveRefreshTokenBoundary;
 
-    @Autowired
-    private ApplicationProperties applicationProperties;
+    private final ApplicationProperties applicationProperties;
 
     public RefreshToken execute(User user) {
         log.info("Generating refresh token for user with id: [{}]", user.getId());
