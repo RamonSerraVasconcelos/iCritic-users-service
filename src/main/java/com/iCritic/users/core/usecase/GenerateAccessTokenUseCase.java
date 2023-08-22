@@ -7,7 +7,6 @@ import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.boundary.GenerateAccessTokenBoundary;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -21,8 +20,7 @@ public class GenerateAccessTokenUseCase {
 
     private final GenerateAccessTokenBoundary generateAccessTokenBoundary;
 
-    @Autowired
-    private ApplicationProperties applicationProperties;
+    private final ApplicationProperties applicationProperties;
 
     public AccessToken execute(User user) {
         log.info("Generating access token for user with id: [{}]", user.getId());
