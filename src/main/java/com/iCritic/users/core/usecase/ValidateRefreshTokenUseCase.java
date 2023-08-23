@@ -43,6 +43,11 @@ public class ValidateRefreshTokenUseCase {
 
         if (!savedToken.get().isActive()) {
             Claim userIdClaim = TokenUtils.getClaim(refreshToken.getClaims(), "userId");
+
+            if(isNull(userIdClaim)) {
+                throw new UnauthorizedAccessException("Invalid refresh token");
+            }
+
             Long userId = Long.parseLong(userIdClaim.getValue());
 
             deleteUserRefreshTokensBoundary.execute(userId);
