@@ -6,17 +6,17 @@ import com.iCritic.users.core.usecase.boundary.GenerateAccessTokenBoundary;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.ZoneId;
 import java.util.Date;
 
 @Component
+@RequiredArgsConstructor
 public class GenerateAccessTokenGateway implements GenerateAccessTokenBoundary {
 
-    @Autowired
-    private ApplicationProperties applicationProperties;
+    private final ApplicationProperties applicationProperties;
 
     public String execute(AccessToken accessToken) {
         Claims claims = Jwts.claims();
