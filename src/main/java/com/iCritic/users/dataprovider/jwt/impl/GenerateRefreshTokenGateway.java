@@ -6,6 +6,7 @@ import com.iCritic.users.core.usecase.boundary.GenerateRefreshTokenBoundary;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -13,10 +14,10 @@ import java.time.ZoneOffset;
 import java.util.Date;
 
 @Component
+@RequiredArgsConstructor
 public class GenerateRefreshTokenGateway implements GenerateRefreshTokenBoundary {
 
-    @Autowired
-    private ApplicationProperties applicationProperties;
+    private final ApplicationProperties applicationProperties;
 
     public String execute(RefreshToken refreshToken) {
         Claims claims = Jwts.claims();
