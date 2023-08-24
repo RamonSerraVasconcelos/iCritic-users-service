@@ -97,17 +97,17 @@ class AuthorizationFilterTest {
         verifyNoInteractions(filterChain);
     }
 
-//    @Test
-//    void givenInvalidToken_thenReturnUnauthorizedResponse() throws ServletException, IOException {
-//        String invalidToken = "invalid_token";
-//        request.setRequestURI("/private");
-//        request.addHeader("Authorization", invalidToken);
-//
-//        doThrow(MalformedJwtException.class).when(jwtProvider).getUserIdFromToken(invalidToken);
-//
-//        authorizationFilter.doFilterInternal(request, response, filterChain);
-//
-//        assertEquals(HttpServletResponse.SC_UNAUTHORIZED, response.getStatus());
-//        verifyNoInteractions(filterChain);
-//    }
+    @Test
+    void givenInvalidToken_thenReturnUnauthorizedResponse() throws ServletException, IOException {
+        String invalidToken = "invalid_token";
+        request.setRequestURI("/private");
+        request.addHeader("Authorization", invalidToken);
+
+        doThrow(MalformedJwtException.class).when(validateAccessTokenBoundary).execute(invalidToken);
+
+        authorizationFilter.doFilterInternal(request, response, filterChain);
+
+        assertEquals(HttpServletResponse.SC_UNAUTHORIZED, response.getStatus());
+        verifyNoInteractions(filterChain);
+    }
 }
