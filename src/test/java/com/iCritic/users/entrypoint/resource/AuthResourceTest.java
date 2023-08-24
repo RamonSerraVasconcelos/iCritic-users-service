@@ -2,22 +2,23 @@ package com.iCritic.users.entrypoint.resource;
 
 import com.iCritic.users.core.fixture.CountryFixture;
 import com.iCritic.users.core.fixture.UserFixture;
+import com.iCritic.users.core.model.AuthorizationData;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.CreateUserUseCase;
 import com.iCritic.users.core.usecase.PasswordResetRequestUseCase;
 import com.iCritic.users.core.usecase.PasswordResetUseCase;
+import com.iCritic.users.core.usecase.RefreshUserTokenUseCase;
 import com.iCritic.users.core.usecase.SignInUserUseCase;
 import com.iCritic.users.entrypoint.fixture.AuthorizationDataFixture;
 import com.iCritic.users.entrypoint.fixture.PasswordResetDataFixture;
 import com.iCritic.users.entrypoint.fixture.UserRequestDtoFixture;
 import com.iCritic.users.entrypoint.fixture.UserResponseDtoFixture;
 import com.iCritic.users.entrypoint.mapper.UserDtoMapper;
-import com.iCritic.users.entrypoint.model.AuthorizationData;
 import com.iCritic.users.entrypoint.model.PasswordResetData;
 import com.iCritic.users.entrypoint.model.UserRequestDto;
 import com.iCritic.users.entrypoint.model.UserResponseDto;
-import com.iCritic.users.dataprovider.jwt.JwtProvider;
 import com.iCritic.users.exception.ResourceViolationException;
+import com.iCritic.users.exception.UnauthorizedAccessException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,6 +27,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
 import javax.validation.Path;
@@ -35,7 +37,11 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -54,6 +60,9 @@ class AuthResourceTest {
     private SignInUserUseCase signInUserUseCase;
 
     @Mock
+    private RefreshUserTokenUseCase refreshUserTokenUseCase;
+
+    @Mock
     private PasswordResetRequestUseCase passwordResetRequestUseCase;
 
     @Mock
@@ -63,10 +72,10 @@ class AuthResourceTest {
     private Validator validator;
 
     @Mock
-    private JwtProvider jwtProvider;
+    private UserDtoMapper userDtoMapper;
 
     @Mock
-    private UserDtoMapper userDtoMapper;
+    HttpServletRequest request;
 
     @Mock
     HttpServletResponse response;
@@ -123,9 +132,7 @@ class AuthResourceTest {
         User user = UserFixture.load();
 
         when(validator.validate(userRequestDto)).thenReturn(Collections.emptySet());
-        when(signInUserUseCase.execute(any())).thenReturn(user);
-        when(jwtProvider.generateToken(any())).thenReturn(authorizationData.getAccessToken());
-        when(jwtProvider.generateRefreshToken(any())).thenReturn(authorizationData.getRefreshToken());
+        when(signInUserUseCase.execute(any())).thenReturn(authorizationData);
 
         AuthorizationData returnedAuthData = authResource.loginUser(userRequestDto, response);
 
@@ -150,19 +157,39 @@ class AuthResourceTest {
     @Test
     void givenCallToSignInUserWithInvalidParameters_whenParametersAreNotEmailOrPassword_thenDontThrowException() {
         UserRequestDto userRequestDto = UserRequestDtoFixture.load();
-        User user = UserFixture.load();
+        AuthorizationData authorizationData = AuthorizationDataFixture.load();
 
         Set<ConstraintViolation<UserRequestDto>> violations = new HashSet<>();
         violations.add(createMockViolation("name"));
         violations.add(createMockViolation("countryId"));
 
         when(validator.validate(userRequestDto)).thenReturn(violations);
-        when(signInUserUseCase.execute(any())).thenReturn(user);
+        when(signInUserUseCase.execute(any())).thenReturn(authorizationData);
 
         assertDoesNotThrow(() -> authResource.loginUser(userRequestDto, response));
     }
 
-    //Necessary to create tests for refresh token flow
+    @Test
+    void givenCallToRefreshTokenWithValidParameters_callSignInUserUseCase_thenReturnAuthorizationData() {
+        AuthorizationData authorizationData = AuthorizationDataFixture.load();
+
+        when(refreshUserTokenUseCase.execute(authorizationData.getRefreshToken())).thenReturn(authorizationData);
+
+        AuthorizationData returnedAuthData = authResource.refreshToken(authorizationData, request, response);
+
+        verify(refreshUserTokenUseCase).execute(authorizationData.getRefreshToken());
+
+        assertNotNull(returnedAuthData);
+        assertEquals(returnedAuthData.getAccessToken(), authorizationData.getAccessToken());
+    }
+
+    @Test
+    void givenCallToRefreshTokenWithNullRefreshToken_thenThrowUnauthorizedAccessException() {
+        AuthorizationData authorizationData = AuthorizationDataFixture.load();
+        authorizationData.setRefreshToken(null);
+
+        assertThrows(UnauthorizedAccessException.class, () -> authResource.refreshToken(authorizationData, request, response));
+    }
 
     @Test
     void givenCallToPasswordResetRequestWithValidParameters_thenReturnStatusOk() {

@@ -1,4 +1,4 @@
-package com.iCritic.users.entrypoint.model;
+package com.iCritic.users.core.model;
 
 import lombok.*;
 

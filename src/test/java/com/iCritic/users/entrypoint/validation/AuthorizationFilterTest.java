@@ -1,6 +1,9 @@
 package com.iCritic.users.entrypoint.validation;
 
-import com.iCritic.users.dataprovider.jwt.JwtProvider;
+import com.iCritic.users.core.fixture.AccessTokenFixture;
+import com.iCritic.users.core.model.AccessToken;
+import com.iCritic.users.core.model.Claim;
+import com.iCritic.users.core.usecase.boundary.ValidateAccessTokenBoundary;
 import io.jsonwebtoken.MalformedJwtException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +19,7 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -28,10 +32,10 @@ class AuthorizationFilterTest {
     private AuthorizationFilter authorizationFilter;
 
     @Mock
-    private JwtProvider jwtProvider;
+    private ValidateAccessTokenBoundary validateAccessTokenBoundary;
 
     @Mock
-    FilterChain filterChain;
+    private FilterChain filterChain;
 
     private MockHttpServletRequest request;
 
@@ -54,9 +58,13 @@ class AuthorizationFilterTest {
     void givenValidToken_whenValidatingToken_thenSetAttributesAndFinishFilter() throws ServletException, IOException {
         String userId = "1";
         String userRole = "DEFAULT";
+        AccessToken accessToken = AccessTokenFixture.load();
+        accessToken.setClaims(List.of(
+                Claim.builder().name("userId").value(userId).build(),
+                Claim.builder().name("role").value(userRole).build()
+        ));
 
-        when(jwtProvider.getUserIdFromToken(TOKEN)).thenReturn(userId);
-        when(jwtProvider.getUserRoleFromToken(TOKEN)).thenReturn(userRole);
+        when(validateAccessTokenBoundary.execute(TOKEN)).thenReturn(accessToken);
 
         request.setRequestURI("/private");
         request.addHeader("Authorization", TOKEN);
@@ -95,7 +103,7 @@ class AuthorizationFilterTest {
         request.setRequestURI("/private");
         request.addHeader("Authorization", invalidToken);
 
-        doThrow(MalformedJwtException.class).when(jwtProvider).getUserIdFromToken(invalidToken);
+        doThrow(MalformedJwtException.class).when(validateAccessTokenBoundary).execute(invalidToken);
 
         authorizationFilter.doFilterInternal(request, response, filterChain);
 

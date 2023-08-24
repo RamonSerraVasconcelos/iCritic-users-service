@@ -1,28 +1,28 @@
 package com.iCritic.users.entrypoint.validation;
 
-import static java.util.Objects.isNull;
-
-import java.io.IOException;
+import com.iCritic.users.core.model.AccessToken;
+import com.iCritic.users.core.model.Claim;
+import com.iCritic.users.core.usecase.boundary.ValidateAccessTokenBoundary;
+import com.iCritic.users.core.utils.TokenUtils;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
-import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
-
-import com.iCritic.users.dataprovider.jwt.JwtProvider;
-
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import static java.util.Objects.isNull;
 
 @Component
 @AllArgsConstructor
 @Slf4j
 public class AuthorizationFilter extends OncePerRequestFilter {
 
-    private final JwtProvider jwtProvider;
+    private final ValidateAccessTokenBoundary validateAccessTokenBoundary;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -40,11 +40,20 @@ public class AuthorizationFilter extends OncePerRequestFilter {
         }
 
         try {
-            log.info("Retrieving information from access token id: [{}]", jwtProvider.getTokenId(token));
-            request.setAttribute("userId", jwtProvider.getUserIdFromToken(token));
-            request.setAttribute("role", jwtProvider.getUserRoleFromToken(token));
+            AccessToken accessToken = validateAccessTokenBoundary.execute(token);
+
+            log.info("Retrieving information from access token id: [{}]", accessToken.getId());
+
+            Claim userIdClaim = TokenUtils.getClaim(accessToken.getClaims(), "userId");
+            String userId = userIdClaim.getValue();
+
+            Claim userRoleClaim = TokenUtils.getClaim(accessToken.getClaims(), "role");
+            String role = userRoleClaim.getValue();
+
+            request.setAttribute("userId", userId);
+            request.setAttribute("role", role);
         } catch (Exception e) {
-            log.error("Error retrieving claims from access token: [{}]", e.getMessage());
+            log.error("Error retrieving claims from access token", e);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }

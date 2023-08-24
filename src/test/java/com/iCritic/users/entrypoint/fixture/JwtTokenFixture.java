@@ -1,5 +1,8 @@
 package com.iCritic.users.entrypoint.fixture;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.UUID;
 
 import io.jsonwebtoken.Jwts;
@@ -22,10 +25,14 @@ public class JwtTokenFixture {
     }
 
     public static String loadRefreshToken() {
+        Date expirationDate = Date.from(new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().plusMinutes(1).atZone(ZoneId.systemDefault()).toInstant());
+
         return Jwts.builder()
                 .setId(UUID.randomUUID().toString())
                 .claim("userId", 1L)
                 .signWith(SignatureAlgorithm.HS512, REFRESH_SECRET)
+                .setIssuedAt(new Date())
+                .setExpiration(expirationDate)
                 .compact();
     }
 

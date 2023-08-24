@@ -2,10 +2,10 @@ package com.iCritic.users.core.usecase;
 
 import com.iCritic.users.core.fixture.UserFixture;
 import com.iCritic.users.core.model.User;
+import com.iCritic.users.core.usecase.boundary.DeleteUserRefreshTokensBoundary;
 import com.iCritic.users.core.usecase.boundary.FindUserByEmailBoundary;
 import com.iCritic.users.core.usecase.boundary.PostPasswordResetMessageBoundary;
 import com.iCritic.users.core.usecase.boundary.UpdateUserBoundary;
-import com.iCritic.users.dataprovider.jwt.JwtManager;
 import com.iCritic.users.entrypoint.fixture.PasswordResetDataFixture;
 import com.iCritic.users.entrypoint.model.PasswordResetData;
 import com.iCritic.users.exception.ResourceViolationException;
@@ -39,10 +39,10 @@ class PasswordResetUseCaseTest {
     private PostPasswordResetMessageBoundary postPasswordResetMessageBoundary;
 
     @Mock
-    private BCryptPasswordEncoder bcrypt;
+    private DeleteUserRefreshTokensBoundary deleteUserRefreshTokensBoundary;
 
     @Mock
-    private JwtManager jwtManager;
+    private BCryptPasswordEncoder bcrypt;
 
     @Test
     void givenValidParameters_thenUpdateUserAndPostPasswordResetMessage() {
@@ -61,7 +61,7 @@ class PasswordResetUseCaseTest {
         verify(bcrypt).matches(passwordResetData.getPassword(), "test");
         verify(postPasswordResetMessageBoundary).execute(user.getId(), user.getEmail());
         verify(updateUserBoundary).execute(user);
-        verify(jwtManager).revokeUserTokens(user.getId());
+        verify(deleteUserRefreshTokensBoundary).execute(user.getId());
     }
 
     @Test
@@ -74,7 +74,7 @@ class PasswordResetUseCaseTest {
         verifyNoInteractions(bcrypt);
         verifyNoInteractions(postPasswordResetMessageBoundary);
         verifyNoInteractions(updateUserBoundary);
-        verifyNoInteractions(jwtManager);
+        verifyNoInteractions(deleteUserRefreshTokensBoundary);
     }
 
     @Test
@@ -87,7 +87,7 @@ class PasswordResetUseCaseTest {
         verifyNoInteractions(bcrypt);
         verifyNoInteractions(postPasswordResetMessageBoundary);
         verifyNoInteractions(updateUserBoundary);
-        verifyNoInteractions(jwtManager);
+        verifyNoInteractions(deleteUserRefreshTokensBoundary);
     }
 
     @Test
@@ -104,7 +104,7 @@ class PasswordResetUseCaseTest {
         verify(bcrypt).matches(passwordResetData.getPasswordResetHash(), "test");
         verifyNoInteractions(postPasswordResetMessageBoundary);
         verifyNoInteractions(updateUserBoundary);
-        verifyNoInteractions(jwtManager);
+        verifyNoInteractions(deleteUserRefreshTokensBoundary);
     }
 
     @Test
@@ -123,6 +123,6 @@ class PasswordResetUseCaseTest {
         verify(bcrypt).matches(passwordResetData.getPassword(), "test");
         verifyNoInteractions(postPasswordResetMessageBoundary);
         verifyNoInteractions(updateUserBoundary);
-        verifyNoInteractions(jwtManager);
+        verifyNoInteractions(deleteUserRefreshTokensBoundary);
     }
 }
