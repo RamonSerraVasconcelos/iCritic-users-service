@@ -23,7 +23,7 @@ public class KafkaProducerConfig {
     private KafkaProperties kafkaProperties;
 
     @Bean
-    public ProducerFactory<String, PasswordResetRequestMessage> requestPasswordResetProducerFactory() {
+    public <T> ProducerFactory<String, T> producerFactory() {
         Map<String, Object> config = new HashMap<>();
         config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers());
         config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -32,21 +32,7 @@ public class KafkaProducerConfig {
     }
 
     @Bean
-    public KafkaTemplate<String, PasswordResetRequestMessage> kafkaTemplate() {
-        return new KafkaTemplate<String, PasswordResetRequestMessage>(requestPasswordResetProducerFactory());
-    }
-
-    @Bean
-    public ProducerFactory<String, PasswordResetMessage> passwordResetProducerFactory() {
-        Map<String, Object> config = new HashMap<>();
-        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers());
-        config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
-        return new DefaultKafkaProducerFactory<>(config);
-    }
-
-    @Bean
-    public KafkaTemplate<String, PasswordResetMessage> passwordResetMessageKafkaTemplate() {
-        return new KafkaTemplate<String, PasswordResetMessage>(passwordResetProducerFactory());
+    public <T> KafkaTemplate<String, T> kafkaTemplate() {
+        return new KafkaTemplate<>(producerFactory());
     }
 }
