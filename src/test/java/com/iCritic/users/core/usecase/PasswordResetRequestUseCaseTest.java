@@ -6,7 +6,6 @@ import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.boundary.FindUserByEmailBoundary;
 import com.iCritic.users.core.usecase.boundary.PostPasswordResetRequestMessageBoundary;
 import com.iCritic.users.dataprovider.gateway.database.impl.UpdateUserGateway;
-import com.iCritic.users.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,7 +13,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
@@ -35,7 +33,7 @@ public class PasswordResetRequestUseCaseTest {
     private PostPasswordResetRequestMessageBoundary postPasswordResetRequestMessageBoundary;
 
     @Mock
-    private UpdateUserGateway updateUserGateway;
+    private UpdateUserGateway updateUserBoundary;
 
     @Mock
     private BCryptPasswordEncoder bcrypt;
@@ -47,14 +45,14 @@ public class PasswordResetRequestUseCaseTest {
 
         when(bcrypt.encode(anyString())).thenReturn(encodedHash);
         when(findUserByEmailBoundary.execute(user.getEmail())).thenReturn(user);
-        when(updateUserGateway.execute(user)).thenReturn(user);
+        when(updateUserBoundary.execute(user)).thenReturn(user);
         doNothing().when(postPasswordResetRequestMessageBoundary).execute(any(PasswordResetRequest.class));
 
         passwordResetRequestUseCase.execute(user.getEmail());
 
         verify(bcrypt).encode(anyString());
         verify(findUserByEmailBoundary).execute(user.getEmail());
-        verify(updateUserGateway).execute(user);
+        verify(updateUserBoundary).execute(user);
         verify(postPasswordResetRequestMessageBoundary).execute(any(PasswordResetRequest.class));
     }
 
@@ -66,7 +64,7 @@ public class PasswordResetRequestUseCaseTest {
         passwordResetRequestUseCase.execute(email);
         verify(findUserByEmailBoundary).execute(email);
         verifyNoInteractions(bcrypt);
-        verifyNoInteractions(updateUserGateway);
+        verifyNoInteractions(updateUserBoundary);
         verifyNoInteractions(postPasswordResetRequestMessageBoundary);
     }
 }

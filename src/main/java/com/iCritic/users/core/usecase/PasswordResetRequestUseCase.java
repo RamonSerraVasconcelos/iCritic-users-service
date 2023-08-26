@@ -4,7 +4,7 @@ import com.iCritic.users.core.model.PasswordResetRequest;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.boundary.FindUserByEmailBoundary;
 import com.iCritic.users.core.usecase.boundary.PostPasswordResetRequestMessageBoundary;
-import com.iCritic.users.dataprovider.gateway.database.impl.UpdateUserGateway;
+import com.iCritic.users.core.usecase.boundary.UpdateUserBoundary;
 import com.iCritic.users.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,7 @@ public class PasswordResetRequestUseCase {
 
     private final PostPasswordResetRequestMessageBoundary postPasswordResetRequestMessageBoundary;
 
-    private final UpdateUserGateway updateUserGateway;
+    private final UpdateUserBoundary updateUserBoundary;
 
     private final BCryptPasswordEncoder bcrypt;
 
@@ -43,7 +43,7 @@ public class PasswordResetRequestUseCase {
             user.setPasswordResetHash(encryptedHash);
             user.setPasswordResetDate(LocalDateTime.now().plusMinutes(5));
 
-            updateUserGateway.execute(user);
+            updateUserBoundary.execute(user);
 
             PasswordResetRequest passwordResetRequest = PasswordResetRequest.builder()
                     .userId(user.getId())
