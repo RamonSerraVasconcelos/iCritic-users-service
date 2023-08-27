@@ -3,14 +3,16 @@ package com.iCritic.users.entrypoint.resource;
 import com.iCritic.users.core.model.AuthorizationData;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.CreateUserUseCase;
+import com.iCritic.users.core.usecase.EmailResetUseCase;
 import com.iCritic.users.core.usecase.PasswordResetRequestUseCase;
 import com.iCritic.users.core.usecase.PasswordResetUseCase;
 import com.iCritic.users.core.usecase.RefreshUserTokenUseCase;
 import com.iCritic.users.core.usecase.SignInUserUseCase;
+import com.iCritic.users.entrypoint.entity.EmailResetData;
 import com.iCritic.users.entrypoint.mapper.UserDtoMapper;
-import com.iCritic.users.entrypoint.model.PasswordResetData;
-import com.iCritic.users.entrypoint.model.UserRequestDto;
-import com.iCritic.users.entrypoint.model.UserResponseDto;
+import com.iCritic.users.entrypoint.entity.PasswordResetData;
+import com.iCritic.users.entrypoint.entity.UserRequestDto;
+import com.iCritic.users.entrypoint.entity.UserResponseDto;
 import com.iCritic.users.exception.ResourceViolationException;
 import com.iCritic.users.exception.UnauthorizedAccessException;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +43,8 @@ public class AuthResource {
     private final PasswordResetUseCase passwordResetUseCase;
 
     private final RefreshUserTokenUseCase refreshUserTokenUseCase;
+
+    private final EmailResetUseCase emailResetUseCase;
 
     private final Validator validator;
 
@@ -121,6 +125,18 @@ public class AuthResource {
         }
 
         passwordResetUseCase.execute(passwordResetData.getEmail(), passwordResetData.getPasswordResetHash(), passwordResetData.getPassword());
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping(path = "/reset-email")
+    public ResponseEntity<Void> emailReset(@RequestBody EmailResetData emailResetData) {
+        Set<ConstraintViolation<EmailResetData>> violations = validator.validate(emailResetData);
+        if (!violations.isEmpty()) {
+            throw new ResourceViolationException(violations);
+        }
+
+        emailResetUseCase.execute(emailResetData.getUserId(), emailResetData.getEmailResetHash());
 
         return ResponseEntity.ok().build();
     }

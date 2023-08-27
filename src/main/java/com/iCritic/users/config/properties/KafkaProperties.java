@@ -15,4 +15,5 @@ public class KafkaProperties {
     private String passwordResetRequestTopic;
     private String passwordResetTopic;
     private String emailResetRequestTopic;
+    private String emailResetTopic;
 }
