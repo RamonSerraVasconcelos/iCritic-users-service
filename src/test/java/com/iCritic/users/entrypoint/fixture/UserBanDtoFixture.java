@@ -1,6 +1,6 @@
 package com.iCritic.users.entrypoint.fixture;
 
-import com.iCritic.users.entrypoint.model.UserBanDto;
+import com.iCritic.users.entrypoint.entity.UserBanDto;
 
 public class UserBanDtoFixture {
 

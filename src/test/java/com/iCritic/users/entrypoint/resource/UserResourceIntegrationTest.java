@@ -1,7 +1,6 @@
 package com.iCritic.users.entrypoint.resource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.iCritic.users.config.properties.AzureStorageProperties;
 import com.iCritic.users.core.fixture.UserFixture;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.*;
@@ -9,9 +8,9 @@ import com.iCritic.users.entrypoint.fixture.UserBanDtoFixture;
 import com.iCritic.users.entrypoint.fixture.UserRequestDtoFixture;
 import com.iCritic.users.entrypoint.fixture.UserResponseDtoFixture;
 import com.iCritic.users.entrypoint.mapper.UserDtoMapper;
-import com.iCritic.users.entrypoint.model.UserBanDto;
-import com.iCritic.users.entrypoint.model.UserRequestDto;
-import com.iCritic.users.entrypoint.model.UserResponseDto;
+import com.iCritic.users.entrypoint.entity.UserBanDto;
+import com.iCritic.users.entrypoint.entity.UserRequestDto;
+import com.iCritic.users.entrypoint.entity.UserResponseDto;
 import com.iCritic.users.entrypoint.validation.AuthorizationFilter;
 import com.iCritic.users.core.usecase.ValidateUserRoleUseCase;
 import com.iCritic.users.exception.ResourceNotFoundException;

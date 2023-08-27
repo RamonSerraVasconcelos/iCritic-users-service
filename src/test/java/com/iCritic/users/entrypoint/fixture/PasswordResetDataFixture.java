@@ -1,6 +1,6 @@
 package com.iCritic.users.entrypoint.fixture;
 
-import com.iCritic.users.entrypoint.model.PasswordResetData;
+import com.iCritic.users.entrypoint.entity.PasswordResetData;
 
 public class PasswordResetDataFixture {
 

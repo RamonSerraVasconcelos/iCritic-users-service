@@ -1,4 +1,4 @@
-package com.iCritic.users.entrypoint.model;
+package com.iCritic.users.entrypoint.entity;
 
 import lombok.*;
 import org.hibernate.validator.constraints.Length;

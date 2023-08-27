@@ -1,7 +1,7 @@
 package com.iCritic.users.entrypoint.fixture;
 
 import com.iCritic.users.core.enums.Role;
-import com.iCritic.users.entrypoint.model.UserResponseDto;
+import com.iCritic.users.entrypoint.entity.UserResponseDto;
 
 import java.time.LocalDateTime;
 

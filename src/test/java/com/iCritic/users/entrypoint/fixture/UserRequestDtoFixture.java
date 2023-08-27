@@ -1,6 +1,6 @@
 package com.iCritic.users.entrypoint.fixture;
 
-import com.iCritic.users.entrypoint.model.UserRequestDto;
+import com.iCritic.users.entrypoint.entity.UserRequestDto;
 
 public class
 UserRequestDtoFixture {
