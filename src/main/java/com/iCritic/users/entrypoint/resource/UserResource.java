@@ -3,6 +3,7 @@ package com.iCritic.users.entrypoint.resource;
 import com.iCritic.users.core.enums.BanActionEnum;
 import com.iCritic.users.core.enums.Role;
 import com.iCritic.users.core.model.User;
+import com.iCritic.users.core.usecase.EmailResetRequestUseCase;
 import com.iCritic.users.core.usecase.FindUserByIdUseCase;
 import com.iCritic.users.core.usecase.FindUsersUseCase;
 import com.iCritic.users.core.usecase.UpdateUserPictureUseCase;
@@ -36,6 +37,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.isNull;
+
 @RestController
 @RequestMapping(path = "/users")
 @RequiredArgsConstructor
@@ -56,6 +59,8 @@ public class UserResource {
     private final ValidateUserRoleUseCase validateUserRoleUseCase;
 
     private final UpdateUserPictureUseCase updateUserPictureUseCase;
+
+    private final EmailResetRequestUseCase emailResetRequestUseCase;
 
     private final UserDtoMapper userDtoMapper;
 
@@ -134,6 +139,19 @@ public class UserResource {
         }
 
         updateUserStatusUseCase.execute(id, banDto.getMotive(), BanActionEnum.UNBAN);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/request-email-change")
+    public ResponseEntity<Void> requestEmailChange(HttpServletRequest request, @RequestBody UserRequestDto userDto) {
+        if(isNull(userDto.getEmail())) {
+            throw new ResourceViolationException("Email is required");
+        }
+
+        Long userId = Long.parseLong(request.getAttribute("userId").toString());
+
+        emailResetRequestUseCase.execute(userId, userDto.getEmail());
 
         return ResponseEntity.ok().build();
     }

@@ -3,7 +3,6 @@ package com.iCritic.users.entrypoint.resource;
 import com.iCritic.users.core.model.AuthorizationData;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.CreateUserUseCase;
-import com.iCritic.users.core.usecase.FindUserByIdUseCase;
 import com.iCritic.users.core.usecase.PasswordResetRequestUseCase;
 import com.iCritic.users.core.usecase.PasswordResetUseCase;
 import com.iCritic.users.core.usecase.RefreshUserTokenUseCase;
@@ -36,8 +35,6 @@ public class AuthResource {
     private final CreateUserUseCase createUserUseCase;
 
     private final SignInUserUseCase signInUserUseCase;
-
-    private final FindUserByIdUseCase findUserByIdUseCase;
 
     private final PasswordResetRequestUseCase passwordResetRequestUseCase;
 

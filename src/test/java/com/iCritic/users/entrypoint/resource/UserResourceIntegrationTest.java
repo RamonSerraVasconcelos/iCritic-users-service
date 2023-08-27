@@ -67,6 +67,9 @@ class UserResourceIntegrationTest {
     private UpdateUserPictureUseCase updateUserPictureUseCase;
 
     @MockBean
+    private EmailResetRequestUseCase emailResetRequestUseCase;
+
+    @MockBean
     private UserDtoMapper userDtoMapper;
 
     @Test
@@ -310,6 +313,41 @@ class UserResourceIntegrationTest {
                 .content(requestBody)
                 .requestAttr("userId", userRequestDto.getId())
                 .requestAttr("role", userRequestDto.getRole());
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void givenRequestToResetEmailRequestEndpointWithValidParameters_thenReturnResponseOk() throws Exception {
+        UserRequestDto userRequestDto = UserRequestDtoFixture.load();
+        userRequestDto.setId(1L);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String requestBody = objectMapper.writeValueAsString(userRequestDto);
+
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post("/users/request-email-change")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody)
+                .requestAttr("userId", userRequestDto.getId());
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void givenRequestToResetEmailRequestEndpointWithInvalidParameters_thenReturnBadRequest() throws Exception {
+        UserRequestDto userRequestDto = UserRequestDtoFixture.load();
+        userRequestDto.setEmail(null);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String requestBody = objectMapper.writeValueAsString(userRequestDto);
+
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post("/users/request-email-change")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody);
 
         mockMvc.perform(requestBuilder)
                 .andExpect(status().isBadRequest());
