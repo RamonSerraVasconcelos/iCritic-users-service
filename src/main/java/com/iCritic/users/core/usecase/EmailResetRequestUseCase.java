@@ -47,7 +47,7 @@ public class EmailResetRequestUseCase {
 
         EmailResetRequest emailResetRequest = EmailResetRequest.builder()
                         .userId(user.getId())
-                        .email(user.getEmail())
+                        .email(user.getNewEmailReset())
                         .emailResetHash(emailResetHash)
                         .build();
 
