@@ -48,6 +48,8 @@ public class EmailResetUseCase {
                     .build();
 
             user.setEmail(user.getNewEmailReset());
+            user.setEmailResetHash(null);
+            user.setEmailResetDate(null);
 
             updateUserBoundary.execute(user);
             postEmailResetMessageBoundary.execute(emailReset);
