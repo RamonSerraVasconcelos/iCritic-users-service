@@ -7,7 +7,7 @@ import com.iCritic.users.core.usecase.boundary.FindUserByEmailBoundary;
 import com.iCritic.users.core.usecase.boundary.PostPasswordResetMessageBoundary;
 import com.iCritic.users.core.usecase.boundary.UpdateUserBoundary;
 import com.iCritic.users.entrypoint.fixture.PasswordResetDataFixture;
-import com.iCritic.users.entrypoint.model.PasswordResetData;
+import com.iCritic.users.entrypoint.entity.PasswordResetData;
 import com.iCritic.users.exception.ResourceViolationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

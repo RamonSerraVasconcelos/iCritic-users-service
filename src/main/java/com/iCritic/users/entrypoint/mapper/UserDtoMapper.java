@@ -2,9 +2,9 @@ package com.iCritic.users.entrypoint.mapper;
 
 import com.iCritic.users.config.properties.AzureStorageProperties;
 import com.iCritic.users.core.model.User;
-import com.iCritic.users.entrypoint.model.CountryResponseDto;
-import com.iCritic.users.entrypoint.model.UserRequestDto;
-import com.iCritic.users.entrypoint.model.UserResponseDto;
+import com.iCritic.users.entrypoint.entity.CountryResponseDto;
+import com.iCritic.users.entrypoint.entity.UserRequestDto;
+import com.iCritic.users.entrypoint.entity.UserResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

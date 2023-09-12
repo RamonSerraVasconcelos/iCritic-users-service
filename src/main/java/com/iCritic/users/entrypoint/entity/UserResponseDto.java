@@ -1,4 +1,4 @@
-package com.iCritic.users.entrypoint.model;
+package com.iCritic.users.entrypoint.entity;
 
 import com.iCritic.users.core.enums.Role;
 import lombok.*;

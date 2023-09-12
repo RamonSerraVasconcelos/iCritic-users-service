@@ -4,6 +4,7 @@ import com.iCritic.users.core.enums.BanActionEnum;
 import com.iCritic.users.core.fixture.CountryFixture;
 import com.iCritic.users.core.fixture.UserFixture;
 import com.iCritic.users.core.model.User;
+import com.iCritic.users.core.usecase.EmailResetRequestUseCase;
 import com.iCritic.users.core.usecase.FindUserByIdUseCase;
 import com.iCritic.users.core.usecase.FindUsersUseCase;
 import com.iCritic.users.core.usecase.UpdateUserPictureUseCase;
@@ -15,9 +16,9 @@ import com.iCritic.users.entrypoint.fixture.UserBanDtoFixture;
 import com.iCritic.users.entrypoint.fixture.UserRequestDtoFixture;
 import com.iCritic.users.entrypoint.fixture.UserResponseDtoFixture;
 import com.iCritic.users.entrypoint.mapper.UserDtoMapper;
-import com.iCritic.users.entrypoint.model.UserBanDto;
-import com.iCritic.users.entrypoint.model.UserRequestDto;
-import com.iCritic.users.entrypoint.model.UserResponseDto;
+import com.iCritic.users.entrypoint.entity.UserBanDto;
+import com.iCritic.users.entrypoint.entity.UserRequestDto;
+import com.iCritic.users.entrypoint.entity.UserResponseDto;
 import com.iCritic.users.exception.ResourceViolationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,6 +48,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -83,6 +86,9 @@ class UserResourceTest {
 
     @Mock
     private UpdateUserPictureUseCase updateUserPictureUseCase;
+
+    @Mock
+    private EmailResetRequestUseCase emailResetRequestUseCase;
 
     @Mock
     private UserDtoMapper userDtoMapper;
@@ -288,6 +294,27 @@ class UserResourceTest {
         when(validator.validate(userBanDto)).thenReturn(violations);
 
         assertThrows(ResourceViolationException.class, () -> userResource.unban(request, id, userBanDto));
+    }
+
+    @Test
+    void givenCallToEmailResetRequestWithValidParameters_thenCallEmailResetRequestUseCase() {
+        UserRequestDto userRequestDto = UserRequestDtoFixture.load();
+
+        request.setAttribute("userId", "1");
+
+        ResponseEntity<Void> response = userResource.requestEmailChange(request, userRequestDto);
+
+        verify(emailResetRequestUseCase).execute(anyLong(), anyString());
+    }
+
+    @Test
+    void givenCallToEmailResetRequestWithInvalidParameters_thenThrowResourceViolationException() {
+        UserRequestDto userRequestDto = UserRequestDtoFixture.load();
+        userRequestDto.setEmail(null);
+
+        request.setAttribute("userId", "1");
+
+        assertThrows(ResourceViolationException.class, () -> userResource.requestEmailChange(request, userRequestDto));
     }
 
     private <T> ConstraintViolation<T> createMockViolation(String propertyName) {
