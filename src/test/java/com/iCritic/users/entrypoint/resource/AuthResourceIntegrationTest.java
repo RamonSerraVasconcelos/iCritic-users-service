@@ -5,19 +5,22 @@ import com.iCritic.users.core.fixture.UserFixture;
 import com.iCritic.users.core.model.AuthorizationData;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.CreateUserUseCase;
+import com.iCritic.users.core.usecase.EmailResetUseCase;
 import com.iCritic.users.core.usecase.FindUserByIdUseCase;
 import com.iCritic.users.core.usecase.PasswordResetRequestUseCase;
 import com.iCritic.users.core.usecase.PasswordResetUseCase;
 import com.iCritic.users.core.usecase.RefreshUserTokenUseCase;
 import com.iCritic.users.core.usecase.SignInUserUseCase;
+import com.iCritic.users.entrypoint.entity.EmailResetData;
+import com.iCritic.users.entrypoint.entity.PasswordResetData;
+import com.iCritic.users.entrypoint.entity.UserRequestDto;
+import com.iCritic.users.entrypoint.entity.UserResponseDto;
 import com.iCritic.users.entrypoint.fixture.AuthorizationDataFixture;
+import com.iCritic.users.entrypoint.fixture.EmailResetDataFixture;
 import com.iCritic.users.entrypoint.fixture.PasswordResetDataFixture;
 import com.iCritic.users.entrypoint.fixture.UserRequestDtoFixture;
 import com.iCritic.users.entrypoint.fixture.UserResponseDtoFixture;
 import com.iCritic.users.entrypoint.mapper.UserDtoMapper;
-import com.iCritic.users.entrypoint.entity.PasswordResetData;
-import com.iCritic.users.entrypoint.entity.UserRequestDto;
-import com.iCritic.users.entrypoint.entity.UserResponseDto;
 import com.iCritic.users.entrypoint.validation.AuthorizationFilter;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -68,6 +71,9 @@ class AuthResourceIntegrationTest {
 
     @MockBean
     private PasswordResetUseCase passwordResetUseCase;
+
+    @MockBean
+    private EmailResetUseCase emailResetUseCase;
 
     @Test
     void givenRequestToRegisterEndpointWithValidParams_thenRegisterAndReturnUser() throws Exception {
@@ -257,6 +263,39 @@ class AuthResourceIntegrationTest {
 
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/reset-password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void givenRequestToEmailResetWithValidParameters_thenReturnResponseOk() throws Exception {
+        EmailResetData emailResetData = EmailResetDataFixture.load();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String requestBody = objectMapper.writeValueAsString(emailResetData);
+
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post("/reset-email")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void givenRequestToEmailResetWithInvalidParameters_thenReturnResponseBadRequest() throws Exception {
+        EmailResetData emailResetData = EmailResetDataFixture.load();
+        emailResetData.setUserId(null);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String requestBody = objectMapper.writeValueAsString(emailResetData);
+
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post("/reset-email")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody);
 

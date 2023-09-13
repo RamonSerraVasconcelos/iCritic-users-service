@@ -5,11 +5,14 @@ import com.iCritic.users.core.fixture.UserFixture;
 import com.iCritic.users.core.model.AuthorizationData;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.CreateUserUseCase;
+import com.iCritic.users.core.usecase.EmailResetUseCase;
 import com.iCritic.users.core.usecase.PasswordResetRequestUseCase;
 import com.iCritic.users.core.usecase.PasswordResetUseCase;
 import com.iCritic.users.core.usecase.RefreshUserTokenUseCase;
 import com.iCritic.users.core.usecase.SignInUserUseCase;
+import com.iCritic.users.entrypoint.entity.EmailResetData;
 import com.iCritic.users.entrypoint.fixture.AuthorizationDataFixture;
+import com.iCritic.users.entrypoint.fixture.EmailResetDataFixture;
 import com.iCritic.users.entrypoint.fixture.PasswordResetDataFixture;
 import com.iCritic.users.entrypoint.fixture.UserRequestDtoFixture;
 import com.iCritic.users.entrypoint.fixture.UserResponseDtoFixture;
@@ -67,6 +70,9 @@ class AuthResourceTest {
 
     @Mock
     private PasswordResetUseCase passwordResetUseCase;
+
+    @Mock
+    private EmailResetUseCase emailResetUseCase;
 
     @Mock
     private Validator validator;
@@ -234,6 +240,29 @@ class AuthResourceTest {
 
         assertThrows(ResourceViolationException.class, () -> authResource.passwordReset(passwordResetData));
         verifyNoInteractions(passwordResetUseCase);
+    }
+
+    @Test
+    void givenCallToEmailResetWithValidParameters_thenReturnStatusOk() {
+        EmailResetData emailResetData = EmailResetDataFixture.load();
+
+        ResponseEntity<Void> response = authResource.emailReset(emailResetData);
+
+        verify(emailResetUseCase).execute(emailResetData.getUserId(), emailResetData.getEmailResetHash());
+        assertEquals(response.getStatusCode().value(), HttpServletResponse.SC_OK);
+    }
+
+    @Test
+    void givenCallToEmailResetWithInvalidParameters_thenThrowResourceViolationException() {
+        EmailResetData emailResetData = EmailResetDataFixture.load();
+
+        Set<ConstraintViolation<EmailResetData>> violations = new HashSet<>();
+        violations.add(createMockViolation("userId"));
+        when(validator.validate(emailResetData)).thenReturn(violations);
+
+        assertThrows(ResourceViolationException.class, () -> authResource.emailReset(emailResetData));
+
+        verifyNoInteractions(emailResetUseCase);
     }
 
     private <T> ConstraintViolation<T> createMockViolation(String propertyName) {
