@@ -6,11 +6,13 @@ import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.EmailResetRequestUseCase;
 import com.iCritic.users.core.usecase.FindUserByIdUseCase;
 import com.iCritic.users.core.usecase.FindUsersUseCase;
+import com.iCritic.users.core.usecase.PasswordChangeUseCase;
 import com.iCritic.users.core.usecase.UpdateUserPictureUseCase;
 import com.iCritic.users.core.usecase.UpdateUserRoleUseCase;
 import com.iCritic.users.core.usecase.UpdateUserStatusUseCase;
 import com.iCritic.users.core.usecase.UpdateUserUseCase;
 import com.iCritic.users.core.usecase.ValidateUserRoleUseCase;
+import com.iCritic.users.entrypoint.entity.ChangePasswordDto;
 import com.iCritic.users.entrypoint.mapper.UserDtoMapper;
 import com.iCritic.users.entrypoint.entity.UserBanDto;
 import com.iCritic.users.entrypoint.entity.UserRequestDto;
@@ -61,6 +63,8 @@ public class UserResource {
     private final UpdateUserPictureUseCase updateUserPictureUseCase;
 
     private final EmailResetRequestUseCase emailResetRequestUseCase;
+
+    private final PasswordChangeUseCase passwordChangeUseCase;
 
     private final UserDtoMapper userDtoMapper;
 
@@ -152,6 +156,20 @@ public class UserResource {
         Long userId = Long.parseLong(request.getAttribute("userId").toString());
 
         emailResetRequestUseCase.execute(userId, userDto.getEmail());
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<Void> changePassword(HttpServletRequest request, @RequestBody ChangePasswordDto changePasswordDto) {
+        Set<ConstraintViolation<ChangePasswordDto>> violations = validator.validate(changePasswordDto);
+        if (!violations.isEmpty()) {
+            throw new ResourceViolationException(violations);
+        }
+
+        Long userId = Long.parseLong(request.getAttribute("userId").toString());
+
+        passwordChangeUseCase.execute(userId, changePasswordDto.getPassword(), changePasswordDto.getNewPassword(), changePasswordDto.getConfirmPassword());
 
         return ResponseEntity.ok().build();
     }
