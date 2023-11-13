@@ -1,7 +1,9 @@
 package com.iCritic.users.core.usecase;
 
 import com.iCritic.users.core.model.User;
+import com.iCritic.users.core.usecase.boundary.DeleteUserRefreshTokensBoundary;
 import com.iCritic.users.core.usecase.boundary.FindUserByIdBoundary;
+import com.iCritic.users.core.usecase.boundary.PostPasswordChangeMessageBoundary;
 import com.iCritic.users.core.usecase.boundary.UpdateUserBoundary;
 import com.iCritic.users.exception.ResourceViolationException;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,10 @@ public class PasswordChangeUseCase {
     private final FindUserByIdBoundary findUserByIdBoundary;
 
     private final UpdateUserBoundary updateUserBoundary;
+
+    private final PostPasswordChangeMessageBoundary postPasswordChangeMessageBoundary;
+
+    private final DeleteUserRefreshTokensBoundary deleteUserRefreshTokensBoundary;
 
     private final BCryptPasswordEncoder bcrypt;
 
@@ -45,6 +51,8 @@ public class PasswordChangeUseCase {
             user.setPassword(bcrypt.encode(newPassword));
 
             updateUserBoundary.execute(user);
+            postPasswordChangeMessageBoundary.execute(user.getId(), user.getEmail());
+            deleteUserRefreshTokensBoundary.execute(user.getId());
         } catch (Exception e) {
             log.error("Error changing password for user with id: [{}]", userId, e);
             throw e;
