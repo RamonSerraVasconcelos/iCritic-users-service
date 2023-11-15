@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iCritic.users.core.fixture.UserFixture;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.*;
+import com.iCritic.users.entrypoint.entity.ChangePasswordDto;
+import com.iCritic.users.entrypoint.fixture.ChangePasswordDtoFixture;
 import com.iCritic.users.entrypoint.fixture.UserBanDtoFixture;
 import com.iCritic.users.entrypoint.fixture.UserRequestDtoFixture;
 import com.iCritic.users.entrypoint.fixture.UserResponseDtoFixture;
@@ -67,6 +69,9 @@ class UserResourceIntegrationTest {
 
     @MockBean
     private EmailResetRequestUseCase emailResetRequestUseCase;
+
+    @MockBean
+    private PasswordChangeUseCase passwordChangeUseCase;
 
     @MockBean
     private UserDtoMapper userDtoMapper;
@@ -347,6 +352,41 @@ class UserResourceIntegrationTest {
                 .post("/users/request-email-change")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void givenRequestToChangePasswordEndpointWithValidParameters_thenReturnResponseOk() throws Exception {
+        ChangePasswordDto changePasswordDto = ChangePasswordDtoFixture.load();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String requestBody = objectMapper.writeValueAsString(changePasswordDto);
+
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post("/users/change-password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody)
+                .requestAttr("userId", 1L);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void givenRequestToChangePasswordEndpointWithInvalidParameters_thenReturnBadRequest() throws Exception {
+        ChangePasswordDto changePasswordDto = ChangePasswordDtoFixture.load();
+        changePasswordDto.setPassword(null);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String requestBody = objectMapper.writeValueAsString(changePasswordDto);
+
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post("/users/change-password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody)
+                .requestAttr("userId", 1L);
 
         mockMvc.perform(requestBuilder)
                 .andExpect(status().isBadRequest());
