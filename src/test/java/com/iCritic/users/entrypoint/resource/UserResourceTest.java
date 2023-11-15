@@ -7,11 +7,14 @@ import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.EmailResetRequestUseCase;
 import com.iCritic.users.core.usecase.FindUserByIdUseCase;
 import com.iCritic.users.core.usecase.FindUsersUseCase;
+import com.iCritic.users.core.usecase.PasswordChangeUseCase;
 import com.iCritic.users.core.usecase.UpdateUserPictureUseCase;
 import com.iCritic.users.core.usecase.UpdateUserRoleUseCase;
 import com.iCritic.users.core.usecase.UpdateUserStatusUseCase;
 import com.iCritic.users.core.usecase.UpdateUserUseCase;
 import com.iCritic.users.core.usecase.ValidateUserRoleUseCase;
+import com.iCritic.users.entrypoint.entity.ChangePasswordDto;
+import com.iCritic.users.entrypoint.fixture.ChangePasswordDtoFixture;
 import com.iCritic.users.entrypoint.fixture.UserBanDtoFixture;
 import com.iCritic.users.entrypoint.fixture.UserRequestDtoFixture;
 import com.iCritic.users.entrypoint.fixture.UserResponseDtoFixture;
@@ -89,6 +92,9 @@ class UserResourceTest {
 
     @Mock
     private EmailResetRequestUseCase emailResetRequestUseCase;
+
+    @Mock
+    private PasswordChangeUseCase passwordChangeUseCase;
 
     @Mock
     private UserDtoMapper userDtoMapper;
@@ -315,6 +321,35 @@ class UserResourceTest {
         request.setAttribute("userId", "1");
 
         assertThrows(ResourceViolationException.class, () -> userResource.requestEmailChange(request, userRequestDto));
+    }
+
+    @Test
+    void givenCallToChangePasswordWithValidParameters_thenCallUseCaseAndReturnOk() {
+        ChangePasswordDto changePasswordDto = ChangePasswordDtoFixture.load();
+
+        request.setAttribute("userId", "1");
+
+        ResponseEntity<Void> response = userResource.changePassword(request, changePasswordDto);
+
+        verify(passwordChangeUseCase).execute(any(), any(), any(), any());
+
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void givenCallToChangePasswordWithInvalidParameters_thenThrowResourceViolationException() {
+        ChangePasswordDto changePasswordDto = ChangePasswordDtoFixture.load();
+        changePasswordDto.setPassword(null);
+
+        request.setAttribute("userId", "1");
+
+        Set<ConstraintViolation<ChangePasswordDto>> violations = new HashSet<>();
+        violations.add(createMockViolation("passowrd"));
+
+        when(validator.validate(changePasswordDto)).thenReturn(violations);
+
+        assertThrows(ResourceViolationException.class, () -> userResource.changePassword(request, changePasswordDto));
     }
 
     private <T> ConstraintViolation<T> createMockViolation(String propertyName) {
