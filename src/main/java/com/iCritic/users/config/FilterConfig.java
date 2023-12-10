@@ -20,7 +20,7 @@ public class FilterConfig {
 
         registrationBean.setFilter(new AuthorizationFilter(validateAccessTokenBoundary));
         registrationBean.addUrlPatterns("*");
-        registrationBean.addInitParameter("excludeUrls", "/register,/login,/refresh,/logout,/forgot-password,/reset-password,/reset-email");
+        registrationBean.addInitParameter("excludeUrls", "/register,/login,/refresh,/logout,/forgot-password,/reset-password,/reset-email, /countries, /countries/*");
 
         return registrationBean;
     }

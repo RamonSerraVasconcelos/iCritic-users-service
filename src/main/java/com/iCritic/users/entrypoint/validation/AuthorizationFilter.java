@@ -7,6 +7,7 @@ import com.iCritic.users.core.utils.TokenUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -64,9 +65,12 @@ public class AuthorizationFilter extends OncePerRequestFilter {
     private boolean isEndpointOpen(HttpServletRequest request) {
         String excludeUrls = getFilterConfig().getInitParameter("excludeUrls");
         String[] excludeUrlArray = excludeUrls.split(",");
+        AntPathMatcher pathMatcher = new AntPathMatcher();
 
         for (String excludeUrl : excludeUrlArray) {
-            if (request.getRequestURI().matches(excludeUrl.trim())) {
+            String trimmedExcludeUrl = excludeUrl.trim();
+
+            if (pathMatcher.match(trimmedExcludeUrl, request.getRequestURI())) {
                 return true;
             }
         }
