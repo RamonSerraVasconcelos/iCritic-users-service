@@ -2,8 +2,8 @@ package com.iCritic.users.dataprovider.gateway.caching.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.iCritic.users.core.model.User;
-import com.iCritic.users.core.usecase.boundary.FindUsersCachedBoundary;
+import com.iCritic.users.core.model.Country;
+import com.iCritic.users.core.usecase.boundary.FindCountriesCachedBoundary;
 import com.iCritic.users.dataprovider.gateway.caching.util.CachingUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,30 +20,30 @@ import static java.util.Objects.isNull;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class FindUsersCachedGateway implements FindUsersCachedBoundary {
+public class FindCountriesCachedGateway implements FindCountriesCachedBoundary {
 
     private final Jedis jedis;
 
     private final ObjectMapper objectMapper;
 
-    public Page<User> execute(Pageable pageable) {
-        String cacheKey = CachingUtils.buildPaginationCachekey("users", pageable.getPageNumber(), pageable.getPageSize());
+    public Page<Country> execute(Pageable pageable) {
+        String cacheKey = CachingUtils.buildPaginationCachekey("countries", pageable.getPageNumber(), pageable.getPageSize());
 
-        log.info("Fetching users from redis cache with cacheKey: [{}]", cacheKey);
+        log.info("Fetching countries from redis cache with cacheKey: [{}]", cacheKey);
 
         try {
-            String usersJson = jedis.get(cacheKey);
+            String countriesJson = jedis.get(cacheKey);
 
-            if (isNull(usersJson) || usersJson.isBlank()) {
+            if (isNull(countriesJson) || countriesJson.isBlank()) {
                 return null;
             }
 
-            List<User> users = objectMapper.readValue(usersJson, new TypeReference<>() {
+            List<Country> countries = objectMapper.readValue(countriesJson, new TypeReference<>() {
             });
 
-            return new PageImpl<>(users, pageable, users.size());
+            return new PageImpl<>(countries, pageable, countries.size());
         } catch (Exception e) {
-            log.error("Error when fetching users from redis cache with cacheKey: [{}]", cacheKey, e);
+            log.error("Error when fetching countries from redis cache with cacheKey: [{}]", cacheKey, e);
             return null;
         }
     }
