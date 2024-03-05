@@ -6,6 +6,7 @@ import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.boundary.CreateUserBoundary;
 import com.iCritic.users.core.usecase.boundary.FindCountryByIdBoundary;
 import com.iCritic.users.core.usecase.boundary.FindUserByEmailBoundary;
+import com.iCritic.users.core.usecase.boundary.InvalidateUsersCacheBoundary;
 import com.iCritic.users.exception.ResourceConflictException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,8 @@ public class CreateUserUseCase {
 
     private final FindCountryByIdBoundary findCountryByIdBoundary;
 
+    private final InvalidateUsersCacheBoundary invalidateUsersCacheBoundary;
+
     private final BCryptPasswordEncoder bcrypt;
 
     public User execute(User user) {
@@ -43,6 +46,10 @@ public class CreateUserUseCase {
         user.setActive(true);
         user.setRole(Role.DEFAULT);
 
-        return createUserBoundary.execute(user);
+        User createdUser = createUserBoundary.execute(user);
+
+        invalidateUsersCacheBoundary.execute();
+
+        return createdUser;
     }
 }

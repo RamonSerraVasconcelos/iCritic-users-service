@@ -4,6 +4,7 @@ import com.iCritic.users.core.model.Country;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.boundary.FindCountryByIdBoundary;
 import com.iCritic.users.core.usecase.boundary.FindUserByIdBoundary;
+import com.iCritic.users.core.usecase.boundary.InvalidateUsersCacheBoundary;
 import com.iCritic.users.core.usecase.boundary.UpdateUserBoundary;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,8 @@ public class UpdateUserUseCase {
     private final FindUserByIdBoundary findUserByIdBoundary;
 
     private final FindCountryByIdBoundary findCountryByIdBoundary;
+
+    private final InvalidateUsersCacheBoundary invalidateUsersCacheBoundary;
 
     public User execute(Long userId, User user) {
         User userToBeUpdated = findUserByIdBoundary.execute(userId);
@@ -37,6 +40,10 @@ public class UpdateUserUseCase {
                 .createdAt(userToBeUpdated.getCreatedAt())
                 .build();
 
-        return updateUserBoundary.execute(userToUpdate);
+        User updatedUser = updateUserBoundary.execute(userToUpdate);
+
+        invalidateUsersCacheBoundary.execute();
+
+        return updatedUser;
     }
 }
