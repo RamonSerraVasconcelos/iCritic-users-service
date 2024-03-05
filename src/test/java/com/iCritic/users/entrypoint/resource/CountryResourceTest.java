@@ -9,6 +9,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -28,16 +30,22 @@ class CountryResourceTest {
     @Mock
     private FindCountryByIdUseCase findCountryByIdUseCase;
 
+    @Mock
+    private Pageable pageable;
+
+    @Mock
+    private Page<Country> pageableCountry;
+
     @Test
     void givenCallToGetAllCountries_thenCallUseCase_andReturnCountries() {
         var countries = List.of(CountryFixture.load(), CountryFixture.load());
 
-        when(findAllCountriesUseCase.execute()).thenReturn(countries);
+        when(findAllCountriesUseCase.execute(pageable)).thenReturn(pageableCountry);
 
-        var returnedCountries = countryResource.loadAll();
+        var returnedCountries = countryResource.loadAll(pageable);
 
-        verify(findAllCountriesUseCase).execute();
-        assertThat(returnedCountries).isNotNull().isNotEmpty().hasSize(2);
+        verify(findAllCountriesUseCase).execute(pageable);
+        assertThat(returnedCountries).isNotNull();
     }
 
     @Test

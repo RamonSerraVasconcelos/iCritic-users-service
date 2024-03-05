@@ -13,12 +13,17 @@ import com.iCritic.users.core.usecase.UpdateUserStatusUseCase;
 import com.iCritic.users.core.usecase.UpdateUserUseCase;
 import com.iCritic.users.core.usecase.ValidateUserRoleUseCase;
 import com.iCritic.users.entrypoint.entity.ChangePasswordDto;
-import com.iCritic.users.entrypoint.mapper.UserDtoMapper;
+import com.iCritic.users.entrypoint.entity.Metadata;
+import com.iCritic.users.entrypoint.entity.PageableUserResponse;
 import com.iCritic.users.entrypoint.entity.UserBanDto;
 import com.iCritic.users.entrypoint.entity.UserRequestDto;
 import com.iCritic.users.entrypoint.entity.UserResponseDto;
+import com.iCritic.users.entrypoint.mapper.UserDtoMapper;
 import com.iCritic.users.exception.ResourceViolationException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -69,8 +74,26 @@ public class UserResource {
     private final UserDtoMapper userDtoMapper;
 
     @GetMapping
-    public List<UserResponseDto> loadAll() {
-        return findUsersUseCase.execute().stream().map(userDtoMapper::userToUserResponseDto).collect(Collectors.toList());
+    public ResponseEntity<PageableUserResponse> loadAll(Pageable pageable) {
+        Page<User> users = findUsersUseCase.execute(pageable);
+
+        List<UserResponseDto> userResponseDtos = users
+                .stream()
+                .map(userDtoMapper::userToUserResponseDto)
+                .collect(Collectors.toList());
+
+        PageableUserResponse response = PageableUserResponse.builder()
+                .data(userResponseDtos)
+                .metadata(Metadata.builder()
+                        .page(pageable.getPageNumber())
+                        .nextPage(pageable.getPageNumber() + 1)
+                        .size(pageable.getPageSize())
+                        .total(users.getTotalElements())
+                        .build())
+                .build();
+
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/{id}")
@@ -149,7 +172,7 @@ public class UserResource {
 
     @PostMapping("/request-email-change")
     public ResponseEntity<Void> requestEmailChange(HttpServletRequest request, @RequestBody UserRequestDto userDto) {
-        if(isNull(userDto.getEmail())) {
+        if (isNull(userDto.getEmail())) {
             throw new ResourceViolationException("Email is required");
         }
 

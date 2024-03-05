@@ -5,6 +5,7 @@ import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.boundary.CreateUserBoundary;
 import com.iCritic.users.core.usecase.boundary.FindCountryByIdBoundary;
 import com.iCritic.users.core.usecase.boundary.FindUserByEmailBoundary;
+import com.iCritic.users.core.usecase.boundary.InvalidateUsersCacheBoundary;
 import com.iCritic.users.exception.ResourceConflictException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,6 +34,9 @@ class CreateUserUseCaseTest {
     private FindCountryByIdBoundary findCountryByIdBoundary;
 
     @Mock
+    private InvalidateUsersCacheBoundary invalidateUsersCacheBoundary;
+
+    @Mock
     private BCryptPasswordEncoder bcrypt;
 
     @Test
@@ -52,6 +56,7 @@ class CreateUserUseCaseTest {
         verify(findCountryByIdBoundary).execute(user.getCountryId());
         verify(bcrypt).encode(initialPassword);
         verify(createUserBoundary).execute(user);
+        verify(invalidateUsersCacheBoundary).execute();
 
         assertNotNull(createdUser);
         assertEquals(createdUser.getName(), user.getName());
