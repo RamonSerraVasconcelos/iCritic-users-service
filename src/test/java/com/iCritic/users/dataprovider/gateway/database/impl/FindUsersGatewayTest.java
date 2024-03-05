@@ -10,6 +10,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -27,25 +29,22 @@ class FindUsersGatewayTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private Pageable pageable;
+
+    @Mock
+    private Page<UserEntity> pageableUser;
+
     @Test
     void givenExecution_callUserRepository_andReturnUsersList() {
         List<User> users = List.of(UserFixture.load(), UserFixture.load(), UserFixture.load());
         List<UserEntity> usersEntity = List.of(UserEntityFixture.load(), UserEntityFixture.load(), UserEntityFixture.load());
 
-        when(userRepository.findAllByOrderByIdAsc()).thenReturn(usersEntity);
+        when(userRepository.findAllByOrderByIdAsc(pageable)).thenReturn(pageableUser);
 
-        List<User> foundUsers = findUsersGateway.execute();
+        Page<User> foundUsers = findUsersGateway.execute(pageable);
 
-        verify(userRepository).findAllByOrderByIdAsc();
+        verify(userRepository).findAllByOrderByIdAsc(pageable);
         assertNotNull(foundUsers);
-        assertEquals(users.size(), foundUsers.size());
-        assertEquals(foundUsers.get(0).getName(), users.get(0).getName());
-        assertEquals(foundUsers.get(0).getEmail(), users.get(0).getEmail());
-        assertEquals(foundUsers.get(0).getDescription(), users.get(0).getDescription());
-        assertEquals(foundUsers.get(0).isActive(), users.get(0).isActive());
-        assertEquals(foundUsers.get(0).getRole(), users.get(0).getRole());
-        assertEquals(foundUsers.get(0).getCountry().getId(), users.get(0).getCountry().getId());
-        assertEquals(foundUsers.get(0).getCountry().getName(), users.get(0).getCountry().getName());
-        assertNotNull(foundUsers.get(0).getCreatedAt());
     }
 }

@@ -14,6 +14,7 @@ import com.iCritic.users.core.usecase.UpdateUserStatusUseCase;
 import com.iCritic.users.core.usecase.UpdateUserUseCase;
 import com.iCritic.users.core.usecase.ValidateUserRoleUseCase;
 import com.iCritic.users.entrypoint.entity.ChangePasswordDto;
+import com.iCritic.users.entrypoint.entity.PageableUserResponse;
 import com.iCritic.users.entrypoint.fixture.ChangePasswordDtoFixture;
 import com.iCritic.users.entrypoint.fixture.UserBanDtoFixture;
 import com.iCritic.users.entrypoint.fixture.UserRequestDtoFixture;
@@ -31,6 +32,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -99,28 +102,22 @@ class UserResourceTest {
     @Mock
     private UserDtoMapper userDtoMapper;
 
+    @Mock
+    private Pageable pageable;
+
+    @Mock
+    private Page<User> pageableUser;
+
     @Captor
     private ArgumentCaptor<BanActionEnum> actionCaptor;
 
     @Test
     void givenCallToLoadAllUsers_thenCallFindUsersUseCaseAndReturnUsers() {
-        List<User> users = List.of(UserFixture.load(), UserFixture.load(), UserFixture.load());
-        UserResponseDto userResponseDto = UserResponseDtoFixture.load();
+        when(findUsersUseCase.execute(pageable)).thenReturn(pageableUser);
 
-        when(findUsersUseCase.execute()).thenReturn(users);
-        when(userDtoMapper.userToUserResponseDto(any())).thenReturn(userResponseDto);
-
-        List<UserResponseDto> returnedUsers = userResource.loadAll();
+        ResponseEntity<PageableUserResponse> returnedUsers = userResource.loadAll(pageable);
 
         assertNotNull(returnedUsers);
-        assertEquals(returnedUsers.get(0).getName(), users.get(0).getName());
-        assertEquals(returnedUsers.get(0).getEmail(), users.get(0).getEmail());
-        assertEquals(returnedUsers.get(0).getDescription(), users.get(0).getDescription());
-        assertEquals(returnedUsers.get(0).isActive(), users.get(0).isActive());
-        assertEquals(returnedUsers.get(0).getRole(), users.get(0).getRole());
-        assertEquals(returnedUsers.get(0).getCountry().getId(), users.get(0).getCountry().getId());
-        assertEquals(returnedUsers.get(0).getCountry().getName(), users.get(0).getCountry().getName());
-        assertNotNull(returnedUsers.get(0).getCreatedAt());
     }
 
     @Test

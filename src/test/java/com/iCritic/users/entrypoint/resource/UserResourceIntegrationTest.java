@@ -3,25 +3,36 @@ package com.iCritic.users.entrypoint.resource;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iCritic.users.core.fixture.UserFixture;
 import com.iCritic.users.core.model.User;
-import com.iCritic.users.core.usecase.*;
+import com.iCritic.users.core.usecase.EmailResetRequestUseCase;
+import com.iCritic.users.core.usecase.FindUserByIdUseCase;
+import com.iCritic.users.core.usecase.FindUsersUseCase;
+import com.iCritic.users.core.usecase.PasswordChangeUseCase;
+import com.iCritic.users.core.usecase.UpdateUserPictureUseCase;
+import com.iCritic.users.core.usecase.UpdateUserRoleUseCase;
+import com.iCritic.users.core.usecase.UpdateUserStatusUseCase;
+import com.iCritic.users.core.usecase.UpdateUserUseCase;
+import com.iCritic.users.core.usecase.ValidateUserRoleUseCase;
 import com.iCritic.users.entrypoint.entity.ChangePasswordDto;
+import com.iCritic.users.entrypoint.entity.UserBanDto;
+import com.iCritic.users.entrypoint.entity.UserRequestDto;
+import com.iCritic.users.entrypoint.entity.UserResponseDto;
 import com.iCritic.users.entrypoint.fixture.ChangePasswordDtoFixture;
 import com.iCritic.users.entrypoint.fixture.UserBanDtoFixture;
 import com.iCritic.users.entrypoint.fixture.UserRequestDtoFixture;
 import com.iCritic.users.entrypoint.fixture.UserResponseDtoFixture;
 import com.iCritic.users.entrypoint.mapper.UserDtoMapper;
-import com.iCritic.users.entrypoint.entity.UserBanDto;
-import com.iCritic.users.entrypoint.entity.UserRequestDto;
-import com.iCritic.users.entrypoint.entity.UserResponseDto;
 import com.iCritic.users.entrypoint.validation.AuthorizationFilter;
-import com.iCritic.users.core.usecase.ValidateUserRoleUseCase;
 import com.iCritic.users.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -31,7 +42,12 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.List;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -76,12 +92,17 @@ class UserResourceIntegrationTest {
     @MockBean
     private UserDtoMapper userDtoMapper;
 
+    @Mock
+    private Pageable pageable;
+
     @Test
     void givenRequestToUsersEndpoint_thenReturnAllUsers() throws Exception {
         List<User> users = List.of(UserFixture.load(), UserFixture.load(), UserFixture.load());
         UserResponseDto userResponseDto = UserResponseDtoFixture.load();
 
-        when(findUsersUseCase.execute()).thenReturn(users);
+        Page<User> userPage = new PageImpl<>(users, pageable, 3);
+
+        when(findUsersUseCase.execute(any(Pageable.class))).thenReturn(userPage);
         when(userDtoMapper.userToUserResponseDto(any())).thenReturn(userResponseDto);
 
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
@@ -90,17 +111,17 @@ class UserResourceIntegrationTest {
 
         mockMvc.perform(requestBuilder)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(users.get(0).getId()))
-                .andExpect(jsonPath("$[0].name").value(users.get(0).getName()))
-                .andExpect(jsonPath("$[0].email").value(users.get(0).getEmail()))
-                .andExpect(jsonPath("$[0].description").value(users.get(0).getDescription()))
-                .andExpect(jsonPath("$[0].active").value(users.get(0).isActive()))
-                .andExpect(jsonPath("$[0].role").value(users.get(0).getRole().toString()))
-                .andExpect(jsonPath("$[0].country.id").value(users.get(0).getCountry().getId()))
-                .andExpect(jsonPath("$[0].country.name").value(users.get(0).getCountry().getName()))
-                .andExpect(jsonPath("$[0].createdAt").isNotEmpty());
+                .andExpect(jsonPath("$.data[0].id").value(users.get(0).getId()))
+                .andExpect(jsonPath("$.data[0].name").value(users.get(0).getName()))
+                .andExpect(jsonPath("$.data[0].email").value(users.get(0).getEmail()))
+                .andExpect(jsonPath("$.data[0].description").value(users.get(0).getDescription()))
+                .andExpect(jsonPath("$.data[0].active").value(users.get(0).isActive()))
+                .andExpect(jsonPath("$.data[0].role").value(users.get(0).getRole().toString()))
+                .andExpect(jsonPath("$.data[0].country.id").value(users.get(0).getCountry().getId()))
+                .andExpect(jsonPath("$.data[0].country.name").value(users.get(0).getCountry().getName()))
+                .andExpect(jsonPath("$.data[0].createdAt").isNotEmpty());
 
-        verify(findUsersUseCase).execute();
+        verify(findUsersUseCase).execute(any(Pageable.class));
     }
 
     @Test

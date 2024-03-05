@@ -5,6 +5,7 @@ import com.iCritic.users.core.fixture.UserFixture;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.boundary.FindCountryByIdBoundary;
 import com.iCritic.users.core.usecase.boundary.FindUserByIdBoundary;
+import com.iCritic.users.core.usecase.boundary.InvalidateUsersCacheBoundary;
 import com.iCritic.users.core.usecase.boundary.UpdateUserBoundary;
 import com.iCritic.users.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
@@ -37,6 +38,9 @@ class UpdateUserUseCaseTest {
     @Mock
     private FindCountryByIdBoundary findCountryByIdBoundary;
 
+    @Mock
+    private InvalidateUsersCacheBoundary invalidateUsersCacheBoundary;
+
     @Captor
     ArgumentCaptor<User> userArgumentCaptor;
 
@@ -57,6 +61,7 @@ class UpdateUserUseCaseTest {
         verify(findUserByIdBoundary).execute(foundUser.getId());
         verify(findCountryByIdBoundary).execute(foundUser.getCountryId());
         verify(updateUserBoundary).execute(any());
+        verify(invalidateUsersCacheBoundary).execute();
 
         assertNotNull(updatedUser);
         assertEquals(updatedUser.getName(), user.getName());
