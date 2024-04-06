@@ -38,6 +38,10 @@ public class SignInUserUseCase {
             throw new ResourceViolationException("Invalid email or password");
         }
 
+        if(!user.isActive()) {
+            throw new ResourceViolationException("Banned user");
+        }
+
         boolean isPasswordValid = bcrypt.matches(userData.getPassword(), user.getPassword());
 
         if (!isPasswordValid) {
