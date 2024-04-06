@@ -250,7 +250,7 @@ class UserResourceTest {
         ResponseEntity<Void> response = userResource.ban(request, id, userBanDto);
 
         assertEquals(actionCaptor.getValue(), BanActionEnum.BAN);
-        assertEquals(response.getStatusCode(), HttpStatus.OK);
+        assertEquals(response.getStatusCode(), HttpStatus.NO_CONTENT);
     }
 
     @Test
@@ -281,7 +281,7 @@ class UserResourceTest {
         ResponseEntity<Void> response = userResource.unban(request, id, userBanDto);
 
         assertEquals(actionCaptor.getValue(), BanActionEnum.UNBAN);
-        assertEquals(response.getStatusCode(), HttpStatus.OK);
+        assertEquals(response.getStatusCode(), HttpStatus.NO_CONTENT);
     }
 
     @Test
