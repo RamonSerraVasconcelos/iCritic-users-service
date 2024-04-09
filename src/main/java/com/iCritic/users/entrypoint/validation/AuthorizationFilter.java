@@ -2,6 +2,7 @@ package com.iCritic.users.entrypoint.validation;
 
 import com.iCritic.users.core.model.AccessToken;
 import com.iCritic.users.core.model.Claim;
+import com.iCritic.users.core.usecase.ValidateAccessTokenUseCase;
 import com.iCritic.users.core.usecase.boundary.ValidateAccessTokenBoundary;
 import com.iCritic.users.core.utils.TokenUtils;
 import lombok.AllArgsConstructor;
@@ -23,7 +24,7 @@ import static java.util.Objects.isNull;
 @Slf4j
 public class AuthorizationFilter extends OncePerRequestFilter {
 
-    private final ValidateAccessTokenBoundary validateAccessTokenBoundary;
+    private final ValidateAccessTokenUseCase validateAccessTokenUseCase;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -33,7 +34,7 @@ public class AuthorizationFilter extends OncePerRequestFilter {
             return;
         }
 
-        String token = request.getHeader("Authorization");
+        String token = request.getHeader("Authorization").replace("Bearer ", "");
 
         if (isNull(token)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -41,15 +42,12 @@ public class AuthorizationFilter extends OncePerRequestFilter {
         }
 
         try {
-            AccessToken accessToken = validateAccessTokenBoundary.execute(token);
+            AccessToken accessToken = validateAccessTokenUseCase.execute(token);
 
             log.info("Retrieving information from access token id: [{}]", accessToken.getId());
 
-            Claim userIdClaim = TokenUtils.getClaim(accessToken.getClaims(), "userId");
-            String userId = userIdClaim.getValue();
-
-            Claim userRoleClaim = TokenUtils.getClaim(accessToken.getClaims(), "role");
-            String role = userRoleClaim.getValue();
+            String userId = TokenUtils.getClaim(accessToken.getClaims(), "userId").getValue();
+            String role = TokenUtils.getClaim(accessToken.getClaims(), "role").getValue();
 
             request.setAttribute("userId", userId);
             request.setAttribute("role", role);

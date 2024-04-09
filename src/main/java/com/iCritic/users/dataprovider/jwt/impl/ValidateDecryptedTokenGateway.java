@@ -1,15 +1,12 @@
 package com.iCritic.users.dataprovider.jwt.impl;
 
-import com.iCritic.users.config.properties.ApplicationProperties;
 import com.iCritic.users.core.model.AccessToken;
 import com.iCritic.users.core.model.Claim;
-import com.iCritic.users.core.usecase.boundary.ValidateAccessTokenBoundary;
+import com.iCritic.users.core.usecase.boundary.ValidateDecryptedTokenBoundary;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,15 +20,11 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class ValidateAccessTokenGateway implements ValidateAccessTokenBoundary {
-
-    private final ApplicationProperties applicationProperties;
+public class ValidateDecryptedTokenGateway implements ValidateDecryptedTokenBoundary {
 
     public AccessToken execute(String encodedToken) {
-        JwtParser jwtParser = Jwts.parser().setSigningKey(applicationProperties.getJwtSecret());
-
         try {
-            Claims claims = jwtParser.parseClaimsJws(encodedToken).getBody();
+            Claims claims = Jwts.parser().parseClaimsJwt(encodedToken).getBody();
 
             return AccessToken.builder()
                     .id(getId(claims))
@@ -39,8 +32,6 @@ public class ValidateAccessTokenGateway implements ValidateAccessTokenBoundary {
                     .issuedAt(getIssuedAt(claims))
                     .expiresAt(getExpiresAt(claims))
                     .build();
-        } catch (SignatureException e) {
-            log.error("Invalid JWT signature: {}", e.getMessage());
         } catch (MalformedJwtException e) {
             log.error("Invalid JWT token: {}", e.getMessage());
         } catch (ExpiredJwtException e) {
