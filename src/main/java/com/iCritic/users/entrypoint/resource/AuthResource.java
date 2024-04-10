@@ -11,7 +11,6 @@ import com.iCritic.users.core.usecase.RefreshUserTokenUseCase;
 import com.iCritic.users.core.usecase.SignInUserUseCase;
 import com.iCritic.users.entrypoint.entity.AccessTokenDecryptedResponseDto;
 import com.iCritic.users.entrypoint.entity.EmailResetData;
-import com.iCritic.users.entrypoint.entity.ValidateTokenRequestDto;
 import com.iCritic.users.entrypoint.mapper.UserDtoMapper;
 import com.iCritic.users.entrypoint.entity.PasswordResetData;
 import com.iCritic.users.entrypoint.entity.UserRequestDto;
@@ -147,8 +146,10 @@ public class AuthResource {
     }
 
     @PostMapping(path = "/auth/token/validate")
-    public ResponseEntity<AccessTokenDecryptedResponseDto> decryptAccessToken(@RequestBody ValidateTokenRequestDto validateTokenRequestDto) {
-        String decryptedToken = decryptAccessTokenUseCase.execute(validateTokenRequestDto.getAccessToken());
+    public ResponseEntity<AccessTokenDecryptedResponseDto> decryptAccessToken(HttpServletRequest request) {
+        String accessToken = request.getHeader("Authorization").replace("Bearer ", "");
+
+        String decryptedToken = decryptAccessTokenUseCase.execute(accessToken);
 
         AccessTokenDecryptedResponseDto accessTokenDecryptedResponseDto = AccessTokenDecryptedResponseDto.builder()
                 .decryptedToken(decryptedToken)

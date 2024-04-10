@@ -22,6 +22,8 @@ public class DecryptAccessTokenUseCase {
     private final GenerateDecryptedTokenBoundary generateDecryptedTokenBoundary;
 
     public String execute(String encodedToken) {
+        log.info("Decrypting access token");
+
         AccessToken accessToken = validateAccessTokenUseCase.execute(encodedToken);
 
         String userId = TokenUtils.getClaim(accessToken.getClaims(), "userId").getValue();
