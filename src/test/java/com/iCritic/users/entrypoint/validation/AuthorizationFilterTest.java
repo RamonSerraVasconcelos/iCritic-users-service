@@ -3,8 +3,7 @@ package com.iCritic.users.entrypoint.validation;
 import com.iCritic.users.core.fixture.AccessTokenFixture;
 import com.iCritic.users.core.model.AccessToken;
 import com.iCritic.users.core.model.Claim;
-import com.iCritic.users.core.usecase.boundary.ValidateAccessTokenBoundary;
-import com.iCritic.users.core.usecase.boundary.ValidateDecryptedTokenBoundary;
+import com.iCritic.users.core.usecase.ValidateAccessTokenUseCase;
 import io.jsonwebtoken.MalformedJwtException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,7 +23,10 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AuthorizationFilterTest {
@@ -33,7 +35,7 @@ class AuthorizationFilterTest {
     private AuthorizationFilter authorizationFilter;
 
     @Mock
-    private ValidateDecryptedTokenBoundary validateDecryptedTokenBoundary;
+    private ValidateAccessTokenUseCase validateAccessTokenUseCase;
 
     @Mock
     private FilterChain filterChain;
@@ -65,7 +67,7 @@ class AuthorizationFilterTest {
                 Claim.builder().name("role").value(userRole).build()
         ));
 
-        when(validateDecryptedTokenBoundary.execute(TOKEN)).thenReturn(accessToken);
+        when(validateAccessTokenUseCase.execute(TOKEN)).thenReturn(accessToken);
 
         request.setRequestURI("/private");
         request.addHeader("Authorization", TOKEN);
@@ -104,7 +106,7 @@ class AuthorizationFilterTest {
         request.setRequestURI("/private");
         request.addHeader("Authorization", invalidToken);
 
-        doThrow(MalformedJwtException.class).when(validateDecryptedTokenBoundary).execute(invalidToken);
+        doThrow(MalformedJwtException.class).when(validateAccessTokenUseCase).execute(invalidToken);
 
         authorizationFilter.doFilterInternal(request, response, filterChain);
 
