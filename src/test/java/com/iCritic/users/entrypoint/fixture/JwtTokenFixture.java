@@ -20,6 +20,8 @@ public class JwtTokenFixture {
                 .setId(UUID.randomUUID().toString())
                 .claim("userId", 1L)
                 .claim("role", "DEFAULT")
+                .setIssuedAt(new Date())
+                .setExpiration(Date.from(LocalDateTime.now().plusSeconds(EXPIRATION).atZone(ZoneId.systemDefault()).toInstant()))
                 .signWith(SignatureAlgorithm.HS512, SECRET)
                 .compact();
     }

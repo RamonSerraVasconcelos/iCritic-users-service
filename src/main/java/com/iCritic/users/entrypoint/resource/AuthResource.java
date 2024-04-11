@@ -3,11 +3,13 @@ package com.iCritic.users.entrypoint.resource;
 import com.iCritic.users.core.model.AuthorizationData;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.CreateUserUseCase;
+import com.iCritic.users.core.usecase.DecryptAccessTokenUseCase;
 import com.iCritic.users.core.usecase.EmailResetUseCase;
 import com.iCritic.users.core.usecase.PasswordResetRequestUseCase;
 import com.iCritic.users.core.usecase.PasswordResetUseCase;
 import com.iCritic.users.core.usecase.RefreshUserTokenUseCase;
 import com.iCritic.users.core.usecase.SignInUserUseCase;
+import com.iCritic.users.entrypoint.entity.AccessTokenDecryptedResponseDto;
 import com.iCritic.users.entrypoint.entity.EmailResetData;
 import com.iCritic.users.entrypoint.mapper.UserDtoMapper;
 import com.iCritic.users.entrypoint.entity.PasswordResetData;
@@ -45,6 +47,8 @@ public class AuthResource {
     private final RefreshUserTokenUseCase refreshUserTokenUseCase;
 
     private final EmailResetUseCase emailResetUseCase;
+
+    private final DecryptAccessTokenUseCase decryptAccessTokenUseCase;
 
     private final Validator validator;
 
@@ -139,6 +143,23 @@ public class AuthResource {
         emailResetUseCase.execute(emailResetData.getUserId(), emailResetData.getEmailResetHash());
 
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping(path = "/auth/token/validate")
+    public ResponseEntity<AccessTokenDecryptedResponseDto> decryptAccessToken(HttpServletRequest request) {
+        String accessToken = request.getHeader("Authorization").replace("Bearer ", "");
+
+        if(accessToken.isEmpty()) {
+            throw new UnauthorizedAccessException("Invalid access token");
+        }
+
+        String decryptedToken = decryptAccessTokenUseCase.execute(accessToken);
+
+        AccessTokenDecryptedResponseDto accessTokenDecryptedResponseDto = AccessTokenDecryptedResponseDto.builder()
+                .decryptedToken(decryptedToken)
+                .build();
+
+        return ResponseEntity.ok(accessTokenDecryptedResponseDto);
     }
 
     private String extractRefreshTokenFromRequest(HttpServletRequest request, AuthorizationData authorizationDataRequest) {

@@ -152,7 +152,7 @@ public class UserResource {
 
         updateUserStatusUseCase.execute(id, banDto.getMotive(), BanActionEnum.BAN);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}/unban")
@@ -167,7 +167,7 @@ public class UserResource {
 
         updateUserStatusUseCase.execute(id, banDto.getMotive(), BanActionEnum.UNBAN);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/request-email-change")

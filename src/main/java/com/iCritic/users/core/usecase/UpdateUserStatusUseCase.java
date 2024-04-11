@@ -1,8 +1,12 @@
 package com.iCritic.users.core.usecase;
 
+import com.iCritic.users.config.properties.ApplicationProperties;
 import com.iCritic.users.core.enums.BanActionEnum;
 import com.iCritic.users.core.model.User;
+import com.iCritic.users.core.usecase.boundary.DeleteUserRefreshTokensBoundary;
 import com.iCritic.users.core.usecase.boundary.FindUserByIdBoundary;
+import com.iCritic.users.core.usecase.boundary.RemoveUserFromBlacklistBoundary;
+import com.iCritic.users.core.usecase.boundary.SaveUserToBlacklistBoundary;
 import com.iCritic.users.core.usecase.boundary.UpdateBanListBoundary;
 import com.iCritic.users.core.usecase.boundary.UpdateUserStatusBoundary;
 import com.iCritic.users.exception.ResourceNotFoundException;
@@ -23,10 +27,20 @@ public class UpdateUserStatusUseCase {
 
     private final UpdateBanListBoundary updateBanListBoundary;
 
+    private final SaveUserToBlacklistBoundary saveUserToBlacklistBoundary;
+
+    private final RemoveUserFromBlacklistBoundary removeUserFromBlacklistBoundary;
+
+    private final DeleteUserRefreshTokensBoundary deleteUserRefreshTokensBoundary;
+
+    private final ApplicationProperties applicationProperties;
+
     public void execute(Long id, String motive, BanActionEnum action) {
         if (!nonNull(id)) {
             throw new ResourceViolationException("Invalid id");
         }
+
+        log.info("Updating user [{}] status with action: [{}]", id, action.name());
 
         User user = findUserByIdBoundary.execute(id);
 
@@ -38,5 +52,12 @@ public class UpdateUserStatusUseCase {
 
         updateUserStatusBoundary.execute(id, active);
         updateBanListBoundary.execute(id, motive, action.toString());
+
+        if (action == BanActionEnum.BAN) {
+            deleteUserRefreshTokensBoundary.execute(user.getId());
+            saveUserToBlacklistBoundary.execute(user.getId(), applicationProperties.getJwtExpiration());
+        } else {
+            removeUserFromBlacklistBoundary.execute(id);
+        }
     }
 }
