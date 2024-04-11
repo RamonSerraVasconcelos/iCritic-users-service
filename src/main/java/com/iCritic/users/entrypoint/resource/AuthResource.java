@@ -149,6 +149,10 @@ public class AuthResource {
     public ResponseEntity<AccessTokenDecryptedResponseDto> decryptAccessToken(HttpServletRequest request) {
         String accessToken = request.getHeader("Authorization").replace("Bearer ", "");
 
+        if(accessToken.isEmpty()) {
+            throw new UnauthorizedAccessException("Invalid access token");
+        }
+
         String decryptedToken = decryptAccessTokenUseCase.execute(accessToken);
 
         AccessTokenDecryptedResponseDto accessTokenDecryptedResponseDto = AccessTokenDecryptedResponseDto.builder()

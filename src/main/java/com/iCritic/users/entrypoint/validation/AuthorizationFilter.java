@@ -4,6 +4,7 @@ import com.iCritic.users.core.model.AccessToken;
 import com.iCritic.users.core.model.Claim;
 import com.iCritic.users.core.usecase.ValidateAccessTokenUseCase;
 import com.iCritic.users.core.usecase.boundary.ValidateAccessTokenBoundary;
+import com.iCritic.users.core.usecase.boundary.ValidateDecryptedTokenBoundary;
 import com.iCritic.users.core.utils.TokenUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +25,7 @@ import static java.util.Objects.isNull;
 @Slf4j
 public class AuthorizationFilter extends OncePerRequestFilter {
 
-    private final ValidateAccessTokenUseCase validateAccessTokenUseCase;
+    private final ValidateDecryptedTokenBoundary validateDecryptedTokenBoundary;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -42,7 +43,7 @@ public class AuthorizationFilter extends OncePerRequestFilter {
         }
 
         try {
-            AccessToken accessToken = validateAccessTokenUseCase.execute(token);
+            AccessToken accessToken = validateDecryptedTokenBoundary.execute(token);
 
             log.info("Retrieving information from access token id: [{}]", accessToken.getId());
 
