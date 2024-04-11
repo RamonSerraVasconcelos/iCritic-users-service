@@ -5,6 +5,7 @@ import com.iCritic.users.core.fixture.UserFixture;
 import com.iCritic.users.core.model.AuthorizationData;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.CreateUserUseCase;
+import com.iCritic.users.core.usecase.DecryptAccessTokenUseCase;
 import com.iCritic.users.core.usecase.EmailResetUseCase;
 import com.iCritic.users.core.usecase.FindUserByIdUseCase;
 import com.iCritic.users.core.usecase.PasswordResetRequestUseCase;
@@ -74,6 +75,9 @@ class AuthResourceIntegrationTest {
 
     @MockBean
     private EmailResetUseCase emailResetUseCase;
+
+    @MockBean
+    private DecryptAccessTokenUseCase decryptAccessTokenUseCase;
 
     @Test
     void givenRequestToRegisterEndpointWithValidParams_thenRegisterAndReturnUser() throws Exception {

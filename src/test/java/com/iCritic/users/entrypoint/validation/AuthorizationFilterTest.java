@@ -4,6 +4,7 @@ import com.iCritic.users.core.fixture.AccessTokenFixture;
 import com.iCritic.users.core.model.AccessToken;
 import com.iCritic.users.core.model.Claim;
 import com.iCritic.users.core.usecase.boundary.ValidateAccessTokenBoundary;
+import com.iCritic.users.core.usecase.boundary.ValidateDecryptedTokenBoundary;
 import io.jsonwebtoken.MalformedJwtException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,7 @@ class AuthorizationFilterTest {
     private AuthorizationFilter authorizationFilter;
 
     @Mock
-    private ValidateAccessTokenBoundary validateAccessTokenBoundary;
+    private ValidateDecryptedTokenBoundary validateDecryptedTokenBoundary;
 
     @Mock
     private FilterChain filterChain;
@@ -64,7 +65,7 @@ class AuthorizationFilterTest {
                 Claim.builder().name("role").value(userRole).build()
         ));
 
-        when(validateAccessTokenBoundary.execute(TOKEN)).thenReturn(accessToken);
+        when(validateDecryptedTokenBoundary.execute(TOKEN)).thenReturn(accessToken);
 
         request.setRequestURI("/private");
         request.addHeader("Authorization", TOKEN);
@@ -103,7 +104,7 @@ class AuthorizationFilterTest {
         request.setRequestURI("/private");
         request.addHeader("Authorization", invalidToken);
 
-        doThrow(MalformedJwtException.class).when(validateAccessTokenBoundary).execute(invalidToken);
+        doThrow(MalformedJwtException.class).when(validateDecryptedTokenBoundary).execute(invalidToken);
 
         authorizationFilter.doFilterInternal(request, response, filterChain);
 

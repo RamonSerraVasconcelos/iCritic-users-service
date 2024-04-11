@@ -1,9 +1,6 @@
 package com.iCritic.users.entrypoint.validation;
 
 import com.iCritic.users.core.model.AccessToken;
-import com.iCritic.users.core.model.Claim;
-import com.iCritic.users.core.usecase.ValidateAccessTokenUseCase;
-import com.iCritic.users.core.usecase.boundary.ValidateAccessTokenBoundary;
 import com.iCritic.users.core.usecase.boundary.ValidateDecryptedTokenBoundary;
 import com.iCritic.users.core.utils.TokenUtils;
 import lombok.AllArgsConstructor;
@@ -35,7 +32,14 @@ public class AuthorizationFilter extends OncePerRequestFilter {
             return;
         }
 
-        String token = request.getHeader("Authorization").replace("Bearer ", "");
+        String authorizationHeader = request.getHeader("Authorization");
+
+        if (isNull(authorizationHeader)) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
+        String token = authorizationHeader.replace("Bearer ", "");
 
         if (isNull(token)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

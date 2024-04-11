@@ -1,9 +1,13 @@
 package com.iCritic.users.core.usecase;
 
+import com.iCritic.users.config.properties.ApplicationProperties;
 import com.iCritic.users.core.enums.BanActionEnum;
 import com.iCritic.users.core.fixture.UserFixture;
 import com.iCritic.users.core.model.User;
+import com.iCritic.users.core.usecase.boundary.DeleteUserRefreshTokensBoundary;
 import com.iCritic.users.core.usecase.boundary.FindUserByIdBoundary;
+import com.iCritic.users.core.usecase.boundary.RemoveUserFromBlacklistBoundary;
+import com.iCritic.users.core.usecase.boundary.SaveUserToBlacklistBoundary;
 import com.iCritic.users.core.usecase.boundary.UpdateBanListBoundary;
 import com.iCritic.users.core.usecase.boundary.UpdateUserStatusBoundary;
 import com.iCritic.users.exception.ResourceNotFoundException;
@@ -32,6 +36,18 @@ class UpdateUserStatusUseCaseTest {
     @Mock
     private UpdateBanListBoundary updateBanListBoundary;
 
+    @Mock
+    private SaveUserToBlacklistBoundary saveUserToBlacklistBoundary;
+
+    @Mock
+    private RemoveUserFromBlacklistBoundary removeUserFromBlacklistBoundary;
+
+    @Mock
+    private DeleteUserRefreshTokensBoundary deleteUserRefreshTokensBoundary;
+
+    @Mock
+    private ApplicationProperties applicationProperties;
+
     @Test
     void givenValidFields_thenCall_updateUserStatusBoundaryWithActiveFalse_and_updateBanListBoundaryWithActionBan() {
         User user = UserFixture.load();
@@ -48,6 +64,9 @@ class UpdateUserStatusUseCaseTest {
         verify(findUserByIdBoundary).execute(user.getId());
         verify(updateUserStatusBoundary).execute(user.getId(), active);
         verify(updateBanListBoundary).execute(user.getId(), motive, action.toString());
+        verify(saveUserToBlacklistBoundary).execute(user.getId(), applicationProperties.getJwtExpiration());
+        verify(deleteUserRefreshTokensBoundary).execute(user.getId());
+        verifyNoInteractions(removeUserFromBlacklistBoundary);
     }
 
     @Test
@@ -66,6 +85,9 @@ class UpdateUserStatusUseCaseTest {
         verify(findUserByIdBoundary).execute(user.getId());
         verify(updateUserStatusBoundary).execute(user.getId(), active);
         verify(updateBanListBoundary).execute(user.getId(), motive, action.toString());
+        verify(removeUserFromBlacklistBoundary).execute(user.getId());
+        verifyNoInteractions(saveUserToBlacklistBoundary);
+        verifyNoInteractions(deleteUserRefreshTokensBoundary);
     }
 
     @Test
