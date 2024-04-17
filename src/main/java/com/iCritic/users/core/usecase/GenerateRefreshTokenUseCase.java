@@ -8,14 +8,13 @@ import com.iCritic.users.core.usecase.boundary.GenerateRefreshTokenBoundary;
 import com.iCritic.users.core.usecase.boundary.SaveRefreshTokenBoundary;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-@Component
+@Service
 @RequiredArgsConstructor
 @Slf4j
 public class GenerateRefreshTokenUseCase {

@@ -8,11 +8,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import static java.util.Objects.nonNull;
 
-@Component
+@Service
 @Slf4j
 @RequiredArgsConstructor
 public class FindUsersUseCase {

@@ -5,11 +5,11 @@ import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.boundary.FindUserByIdBoundary;
 import com.iCritic.users.core.usecase.boundary.UpdateUserBoundary;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class UpdateUserPictureUseCase {
 
