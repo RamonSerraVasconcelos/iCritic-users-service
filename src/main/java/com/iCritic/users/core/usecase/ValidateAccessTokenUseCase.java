@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Base64;
 
+import static java.util.Objects.isNull;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -28,6 +30,10 @@ public class ValidateAccessTokenUseCase {
             AccessToken accessToken = isTokenSigned(token) ?
                     validateAccessTokenBoundary.execute(token) :
                     validateDecryptedTokenBoundary.execute(token);
+
+            if (isNull(accessToken)) {
+                throw new UnauthorizedAccessException("Invalid access token");
+            }
 
             String userId = TokenUtils.getClaim(accessToken.getClaims(), "userId").getValue();
 
