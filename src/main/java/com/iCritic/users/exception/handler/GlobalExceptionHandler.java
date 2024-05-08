@@ -46,11 +46,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(buildResponseError(ex.getMessage()));
     }
 
-    @ExceptionHandler(NullPointerException.class)
-    public ResponseEntity<ErrorDetails> nullPointerExceptionHandler(NullPointerException ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-    }
-
     @ExceptionHandler(ConnectException.class)
     public ResponseEntity<ErrorDetails> connectExceptionHandler(ConnectException ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

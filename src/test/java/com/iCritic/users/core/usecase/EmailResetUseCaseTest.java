@@ -2,7 +2,6 @@ package com.iCritic.users.core.usecase;
 
 import com.iCritic.users.core.fixture.UserFixture;
 import com.iCritic.users.core.model.User;
-import com.iCritic.users.core.usecase.boundary.PostEmailResetMessageBoundary;
 import com.iCritic.users.core.usecase.boundary.UpdateUserBoundary;
 import com.iCritic.users.exception.ResourceNotFoundException;
 import com.iCritic.users.exception.ResourceViolationException;

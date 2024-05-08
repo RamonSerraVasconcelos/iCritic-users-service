@@ -2,7 +2,6 @@ package com.iCritic.users.core.usecase;
 
 import com.iCritic.users.core.fixture.UserFixture;
 import com.iCritic.users.core.model.User;
-import com.iCritic.users.core.usecase.boundary.PostEmailResetRequestMessageBoundary;
 import com.iCritic.users.core.usecase.boundary.UpdateUserBoundary;
 import com.iCritic.users.exception.ResourceConflictException;
 import org.junit.jupiter.api.Test;

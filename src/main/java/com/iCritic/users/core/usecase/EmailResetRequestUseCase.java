@@ -3,6 +3,7 @@ package com.iCritic.users.core.usecase;
 import com.iCritic.users.core.enums.NotificationBodyEnum;
 import com.iCritic.users.core.enums.NotificationIdsEnum;
 import com.iCritic.users.core.model.User;
+import com.iCritic.users.core.usecase.boundary.FindUserByEmailBoundary;
 import com.iCritic.users.core.usecase.boundary.UpdateUserBoundary;
 import com.iCritic.users.exception.ResourceConflictException;
 import lombok.RequiredArgsConstructor;
@@ -15,12 +16,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import static java.util.Objects.nonNull;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class EmailResetRequestUseCase {
 
     private final FindUserByIdUseCase findUserByIdUseCase;
+
+    private final FindUserByEmailBoundary findUserByEmailBoundary;
 
     private final UpdateUserBoundary updateUserBoundary;
 
@@ -34,6 +39,12 @@ public class EmailResetRequestUseCase {
         log.info("Requesting email reset for user with id: [{}]", id);
 
         User user = findUserByIdUseCase.execute(id);
+
+        User isUserDuplicated = findUserByEmailBoundary.execute(newEmail);
+
+        if (nonNull(isUserDuplicated)) {
+            throw new ResourceConflictException("User email already exists");
+        }
 
         if (user.getEmail().equals(newEmail)) {
             log.info("User with id: [{}] already has the new email: [{}]", id, newEmail);
