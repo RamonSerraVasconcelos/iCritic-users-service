@@ -34,9 +34,6 @@ class EmailResetUseCaseTest {
     private UpdateUserBoundary updateUserBoundary;
 
     @Mock
-    private PostEmailResetMessageBoundary postEmailResetMessageBoundary;
-
-    @Mock
     private BCryptPasswordEncoder bcrypt;
 
     @Test

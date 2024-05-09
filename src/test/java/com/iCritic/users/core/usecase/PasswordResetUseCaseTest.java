@@ -4,7 +4,6 @@ import com.iCritic.users.core.fixture.UserFixture;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.boundary.DeleteUserRefreshTokensBoundary;
 import com.iCritic.users.core.usecase.boundary.FindUserByEmailBoundary;
-import com.iCritic.users.core.usecase.boundary.PostPasswordResetMessageBoundary;
 import com.iCritic.users.core.usecase.boundary.UpdateUserBoundary;
 import com.iCritic.users.entrypoint.fixture.PasswordResetDataFixture;
 import com.iCritic.users.entrypoint.entity.PasswordResetData;
@@ -36,9 +35,6 @@ class PasswordResetUseCaseTest {
     private UpdateUserBoundary updateUserBoundary;
 
     @Mock
-    private PostPasswordResetMessageBoundary postPasswordResetMessageBoundary;
-
-    @Mock
     private DeleteUserRefreshTokensBoundary deleteUserRefreshTokensBoundary;
 
     @Mock
@@ -59,7 +55,6 @@ class PasswordResetUseCaseTest {
         verify(findUserByEmailBoundary).execute(passwordResetData.getEmail());
         verify(bcrypt).matches(passwordResetData.getPasswordResetHash(), "test");
         verify(bcrypt).matches(passwordResetData.getPassword(), "test");
-        verify(postPasswordResetMessageBoundary).execute(user.getId(), user.getEmail());
         verify(updateUserBoundary).execute(user);
         verify(deleteUserRefreshTokensBoundary).execute(user.getId());
     }
@@ -72,7 +67,6 @@ class PasswordResetUseCaseTest {
         assertThrows(ResourceViolationException.class, () -> passwordResetUseCase.execute(passwordResetData.getEmail(), passwordResetData.getPasswordResetHash(), passwordResetData.getPassword()));
         verify(findUserByEmailBoundary).execute(passwordResetData.getEmail());
         verifyNoInteractions(bcrypt);
-        verifyNoInteractions(postPasswordResetMessageBoundary);
         verifyNoInteractions(updateUserBoundary);
         verifyNoInteractions(deleteUserRefreshTokensBoundary);
     }
@@ -85,7 +79,6 @@ class PasswordResetUseCaseTest {
         assertThrows(ResourceViolationException.class, () -> passwordResetUseCase.execute(passwordResetData.getEmail(), passwordResetData.getPasswordResetHash(), passwordResetData.getPassword()));
         verify(findUserByEmailBoundary).execute(passwordResetData.getEmail());
         verifyNoInteractions(bcrypt);
-        verifyNoInteractions(postPasswordResetMessageBoundary);
         verifyNoInteractions(updateUserBoundary);
         verifyNoInteractions(deleteUserRefreshTokensBoundary);
     }
@@ -102,7 +95,6 @@ class PasswordResetUseCaseTest {
         assertThrows(ResourceViolationException.class, () -> passwordResetUseCase.execute(passwordResetData.getEmail(), passwordResetData.getPasswordResetHash(), passwordResetData.getPassword()));
         verify(findUserByEmailBoundary).execute(passwordResetData.getEmail());
         verify(bcrypt).matches(passwordResetData.getPasswordResetHash(), "test");
-        verifyNoInteractions(postPasswordResetMessageBoundary);
         verifyNoInteractions(updateUserBoundary);
         verifyNoInteractions(deleteUserRefreshTokensBoundary);
     }
@@ -121,7 +113,6 @@ class PasswordResetUseCaseTest {
         verify(findUserByEmailBoundary).execute(passwordResetData.getEmail());
         verify(bcrypt).matches(passwordResetData.getPasswordResetHash(), "test");
         verify(bcrypt).matches(passwordResetData.getPassword(), "test");
-        verifyNoInteractions(postPasswordResetMessageBoundary);
         verifyNoInteractions(updateUserBoundary);
         verifyNoInteractions(deleteUserRefreshTokensBoundary);
     }

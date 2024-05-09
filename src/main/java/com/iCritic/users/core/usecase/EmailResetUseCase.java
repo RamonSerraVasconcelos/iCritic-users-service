@@ -2,7 +2,6 @@ package com.iCritic.users.core.usecase;
 
 import com.iCritic.users.core.enums.NotificationBodyEnum;
 import com.iCritic.users.core.enums.NotificationIdsEnum;
-import com.iCritic.users.core.model.EmailReset;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.boundary.UpdateUserBoundary;
 import com.iCritic.users.exception.ResourceNotFoundException;
@@ -45,18 +44,13 @@ public class EmailResetUseCase {
                 throw new ResourceViolationException("Your password reset link has expired");
             }
 
-            EmailReset emailReset = EmailReset.builder()
-                    .userId(user.getId())
-                    .email(user.getEmail())
-                    .build();
-
             user.setEmail(user.getNewEmailReset());
             user.setEmailResetHash(null);
             user.setEmailResetDate(null);
 
             updateUserBoundary.execute(user);
 
-            log.info("Finished replacing email: [{}] for user with id: [{}]", emailReset.getEmail(), user.getId());
+            log.info("Finished replacing email: [{}] for user with id: [{}]", user.getEmail(), user.getId());
 
             sendEmailNotificationUseCase.execute(user.getId(), user.getEmail(), NotificationIdsEnum.EMAIL_RESET.getNotificationId(),
                     NOTIFICATION_SUBJECT, NotificationBodyEnum.EMAIL_RESET, null);

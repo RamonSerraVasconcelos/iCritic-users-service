@@ -1,8 +1,6 @@
 package com.iCritic.users.config;
 
 import com.iCritic.users.config.properties.KafkaProperties;
-import com.iCritic.users.dataprovider.gateway.kafka.entity.PasswordResetMessage;
-import com.iCritic.users.dataprovider.gateway.kafka.entity.PasswordResetRequestMessage;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Autowired;

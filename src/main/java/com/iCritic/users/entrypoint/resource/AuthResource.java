@@ -118,7 +118,7 @@ public class AuthResource {
 
         passwordResetRequestUseCase.execute(userRequestDto.getEmail());
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping(path = "/reset-password")

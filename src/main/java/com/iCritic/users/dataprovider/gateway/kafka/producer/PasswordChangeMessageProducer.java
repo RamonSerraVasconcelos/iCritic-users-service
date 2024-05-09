@@ -2,7 +2,6 @@ package com.iCritic.users.dataprovider.gateway.kafka.producer;
 
 import com.iCritic.users.config.properties.KafkaProperties;
 import com.iCritic.users.dataprovider.gateway.kafka.entity.PasswordChangeMessage;
-import com.iCritic.users.dataprovider.gateway.kafka.entity.PasswordResetMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
