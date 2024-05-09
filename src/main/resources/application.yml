@@ -11,11 +11,6 @@ spring:
   kafka:
     bootstrap-servers: ${ICRITIC_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     email-notification-topic: ${ICRITIC_KAFKA_EMAIL_NOTIFICATION_TOPIC:email-notification}
-    password-reset-request-topic: ${ICRITIC_KAFKA_PASSWORD_RESET_REQUEST_TOPIC:password-reset-request}
-    password-reset-topic: ${ICRITIC_KAFKA_PASSWORD_RESET_TOPIC:password-reset}
-    password-change-topic: ${ICRITIC_KAFKA_PASSWORD_CHANGE_TOPIC:password-change}
-    email-reset-request-topic: ${ICRITIC_KAFKA_EMAIL_RESET_REQUEST_TOPIC:email-reset-request}
-    email-reset-topic: ${ICRITIC_KAFKA_EMAIL_RESET_TOPIC:email-reset}
   redis:
     host: ${REDIS_HOST:127.0.0.1}
     port: ${REDIS_PORT:6379}

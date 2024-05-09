@@ -4,7 +4,6 @@ import com.iCritic.users.core.fixture.UserFixture;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.boundary.DeleteUserRefreshTokensBoundary;
 import com.iCritic.users.core.usecase.boundary.FindUserByIdBoundary;
-import com.iCritic.users.core.usecase.boundary.PostPasswordChangeMessageBoundary;
 import com.iCritic.users.core.usecase.boundary.UpdateUserBoundary;
 import com.iCritic.users.exception.ResourceViolationException;
 import org.junit.jupiter.api.Test;
@@ -30,9 +29,6 @@ class PasswordChangeUseCaseTest {
 
     @Mock
     private UpdateUserBoundary updateUserBoundary;
-
-    @Mock
-    private PostPasswordChangeMessageBoundary postPasswordChangeMessageBoundary;
 
     @Mock
     private DeleteUserRefreshTokensBoundary deleteUserRefreshTokensBoundary;
@@ -75,7 +71,6 @@ class PasswordChangeUseCaseTest {
         verify(bcrypt).matches("test", "test");
 
         verifyNoInteractions(updateUserBoundary);
-        verifyNoInteractions(postPasswordChangeMessageBoundary);
         verifyNoInteractions(deleteUserRefreshTokensBoundary);
     }
 
@@ -95,7 +90,6 @@ class PasswordChangeUseCaseTest {
         verify(bcrypt).matches(newPassword, "test");
 
         verifyNoInteractions(updateUserBoundary);
-        verifyNoInteractions(postPasswordChangeMessageBoundary);
         verifyNoInteractions(deleteUserRefreshTokensBoundary);
 
         assertEquals("The new password cannot be equal to the old one", ex.getMessage());
@@ -117,7 +111,6 @@ class PasswordChangeUseCaseTest {
         verify(bcrypt).matches(newPassword, "test");
 
         verifyNoInteractions(updateUserBoundary);
-        verifyNoInteractions(postPasswordChangeMessageBoundary);
         verifyNoInteractions(deleteUserRefreshTokensBoundary);
 
         assertEquals("Password confirmation does not match", ex.getMessage());

@@ -124,7 +124,7 @@ public class UserResource {
     public ResponseEntity<Void> changeProfilePicture(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
         try {
             updateUserPictureUseCase.execute(Long.parseLong(request.getAttribute("userId").toString()), file.getOriginalFilename(), file.getInputStream());
-            return ResponseEntity.ok().build();
+            return ResponseEntity.noContent().build();
         } catch (IOException e) {
             throw new ResourceViolationException("Invalid file");
         }
@@ -137,7 +137,7 @@ public class UserResource {
 
         updateUserRoleUseCase.execute(id, userDto.getRole());
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}/ban")
@@ -180,7 +180,7 @@ public class UserResource {
 
         emailResetRequestUseCase.execute(userId, userDto.getEmail());
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/change-password")
@@ -194,6 +194,6 @@ public class UserResource {
 
         passwordChangeUseCase.execute(userId, changePasswordDto.getPassword(), changePasswordDto.getNewPassword(), changePasswordDto.getConfirmPassword());
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }
