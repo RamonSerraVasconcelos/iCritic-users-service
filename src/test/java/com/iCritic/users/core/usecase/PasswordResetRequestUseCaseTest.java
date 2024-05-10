@@ -11,6 +11,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -29,6 +32,9 @@ public class PasswordResetRequestUseCaseTest {
     private UpdateUserGateway updateUserBoundary;
 
     @Mock
+    private SendEmailNotificationUseCase sendEmailNotificationUseCase;
+
+    @Mock
     private BCryptPasswordEncoder bcrypt;
 
     @Test
@@ -45,6 +51,7 @@ public class PasswordResetRequestUseCaseTest {
         verify(bcrypt).encode(anyString());
         verify(findUserByEmailBoundary).execute(user.getEmail());
         verify(updateUserBoundary).execute(user);
+        verify(sendEmailNotificationUseCase).execute(anyLong(), anyString(), anyString(), anyString(), any(), anyMap());
     }
 
     @Test
@@ -56,5 +63,6 @@ public class PasswordResetRequestUseCaseTest {
         verify(findUserByEmailBoundary).execute(email);
         verifyNoInteractions(bcrypt);
         verifyNoInteractions(updateUserBoundary);
+        verifyNoInteractions(sendEmailNotificationUseCase);
     }
 }

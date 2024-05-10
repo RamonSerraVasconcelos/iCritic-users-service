@@ -1,5 +1,7 @@
 package com.iCritic.users.core.usecase;
 
+import com.iCritic.users.core.enums.NotificationBodyEnum;
+import com.iCritic.users.core.enums.NotificationIdsEnum;
 import com.iCritic.users.core.fixture.UserFixture;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.boundary.DeleteUserRefreshTokensBoundary;
@@ -34,6 +36,9 @@ class PasswordChangeUseCaseTest {
     private DeleteUserRefreshTokensBoundary deleteUserRefreshTokensBoundary;
 
     @Mock
+    private SendEmailNotificationUseCase sendEmailNotificationUseCase;
+
+    @Mock
     private BCryptPasswordEncoder bcrypt;
 
     @Test
@@ -55,6 +60,8 @@ class PasswordChangeUseCaseTest {
         verify(bcrypt).encode(newPassword);
         verify(updateUserBoundary).execute(user);
         verify(deleteUserRefreshTokensBoundary).execute(user.getId());
+        verify(sendEmailNotificationUseCase).execute(user.getId(), user.getEmail(), NotificationIdsEnum.PASSWORD_CHANGE.getNotificationId(),
+                "Password Reset Request", NotificationBodyEnum.PASSWORD_CHANGE, null);
     }
 
     @Test
@@ -72,6 +79,7 @@ class PasswordChangeUseCaseTest {
 
         verifyNoInteractions(updateUserBoundary);
         verifyNoInteractions(deleteUserRefreshTokensBoundary);
+        verifyNoInteractions(sendEmailNotificationUseCase);
     }
 
     @Test
@@ -91,6 +99,7 @@ class PasswordChangeUseCaseTest {
 
         verifyNoInteractions(updateUserBoundary);
         verifyNoInteractions(deleteUserRefreshTokensBoundary);
+        verifyNoInteractions(sendEmailNotificationUseCase);
 
         assertEquals("The new password cannot be equal to the old one", ex.getMessage());
     }
@@ -112,6 +121,7 @@ class PasswordChangeUseCaseTest {
 
         verifyNoInteractions(updateUserBoundary);
         verifyNoInteractions(deleteUserRefreshTokensBoundary);
+        verifyNoInteractions(sendEmailNotificationUseCase);
 
         assertEquals("Password confirmation does not match", ex.getMessage());
     }

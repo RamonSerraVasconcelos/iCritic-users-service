@@ -231,7 +231,7 @@ class UserResourceIntegrationTest {
                 .requestAttr("userId", 1L);
 
         mockMvc.perform(requestBuilder)
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
     }
 
     @Test
@@ -252,7 +252,7 @@ class UserResourceIntegrationTest {
                 .requestAttr("role", userRequestDto.getRole());
 
         mockMvc.perform(requestBuilder)
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
     }
 
     @Test
@@ -358,7 +358,7 @@ class UserResourceIntegrationTest {
                 .requestAttr("userId", userRequestDto.getId());
 
         mockMvc.perform(requestBuilder)
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
     }
 
     @Test
@@ -392,7 +392,7 @@ class UserResourceIntegrationTest {
                 .requestAttr("userId", 1L);
 
         mockMvc.perform(requestBuilder)
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
     }
 
     @Test

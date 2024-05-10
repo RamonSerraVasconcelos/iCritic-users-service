@@ -1,5 +1,7 @@
 package com.iCritic.users.core.usecase;
 
+import com.iCritic.users.core.enums.NotificationBodyEnum;
+import com.iCritic.users.core.enums.NotificationIdsEnum;
 import com.iCritic.users.core.fixture.UserFixture;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.boundary.DeleteUserRefreshTokensBoundary;
@@ -38,6 +40,9 @@ class PasswordResetUseCaseTest {
     private DeleteUserRefreshTokensBoundary deleteUserRefreshTokensBoundary;
 
     @Mock
+    private SendEmailNotificationUseCase sendEmailNotificationUseCase;
+
+    @Mock
     private BCryptPasswordEncoder bcrypt;
 
     @Test
@@ -57,6 +62,8 @@ class PasswordResetUseCaseTest {
         verify(bcrypt).matches(passwordResetData.getPassword(), "test");
         verify(updateUserBoundary).execute(user);
         verify(deleteUserRefreshTokensBoundary).execute(user.getId());
+        verify(sendEmailNotificationUseCase).execute(user.getId(), user.getEmail(), NotificationIdsEnum.PASSWORD_RESET.getNotificationId(),
+                "Password reset notification", NotificationBodyEnum.PASSWORD_RESET, null);
     }
 
     @Test
@@ -69,6 +76,7 @@ class PasswordResetUseCaseTest {
         verifyNoInteractions(bcrypt);
         verifyNoInteractions(updateUserBoundary);
         verifyNoInteractions(deleteUserRefreshTokensBoundary);
+        verifyNoInteractions(sendEmailNotificationUseCase);
     }
 
     @Test
@@ -81,6 +89,7 @@ class PasswordResetUseCaseTest {
         verifyNoInteractions(bcrypt);
         verifyNoInteractions(updateUserBoundary);
         verifyNoInteractions(deleteUserRefreshTokensBoundary);
+        verifyNoInteractions(sendEmailNotificationUseCase);
     }
 
     @Test
@@ -97,6 +106,7 @@ class PasswordResetUseCaseTest {
         verify(bcrypt).matches(passwordResetData.getPasswordResetHash(), "test");
         verifyNoInteractions(updateUserBoundary);
         verifyNoInteractions(deleteUserRefreshTokensBoundary);
+        verifyNoInteractions(sendEmailNotificationUseCase);
     }
 
     @Test
@@ -115,5 +125,6 @@ class PasswordResetUseCaseTest {
         verify(bcrypt).matches(passwordResetData.getPassword(), "test");
         verifyNoInteractions(updateUserBoundary);
         verifyNoInteractions(deleteUserRefreshTokensBoundary);
+        verifyNoInteractions(sendEmailNotificationUseCase);
     }
 }
