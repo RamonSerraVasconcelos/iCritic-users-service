@@ -1,5 +1,6 @@
 package com.iCritic.users.core.usecase;
 
+import com.iCritic.users.core.enums.NotificationContentEnum;
 import com.iCritic.users.core.fixture.UserFixture;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.boundary.FindUserByEmailBoundary;
@@ -51,7 +52,7 @@ public class PasswordResetRequestUseCaseTest {
         verify(bcrypt).encode(anyString());
         verify(findUserByEmailBoundary).execute(user.getEmail());
         verify(updateUserBoundary).execute(user);
-        verify(sendEmailNotificationUseCase).execute(anyLong(), anyString(), anyString(), anyString(), any(), anyMap());
+        verify(sendEmailNotificationUseCase).execute(anyLong(), anyString(), any(NotificationContentEnum.class), anyMap());
     }
 
     @Test

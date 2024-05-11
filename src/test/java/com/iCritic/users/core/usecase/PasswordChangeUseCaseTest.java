@@ -1,7 +1,6 @@
 package com.iCritic.users.core.usecase;
 
-import com.iCritic.users.core.enums.NotificationBodyEnum;
-import com.iCritic.users.core.enums.NotificationIdsEnum;
+import com.iCritic.users.core.enums.NotificationContentEnum;
 import com.iCritic.users.core.fixture.UserFixture;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.boundary.DeleteUserRefreshTokensBoundary;
@@ -60,8 +59,7 @@ class PasswordChangeUseCaseTest {
         verify(bcrypt).encode(newPassword);
         verify(updateUserBoundary).execute(user);
         verify(deleteUserRefreshTokensBoundary).execute(user.getId());
-        verify(sendEmailNotificationUseCase).execute(user.getId(), user.getEmail(), NotificationIdsEnum.PASSWORD_CHANGE.getNotificationId(),
-                "Password Reset Request", NotificationBodyEnum.PASSWORD_CHANGE, null);
+        verify(sendEmailNotificationUseCase).execute(user.getId(), user.getEmail(), NotificationContentEnum.PASSWORD_CHANGE, null);
     }
 
     @Test

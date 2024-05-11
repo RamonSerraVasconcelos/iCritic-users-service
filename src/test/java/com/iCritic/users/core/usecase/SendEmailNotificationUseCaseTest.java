@@ -1,6 +1,6 @@
 package com.iCritic.users.core.usecase;
 
-import com.iCritic.users.core.enums.NotificationBodyEnum;
+import com.iCritic.users.core.enums.NotificationContentEnum;
 import com.iCritic.users.core.model.EmailNotification;
 import com.iCritic.users.core.usecase.boundary.SendEmailNotificationBoundary;
 import org.junit.jupiter.api.Test;
@@ -28,14 +28,12 @@ class SendEmailNotificationUseCaseTest {
     void givenExecution_ThenPrepare_AndSendEmail() {
         Long userId = 1L;
         String email = "a@a.com";
-        String subjectId = "1";
-        String subject = "subject";
 
         Map<String, String> variables = new HashMap<>();
         variables.put("userId", userId.toString());
         variables.put("emailResetHash", "hash");
 
-        sendEmailNotificationUseCase.execute(userId, email, subjectId, subject, NotificationBodyEnum.EMAIL_RESET_REQUEST, variables);
+        sendEmailNotificationUseCase.execute(userId, email, NotificationContentEnum.EMAIL_RESET_REQUEST, variables);
 
         verify(sendEmailNotificationBoundary).execute(any(EmailNotification.class));
     }

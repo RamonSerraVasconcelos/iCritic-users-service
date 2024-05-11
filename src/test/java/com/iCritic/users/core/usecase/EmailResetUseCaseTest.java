@@ -1,7 +1,6 @@
 package com.iCritic.users.core.usecase;
 
-import com.iCritic.users.core.enums.NotificationBodyEnum;
-import com.iCritic.users.core.enums.NotificationIdsEnum;
+import com.iCritic.users.core.enums.NotificationContentEnum;
 import com.iCritic.users.core.fixture.UserFixture;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.boundary.UpdateUserBoundary;
@@ -57,8 +56,7 @@ class EmailResetUseCaseTest {
         verify(bcrypt).matches(anyString(), anyString());
         verify(updateUserBoundary).execute(any(User.class));
 
-        verify(sendEmailNotificationUseCase).execute(user.getId(), user.getEmail(), NotificationIdsEnum.EMAIL_RESET.getNotificationId(),
-                "Email Reset Notification", NotificationBodyEnum.EMAIL_RESET, null);
+        verify(sendEmailNotificationUseCase).execute(user.getId(), user.getEmail(), NotificationContentEnum.EMAIL_RESET, null);
     }
 
     @Test
