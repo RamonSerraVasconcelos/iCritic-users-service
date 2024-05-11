@@ -1,8 +1,8 @@
 package com.iCritic.users.core.usecase;
 
-import com.iCritic.users.core.model.EmailResetRequest;
+import com.iCritic.users.core.enums.NotificationContentEnum;
 import com.iCritic.users.core.model.User;
-import com.iCritic.users.core.usecase.boundary.PostEmailResetRequestMessageBoundary;
+import com.iCritic.users.core.usecase.boundary.FindUserByEmailBoundary;
 import com.iCritic.users.core.usecase.boundary.UpdateUserBoundary;
 import com.iCritic.users.exception.ResourceConflictException;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +11,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+
+import static java.util.Objects.nonNull;
 
 @Service
 @RequiredArgsConstructor
@@ -20,9 +24,11 @@ public class EmailResetRequestUseCase {
 
     private final FindUserByIdUseCase findUserByIdUseCase;
 
+    private final FindUserByEmailBoundary findUserByEmailBoundary;
+
     private final UpdateUserBoundary updateUserBoundary;
 
-    private final PostEmailResetRequestMessageBoundary postEmailResetRequestMessageBoundary;
+    private final SendEmailNotificationUseCase sendEmailNotificationUseCase;
 
     private final BCryptPasswordEncoder bcrypt;
 
@@ -30,6 +36,12 @@ public class EmailResetRequestUseCase {
         log.info("Requesting email reset for user with id: [{}]", id);
 
         User user = findUserByIdUseCase.execute(id);
+
+        User isUserDuplicated = findUserByEmailBoundary.execute(newEmail);
+
+        if (nonNull(isUserDuplicated)) {
+            throw new ResourceConflictException("User email already exists");
+        }
 
         if (user.getEmail().equals(newEmail)) {
             log.info("User with id: [{}] already has the new email: [{}]", id, newEmail);
@@ -45,12 +57,10 @@ public class EmailResetRequestUseCase {
 
         updateUserBoundary.execute(user);
 
-        EmailResetRequest emailResetRequest = EmailResetRequest.builder()
-                        .userId(user.getId())
-                        .email(user.getNewEmailReset())
-                        .emailResetHash(emailResetHash)
-                        .build();
+        Map<String, String> notificationBodyVariables = new HashMap<>();
+        notificationBodyVariables.put("userId", user.getId().toString());
+        notificationBodyVariables.put("emailResetHash", emailResetHash);
 
-        postEmailResetRequestMessageBoundary.execute(emailResetRequest);
+        sendEmailNotificationUseCase.execute(user.getId(), user.getNewEmailReset(), NotificationContentEnum.EMAIL_RESET_REQUEST ,notificationBodyVariables);
     }
 }

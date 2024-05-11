@@ -118,7 +118,7 @@ public class AuthResource {
 
         passwordResetRequestUseCase.execute(userRequestDto.getEmail());
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping(path = "/reset-password")
@@ -130,7 +130,7 @@ public class AuthResource {
 
         passwordResetUseCase.execute(passwordResetData.getEmail(), passwordResetData.getPasswordResetHash(), passwordResetData.getPassword());
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping(path = "/reset-email")
@@ -142,7 +142,7 @@ public class AuthResource {
 
         emailResetUseCase.execute(emailResetData.getUserId(), emailResetData.getEmailResetHash());
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping(path = "/auth/token/validate")

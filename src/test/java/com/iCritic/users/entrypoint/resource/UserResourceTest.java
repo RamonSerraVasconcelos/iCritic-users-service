@@ -219,7 +219,7 @@ class UserResourceTest {
 
         verify(updateUserPictureUseCase).execute(any(), any(), any());
         assertNotNull(response);
-        assertEquals(response.getStatusCode(), HttpStatus.OK);
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
 
     @Test
@@ -331,7 +331,7 @@ class UserResourceTest {
         verify(passwordChangeUseCase).execute(any(), any(), any(), any());
 
         assertNotNull(response);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
 
     @Test

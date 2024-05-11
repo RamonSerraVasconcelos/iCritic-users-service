@@ -1,10 +1,10 @@
 package com.iCritic.users.core.usecase;
 
+import com.iCritic.users.core.enums.NotificationContentEnum;
 import com.iCritic.users.core.fixture.UserFixture;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.boundary.DeleteUserRefreshTokensBoundary;
 import com.iCritic.users.core.usecase.boundary.FindUserByEmailBoundary;
-import com.iCritic.users.core.usecase.boundary.PostPasswordResetMessageBoundary;
 import com.iCritic.users.core.usecase.boundary.UpdateUserBoundary;
 import com.iCritic.users.entrypoint.fixture.PasswordResetDataFixture;
 import com.iCritic.users.entrypoint.entity.PasswordResetData;
@@ -36,10 +36,10 @@ class PasswordResetUseCaseTest {
     private UpdateUserBoundary updateUserBoundary;
 
     @Mock
-    private PostPasswordResetMessageBoundary postPasswordResetMessageBoundary;
+    private DeleteUserRefreshTokensBoundary deleteUserRefreshTokensBoundary;
 
     @Mock
-    private DeleteUserRefreshTokensBoundary deleteUserRefreshTokensBoundary;
+    private SendEmailNotificationUseCase sendEmailNotificationUseCase;
 
     @Mock
     private BCryptPasswordEncoder bcrypt;
@@ -59,9 +59,9 @@ class PasswordResetUseCaseTest {
         verify(findUserByEmailBoundary).execute(passwordResetData.getEmail());
         verify(bcrypt).matches(passwordResetData.getPasswordResetHash(), "test");
         verify(bcrypt).matches(passwordResetData.getPassword(), "test");
-        verify(postPasswordResetMessageBoundary).execute(user.getId(), user.getEmail());
         verify(updateUserBoundary).execute(user);
         verify(deleteUserRefreshTokensBoundary).execute(user.getId());
+        verify(sendEmailNotificationUseCase).execute(user.getId(), user.getEmail(), NotificationContentEnum.PASSWORD_RESET, null);
     }
 
     @Test
@@ -72,9 +72,9 @@ class PasswordResetUseCaseTest {
         assertThrows(ResourceViolationException.class, () -> passwordResetUseCase.execute(passwordResetData.getEmail(), passwordResetData.getPasswordResetHash(), passwordResetData.getPassword()));
         verify(findUserByEmailBoundary).execute(passwordResetData.getEmail());
         verifyNoInteractions(bcrypt);
-        verifyNoInteractions(postPasswordResetMessageBoundary);
         verifyNoInteractions(updateUserBoundary);
         verifyNoInteractions(deleteUserRefreshTokensBoundary);
+        verifyNoInteractions(sendEmailNotificationUseCase);
     }
 
     @Test
@@ -85,9 +85,9 @@ class PasswordResetUseCaseTest {
         assertThrows(ResourceViolationException.class, () -> passwordResetUseCase.execute(passwordResetData.getEmail(), passwordResetData.getPasswordResetHash(), passwordResetData.getPassword()));
         verify(findUserByEmailBoundary).execute(passwordResetData.getEmail());
         verifyNoInteractions(bcrypt);
-        verifyNoInteractions(postPasswordResetMessageBoundary);
         verifyNoInteractions(updateUserBoundary);
         verifyNoInteractions(deleteUserRefreshTokensBoundary);
+        verifyNoInteractions(sendEmailNotificationUseCase);
     }
 
     @Test
@@ -102,9 +102,9 @@ class PasswordResetUseCaseTest {
         assertThrows(ResourceViolationException.class, () -> passwordResetUseCase.execute(passwordResetData.getEmail(), passwordResetData.getPasswordResetHash(), passwordResetData.getPassword()));
         verify(findUserByEmailBoundary).execute(passwordResetData.getEmail());
         verify(bcrypt).matches(passwordResetData.getPasswordResetHash(), "test");
-        verifyNoInteractions(postPasswordResetMessageBoundary);
         verifyNoInteractions(updateUserBoundary);
         verifyNoInteractions(deleteUserRefreshTokensBoundary);
+        verifyNoInteractions(sendEmailNotificationUseCase);
     }
 
     @Test
@@ -121,8 +121,8 @@ class PasswordResetUseCaseTest {
         verify(findUserByEmailBoundary).execute(passwordResetData.getEmail());
         verify(bcrypt).matches(passwordResetData.getPasswordResetHash(), "test");
         verify(bcrypt).matches(passwordResetData.getPassword(), "test");
-        verifyNoInteractions(postPasswordResetMessageBoundary);
         verifyNoInteractions(updateUserBoundary);
         verifyNoInteractions(deleteUserRefreshTokensBoundary);
+        verifyNoInteractions(sendEmailNotificationUseCase);
     }
 }

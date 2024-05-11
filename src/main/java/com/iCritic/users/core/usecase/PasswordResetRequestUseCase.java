@@ -1,9 +1,8 @@
 package com.iCritic.users.core.usecase;
 
-import com.iCritic.users.core.model.PasswordResetRequest;
+import com.iCritic.users.core.enums.NotificationContentEnum;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.boundary.FindUserByEmailBoundary;
-import com.iCritic.users.core.usecase.boundary.PostPasswordResetRequestMessageBoundary;
 import com.iCritic.users.core.usecase.boundary.UpdateUserBoundary;
 import com.iCritic.users.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +11,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
@@ -23,9 +24,9 @@ public class PasswordResetRequestUseCase {
 
     private final FindUserByEmailBoundary findUserByEmailBoundary;
 
-    private final PostPasswordResetRequestMessageBoundary postPasswordResetRequestMessageBoundary;
-
     private final UpdateUserBoundary updateUserBoundary;
+
+    private final SendEmailNotificationUseCase sendEmailNotificationUseCase;
 
     private final BCryptPasswordEncoder bcrypt;
 
@@ -45,13 +46,10 @@ public class PasswordResetRequestUseCase {
 
             updateUserBoundary.execute(user);
 
-            PasswordResetRequest passwordResetRequest = PasswordResetRequest.builder()
-                    .userId(user.getId())
-                    .email(user.getEmail())
-                    .passwordResetHash(passwordResetHash)
-                    .build();
+            Map<String, String> notificationBodyVariables = new HashMap<>();
+            notificationBodyVariables.put("passwordResetHash", passwordResetHash);
 
-            postPasswordResetRequestMessageBoundary.execute(passwordResetRequest);
+            sendEmailNotificationUseCase.execute(user.getId(), user.getEmail(), NotificationContentEnum.PASSWORD_RESET_REQUEST, notificationBodyVariables);
         } catch (ResourceNotFoundException e) {
             log.error("User not found with email: {}", email);
         }

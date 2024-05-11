@@ -1,4 +1,4 @@
-package com.iCritic.users.core.model;
+package com.iCritic.users.dataprovider.gateway.kafka.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,8 +11,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class EmailReset {
+public class EmailNotificationMessage {
 
     private Long userId;
+    private String notificationSubjectId;
     private String email;
+    private String subject;
+    private String body;
 }

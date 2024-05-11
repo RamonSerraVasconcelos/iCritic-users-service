@@ -1,10 +1,10 @@
 package com.iCritic.users.core.usecase;
 
+import com.iCritic.users.core.enums.NotificationContentEnum;
 import com.iCritic.users.core.fixture.UserFixture;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.boundary.DeleteUserRefreshTokensBoundary;
 import com.iCritic.users.core.usecase.boundary.FindUserByIdBoundary;
-import com.iCritic.users.core.usecase.boundary.PostPasswordChangeMessageBoundary;
 import com.iCritic.users.core.usecase.boundary.UpdateUserBoundary;
 import com.iCritic.users.exception.ResourceViolationException;
 import org.junit.jupiter.api.Test;
@@ -32,10 +32,10 @@ class PasswordChangeUseCaseTest {
     private UpdateUserBoundary updateUserBoundary;
 
     @Mock
-    private PostPasswordChangeMessageBoundary postPasswordChangeMessageBoundary;
+    private DeleteUserRefreshTokensBoundary deleteUserRefreshTokensBoundary;
 
     @Mock
-    private DeleteUserRefreshTokensBoundary deleteUserRefreshTokensBoundary;
+    private SendEmailNotificationUseCase sendEmailNotificationUseCase;
 
     @Mock
     private BCryptPasswordEncoder bcrypt;
@@ -59,6 +59,7 @@ class PasswordChangeUseCaseTest {
         verify(bcrypt).encode(newPassword);
         verify(updateUserBoundary).execute(user);
         verify(deleteUserRefreshTokensBoundary).execute(user.getId());
+        verify(sendEmailNotificationUseCase).execute(user.getId(), user.getEmail(), NotificationContentEnum.PASSWORD_CHANGE, null);
     }
 
     @Test
@@ -75,8 +76,8 @@ class PasswordChangeUseCaseTest {
         verify(bcrypt).matches("test", "test");
 
         verifyNoInteractions(updateUserBoundary);
-        verifyNoInteractions(postPasswordChangeMessageBoundary);
         verifyNoInteractions(deleteUserRefreshTokensBoundary);
+        verifyNoInteractions(sendEmailNotificationUseCase);
     }
 
     @Test
@@ -95,8 +96,8 @@ class PasswordChangeUseCaseTest {
         verify(bcrypt).matches(newPassword, "test");
 
         verifyNoInteractions(updateUserBoundary);
-        verifyNoInteractions(postPasswordChangeMessageBoundary);
         verifyNoInteractions(deleteUserRefreshTokensBoundary);
+        verifyNoInteractions(sendEmailNotificationUseCase);
 
         assertEquals("The new password cannot be equal to the old one", ex.getMessage());
     }
@@ -117,8 +118,8 @@ class PasswordChangeUseCaseTest {
         verify(bcrypt).matches(newPassword, "test");
 
         verifyNoInteractions(updateUserBoundary);
-        verifyNoInteractions(postPasswordChangeMessageBoundary);
         verifyNoInteractions(deleteUserRefreshTokensBoundary);
+        verifyNoInteractions(sendEmailNotificationUseCase);
 
         assertEquals("Password confirmation does not match", ex.getMessage());
     }

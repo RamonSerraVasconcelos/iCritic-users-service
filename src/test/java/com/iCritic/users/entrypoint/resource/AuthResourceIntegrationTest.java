@@ -221,7 +221,7 @@ class AuthResourceIntegrationTest {
                 .content(requestBody);
 
         mockMvc.perform(requestBuilder)
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
     }
 
     @Test
@@ -254,7 +254,7 @@ class AuthResourceIntegrationTest {
                 .content(requestBody);
 
         mockMvc.perform(requestBuilder)
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
     }
 
     @Test
@@ -287,7 +287,7 @@ class AuthResourceIntegrationTest {
                 .content(requestBody);
 
         mockMvc.perform(requestBuilder)
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
     }
 
     @Test

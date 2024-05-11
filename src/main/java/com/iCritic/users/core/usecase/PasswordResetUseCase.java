@@ -1,9 +1,9 @@
 package com.iCritic.users.core.usecase;
 
+import com.iCritic.users.core.enums.NotificationContentEnum;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.boundary.DeleteUserRefreshTokensBoundary;
 import com.iCritic.users.core.usecase.boundary.FindUserByEmailBoundary;
-import com.iCritic.users.core.usecase.boundary.PostPasswordResetMessageBoundary;
 import com.iCritic.users.core.usecase.boundary.UpdateUserBoundary;
 import com.iCritic.users.exception.ResourceViolationException;
 import lombok.RequiredArgsConstructor;
@@ -24,9 +24,9 @@ public class PasswordResetUseCase {
 
     private final UpdateUserBoundary updateUserBoundary;
 
-    private final PostPasswordResetMessageBoundary postPasswordResetMessageBoundary;
-
     private final DeleteUserRefreshTokensBoundary deleteUserRefreshTokensBoundary;
+
+    private final SendEmailNotificationUseCase sendEmailNotificationUseCase;
 
     private final BCryptPasswordEncoder bcrypt;
 
@@ -60,8 +60,9 @@ public class PasswordResetUseCase {
             user.setPasswordResetDate(null);
 
             updateUserBoundary.execute(user);
-            postPasswordResetMessageBoundary.execute(user.getId(), user.getEmail());
             deleteUserRefreshTokensBoundary.execute(user.getId());
+
+            sendEmailNotificationUseCase.execute(user.getId(), user.getEmail(), NotificationContentEnum.PASSWORD_RESET, null);
         } catch (ResourceViolationException e) {
             log.error("Failed to reset user password with email: [{}]", email, e);
             throw e;

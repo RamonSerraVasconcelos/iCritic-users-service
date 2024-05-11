@@ -1,8 +1,7 @@
 package com.iCritic.users.core.usecase;
 
-import com.iCritic.users.core.model.EmailReset;
+import com.iCritic.users.core.enums.NotificationContentEnum;
 import com.iCritic.users.core.model.User;
-import com.iCritic.users.core.usecase.boundary.PostEmailResetMessageBoundary;
 import com.iCritic.users.core.usecase.boundary.UpdateUserBoundary;
 import com.iCritic.users.exception.ResourceNotFoundException;
 import com.iCritic.users.exception.ResourceViolationException;
@@ -22,7 +21,7 @@ public class EmailResetUseCase {
 
     private final UpdateUserBoundary updateUserBoundary;
 
-    private final PostEmailResetMessageBoundary postEmailResetMessageBoundary;
+    private final SendEmailNotificationUseCase sendEmailNotificationUseCase;
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -42,19 +41,15 @@ public class EmailResetUseCase {
                 throw new ResourceViolationException("Your password reset link has expired");
             }
 
-            EmailReset emailReset = EmailReset.builder()
-                    .userId(user.getId())
-                    .email(user.getEmail())
-                    .build();
-
             user.setEmail(user.getNewEmailReset());
             user.setEmailResetHash(null);
             user.setEmailResetDate(null);
 
             updateUserBoundary.execute(user);
-            postEmailResetMessageBoundary.execute(emailReset);
 
-            log.info("Finished replacing email: [{}] for user with id: [{}]", emailReset.getEmail(), user.getId());
+            log.info("Finished replacing email: [{}] for user with id: [{}]", user.getEmail(), user.getId());
+
+            sendEmailNotificationUseCase.execute(user.getId(), user.getEmail(), NotificationContentEnum.EMAIL_RESET, null);
         } catch (ResourceNotFoundException e) {
             log.error("Error when resetting email for user with id: [{}]", userId, e);
             throw new ResourceViolationException("Invalid request data");

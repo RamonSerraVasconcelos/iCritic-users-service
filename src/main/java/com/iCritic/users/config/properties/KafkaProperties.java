@@ -12,9 +12,5 @@ import org.springframework.context.annotation.Configuration;
 public class KafkaProperties {
 
     private String bootstrapServers;
-    private String passwordResetRequestTopic;
-    private String passwordResetTopic;
-    private String passwordChangeTopic;
-    private String emailResetRequestTopic;
-    private String emailResetTopic;
+    private String emailNotificationTopic;
 }

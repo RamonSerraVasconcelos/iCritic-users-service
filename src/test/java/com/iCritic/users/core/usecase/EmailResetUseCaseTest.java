@@ -1,8 +1,8 @@
 package com.iCritic.users.core.usecase;
 
+import com.iCritic.users.core.enums.NotificationContentEnum;
 import com.iCritic.users.core.fixture.UserFixture;
 import com.iCritic.users.core.model.User;
-import com.iCritic.users.core.usecase.boundary.PostEmailResetMessageBoundary;
 import com.iCritic.users.core.usecase.boundary.UpdateUserBoundary;
 import com.iCritic.users.exception.ResourceNotFoundException;
 import com.iCritic.users.exception.ResourceViolationException;
@@ -35,7 +35,7 @@ class EmailResetUseCaseTest {
     private UpdateUserBoundary updateUserBoundary;
 
     @Mock
-    private PostEmailResetMessageBoundary postEmailResetMessageBoundary;
+    private SendEmailNotificationUseCase sendEmailNotificationUseCase;
 
     @Mock
     private BCryptPasswordEncoder bcrypt;
@@ -55,6 +55,8 @@ class EmailResetUseCaseTest {
         verify(findUserByIdUseCase).execute(user.getId());
         verify(bcrypt).matches(anyString(), anyString());
         verify(updateUserBoundary).execute(any(User.class));
+
+        verify(sendEmailNotificationUseCase).execute(user.getId(), user.getEmail(), NotificationContentEnum.EMAIL_RESET, null);
     }
 
     @Test

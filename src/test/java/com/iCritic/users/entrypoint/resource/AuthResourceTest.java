@@ -204,7 +204,7 @@ class AuthResourceTest {
         ResponseEntity<Void> response = authResource.passwordResetRequest(userRequestDto);
 
         verify(passwordResetRequestUseCase).execute(userRequestDto.getEmail());
-        assertEquals(response.getStatusCode().value(), HttpServletResponse.SC_OK);
+        assertEquals(response.getStatusCode().value(), HttpServletResponse.SC_NO_CONTENT);
     }
 
     @Test
@@ -226,7 +226,7 @@ class AuthResourceTest {
         ResponseEntity<Void> response = authResource.passwordReset(passwordResetData);
 
         verify(passwordResetUseCase).execute(passwordResetData.getEmail(), passwordResetData.getPasswordResetHash(), passwordResetData.getPassword());
-        assertEquals(response.getStatusCode().value(), HttpServletResponse.SC_OK);
+        assertEquals(response.getStatusCode().value(), HttpServletResponse.SC_NO_CONTENT);
     }
 
     @Test
@@ -249,7 +249,7 @@ class AuthResourceTest {
         ResponseEntity<Void> response = authResource.emailReset(emailResetData);
 
         verify(emailResetUseCase).execute(emailResetData.getUserId(), emailResetData.getEmailResetHash());
-        assertEquals(response.getStatusCode().value(), HttpServletResponse.SC_OK);
+        assertEquals(response.getStatusCode().value(), HttpServletResponse.SC_NO_CONTENT);
     }
 
     @Test
