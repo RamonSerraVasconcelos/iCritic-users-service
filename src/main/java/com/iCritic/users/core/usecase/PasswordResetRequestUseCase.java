@@ -1,7 +1,6 @@
 package com.iCritic.users.core.usecase;
 
-import com.iCritic.users.core.enums.NotificationBodyEnum;
-import com.iCritic.users.core.enums.NotificationIdsEnum;
+import com.iCritic.users.core.enums.NotificationContentEnum;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.boundary.FindUserByEmailBoundary;
 import com.iCritic.users.core.usecase.boundary.UpdateUserBoundary;
@@ -31,8 +30,6 @@ public class PasswordResetRequestUseCase {
 
     private final BCryptPasswordEncoder bcrypt;
 
-    private static final String NOTIFICATION_SUBJECT = "Password Reset Request";
-
     public void execute(String email) {
         try {
             User user = findUserByEmailBoundary.execute(email);
@@ -52,8 +49,7 @@ public class PasswordResetRequestUseCase {
             Map<String, String> notificationBodyVariables = new HashMap<>();
             notificationBodyVariables.put("passwordResetHash", passwordResetHash);
 
-            sendEmailNotificationUseCase.execute(user.getId(), user.getEmail(), NotificationIdsEnum.PASSWORD_RESET_REQUEST.getNotificationId(),
-                    NOTIFICATION_SUBJECT, NotificationBodyEnum.PASSWORD_RESET_REQUEST, notificationBodyVariables);
+            sendEmailNotificationUseCase.execute(user.getId(), user.getEmail(), NotificationContentEnum.PASSWORD_RESET_REQUEST, notificationBodyVariables);
         } catch (ResourceNotFoundException e) {
             log.error("User not found with email: {}", email);
         }

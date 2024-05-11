@@ -1,7 +1,6 @@
 package com.iCritic.users.core.usecase;
 
-import com.iCritic.users.core.enums.NotificationBodyEnum;
-import com.iCritic.users.core.enums.NotificationIdsEnum;
+import com.iCritic.users.core.enums.NotificationContentEnum;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.boundary.DeleteUserRefreshTokensBoundary;
 import com.iCritic.users.core.usecase.boundary.FindUserByIdBoundary;
@@ -26,8 +25,6 @@ public class PasswordChangeUseCase {
     private final SendEmailNotificationUseCase sendEmailNotificationUseCase;
 
     private final BCryptPasswordEncoder bcrypt;
-
-    private static final String NOTIFICATION_SUBJECT = "Password Reset Request";
 
     public void execute(Long userId, String currentPassword, String newPassword, String newPasswordConfirmation) {
         try {
@@ -56,8 +53,7 @@ public class PasswordChangeUseCase {
             updateUserBoundary.execute(user);
             deleteUserRefreshTokensBoundary.execute(user.getId());
 
-            sendEmailNotificationUseCase.execute(user.getId(), user.getEmail(), NotificationIdsEnum.PASSWORD_CHANGE.getNotificationId(),
-                    NOTIFICATION_SUBJECT, NotificationBodyEnum.PASSWORD_CHANGE, null);
+            sendEmailNotificationUseCase.execute(user.getId(), user.getEmail(), NotificationContentEnum.PASSWORD_CHANGE, null);
         } catch (Exception e) {
             log.error("Error changing password for user with id: [{}]", userId, e);
             throw e;

@@ -1,7 +1,6 @@
 package com.iCritic.users.core.usecase;
 
-import com.iCritic.users.core.enums.NotificationBodyEnum;
-import com.iCritic.users.core.enums.NotificationIdsEnum;
+import com.iCritic.users.core.enums.NotificationContentEnum;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.boundary.UpdateUserBoundary;
 import com.iCritic.users.exception.ResourceNotFoundException;
@@ -25,8 +24,6 @@ public class EmailResetUseCase {
     private final SendEmailNotificationUseCase sendEmailNotificationUseCase;
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    private static final String NOTIFICATION_SUBJECT = "Email Reset Notification";
 
     public void execute(Long userId, String emailResetHash) {
         try {
@@ -52,8 +49,7 @@ public class EmailResetUseCase {
 
             log.info("Finished replacing email: [{}] for user with id: [{}]", user.getEmail(), user.getId());
 
-            sendEmailNotificationUseCase.execute(user.getId(), user.getEmail(), NotificationIdsEnum.EMAIL_RESET.getNotificationId(),
-                    NOTIFICATION_SUBJECT, NotificationBodyEnum.EMAIL_RESET, null);
+            sendEmailNotificationUseCase.execute(user.getId(), user.getEmail(), NotificationContentEnum.EMAIL_RESET, null);
         } catch (ResourceNotFoundException e) {
             log.error("Error when resetting email for user with id: [{}]", userId, e);
             throw new ResourceViolationException("Invalid request data");

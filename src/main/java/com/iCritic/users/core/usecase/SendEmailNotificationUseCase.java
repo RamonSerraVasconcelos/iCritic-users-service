@@ -1,6 +1,6 @@
 package com.iCritic.users.core.usecase;
 
-import com.iCritic.users.core.enums.NotificationBodyEnum;
+import com.iCritic.users.core.enums.NotificationContentEnum;
 import com.iCritic.users.core.model.EmailNotification;
 import com.iCritic.users.core.usecase.boundary.SendEmailNotificationBoundary;
 import com.iCritic.users.core.utils.NotificationUtils;
@@ -17,16 +17,15 @@ public class SendEmailNotificationUseCase {
 
     private final SendEmailNotificationBoundary sendEmailNotificationBoundary;
 
-    public void execute(Long userId, String email, String subjectId, String subject, NotificationBodyEnum bodyTemplate, Map<String, String> variables) {
-        log.info("Sending email notification to user [{}] with subject id: [{}]", userId, subjectId);
+    public void execute(Long userId, String email, NotificationContentEnum notificationContentEnum, Map<String, String> variables) {
+        log.info("Sending email notification to user [{}] with subject id: [{}]", userId, notificationContentEnum.getNotificationId());
 
-        String body = NotificationUtils.replaceVariables(bodyTemplate.getNotificationBodyTemplate(), variables);
+        String body = NotificationUtils.replaceVariables(notificationContentEnum.getBodyTemplate(), variables);
 
         EmailNotification emailNotification = new EmailNotification();
         emailNotification.setUserId(userId);
-        emailNotification.setNotificationSubjectId(subjectId);
         emailNotification.setEmail(email);
-        emailNotification.setSubject(subject);
+        emailNotification.setNotificationContentEnum(notificationContentEnum);
         emailNotification.setBody(body);
 
         sendEmailNotificationBoundary.execute(emailNotification);

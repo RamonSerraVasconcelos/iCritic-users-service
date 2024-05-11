@@ -15,9 +15,7 @@ public class SendEmailNotificationGateway implements SendEmailNotificationBounda
     private final SendEmailNotificationProducer sendEmailNotificationProducer;
 
     public void execute(EmailNotification emailNotification) {
-        EmailNotificationMessageMapper mapper = EmailNotificationMessageMapper.INSTANCE;
-
-        EmailNotificationMessage emailNotificationMessage = mapper.emailNotificationToEmailNotificationMessage(emailNotification);
+        EmailNotificationMessage emailNotificationMessage = EmailNotificationMessageMapper.emailNotificationToEmailNotificationMessage(emailNotification);
 
         sendEmailNotificationProducer.execute(emailNotificationMessage);
     }

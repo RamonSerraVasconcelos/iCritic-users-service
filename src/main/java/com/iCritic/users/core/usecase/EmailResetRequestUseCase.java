@@ -1,7 +1,6 @@
 package com.iCritic.users.core.usecase;
 
-import com.iCritic.users.core.enums.NotificationBodyEnum;
-import com.iCritic.users.core.enums.NotificationIdsEnum;
+import com.iCritic.users.core.enums.NotificationContentEnum;
 import com.iCritic.users.core.model.User;
 import com.iCritic.users.core.usecase.boundary.FindUserByEmailBoundary;
 import com.iCritic.users.core.usecase.boundary.UpdateUserBoundary;
@@ -33,8 +32,6 @@ public class EmailResetRequestUseCase {
 
     private final BCryptPasswordEncoder bcrypt;
 
-    private final String NOTIFICATION_SUBJECT = "Email Reset Request";
-
     public void execute(Long id, String newEmail) {
         log.info("Requesting email reset for user with id: [{}]", id);
 
@@ -64,7 +61,6 @@ public class EmailResetRequestUseCase {
         notificationBodyVariables.put("userId", user.getId().toString());
         notificationBodyVariables.put("emailResetHash", emailResetHash);
 
-        sendEmailNotificationUseCase.execute(user.getId(), user.getNewEmailReset(), NotificationIdsEnum.EMAIL_RESET_REQUEST.getNotificationId(),
-                NOTIFICATION_SUBJECT, NotificationBodyEnum.EMAIL_RESET_REQUEST, notificationBodyVariables);
+        sendEmailNotificationUseCase.execute(user.getId(), user.getNewEmailReset(), NotificationContentEnum.EMAIL_RESET_REQUEST ,notificationBodyVariables);
     }
 }
