@@ -15,6 +15,8 @@ public class FindUserByIdUseCase {
     private final FindUserByIdBoundary findUserByIdBoundary;
 
     public User execute(Long id) {
+        log.info("Finding user with id: [{}]", id);
+
         try {
             return findUserByIdBoundary.execute(id);
         } catch (ResourceNotFoundException e) {
