@@ -32,6 +32,8 @@ public class InvalidatePaginationCache {
             nextCursor = scanResult.getCursor();
         } while (!nextCursor.equals("0"));
 
-        jedis.del(keysToDelete.toArray(new String[0]));
+        if (!keysToDelete.isEmpty()) {
+            jedis.del(keysToDelete.toArray(new String[0]));
+        }
     }
 }
