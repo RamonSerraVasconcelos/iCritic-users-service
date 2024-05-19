@@ -31,6 +31,8 @@ public class CreateUserUseCase {
     private final BCryptPasswordEncoder bcrypt;
 
     public User execute(User user) {
+        log.info("Creating user with name: [{}]", user.getName());
+
         User isUserDuplicated = findUserByEmailBoundary.execute(user.getEmail());
 
         if (nonNull(isUserDuplicated)) {
